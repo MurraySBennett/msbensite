@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Murray S. Bennett - Teaching Experience</title>
+    <!-- Link to Google Fonts for the clean body text (load first) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Link to Google Fonts for the retro arcade style (load second) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Link to your custom CSS file -->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Link to Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <header>
+      <!-- <h1>My Research Arcade!</h1> -->
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="research.html">Research</a></li>
+          <li><a href="experiments.html">Experiment Demos</a></li>
+          <li><a href="teaching.html" class="active">Teaching</a></li>
+          <li><a href="cv.html">CV</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="container">
+      <section id="teaching-experience">
+        <h2 style="text-align: center">Teaching Experience</h2>
+        <p style="text-align: center">
+          A summary of my teaching roles and contributions.<br />
+          <!-- <a
+            href="./assets/downloadables/teaching_portfolioMSB.pdf"
+            target="_blank"
+            >Download my teaching portfolio</a
+          > -->
+        </p>
+
+        <hr />
+        <div>
+          <h1>Teaching Philosophy</h1>
+          <p>
+            My teaching philosophy is centered around fostering an engaging and
+            inclusive learning environment that encourages critical thinking and
+            active participation. I believe in the importance of adapting my
+            teaching methods to accommodate diverse learning styles and
+            backgrounds, ensuring that all students feel valued and supported.
+            Through interactive discussions, hands-on activities, and real-world
+            applications, I aim to make complex concepts accessible and
+            relevant, empowering students to develop a deep understanding of the
+            subject matter.
+          </p>
+        </div>
+
+        <details open>
+          <summary>Course Instructor</summary>
+          <div class="teaching-entry">
+            <p style="margin-bottom: 0.5em">
+              <strong>Introduction to Psychology</strong>
+              <br /><em>University of Texas at San Antonio (Fall 2024)</em>
+            </p>
+            <p>
+              Introduction to the study of and scientific approaches to
+              attention, sensation, perception, emotion, motivation, learning,
+              memory, problem solving, personality, mental and behavioural
+              development, abnormal behaviour, and social behaviour in group
+              settings.
+            </p>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Lab Demonstrator and Grader</summary>
+          <div class="teaching-entry">
+            <p>
+              <strong>Psychology Graded Honours Thesis</strong><br />
+              <em>University of Newcastle (2021)</em>
+            </p>
+            <p>
+              Graded honours theses for students in the School of Psychology
+            </p>
+          </div>
+          <div class="teaching-entry">
+            <p style="margin-bottom: 0.5em">
+              <strong>Advanced Research Methods & Design</strong><br />
+              <em>University of Newcastle (2021)</em>
+            </p>
+            <p>
+              Honours level course covering a advanced statistical techniques
+              and research methodology relevant to the projects undertaken by
+              students at this level, such as analytic strategy, design
+              planning, data handling, and Bayesian analysis.
+            </p>
+          </div>
+          <div class="teaching-entry">
+            <p style="margin-bottom: 0.5em">
+              <strong>Cognitive Psychology</strong><br />
+              <em>University of Newcastle (2019-2020)</em>
+            </p>
+            <p>
+              Examination of psychological processes such as attention, memory,
+              word recognition, reasoning and problem solving. Laboratory
+              exercises are used to demonstrate these basic psychological
+              processes.
+            </p>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <footer>
+      <p>
+        <a href="mailto:bennett.1755@osu.edu"
+          ><i class="fas fa-envelope"></i> Email</a
+        >
+        |
+        <a href="https://orcid.org/0000-0001-7309-4915" target="_blank"
+          ><i class="fab fa-orcid"></i> ORCID</a
+        >
+        |
+        <a href="https://github.com/MurraySBennett" target="_blank"
+          ><i class="fab fa-github"></i> GitHub</a
+        >
+      </p>
+      <p>&copy; <span id="current-year"></span> Murray S. Bennett</p>
+    </footer>
+
+    <script>
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+    </script>
+  </body>
+</html>

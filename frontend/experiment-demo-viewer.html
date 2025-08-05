@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Experiment Demo - Murray S. Bennett</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <header>
+      <!-- <h1>My Research Arcade!</h1> -->
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="research.html">Research</a></li>
+          <li>
+            <a href="experiments.html" class="active">Experiment Demos</a>
+          </li>
+          <li><a href="teaching.html">Teaching</a></li>
+          <li><a href="cv.html">CV</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="container">
+      <section id="demo-viewer-content">
+        <h2 id="demo-title">Loading Demo...</h2>
+        <hr />
+        <br />
+        <div
+          id="demo-area"
+          style="
+            min-height: 650px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <!-- The specific demo's HTML will be loaded here -->
+          <p>Please wait while the demo loads...</p>
+        </div>
+        <div
+          id="demo-error"
+          style="display: none; color: red; text-align: center"
+        >
+          <p>Error loading demo. Please check the URL or try again later.</p>
+        </div>
+        <br />
+        <hr />
+        <p>
+          <a href="experiments.html"
+            ><i class="fas fa-arrow-left"></i> Back to Experiment Demos</a
+          >
+        </p>
+      </section>
+    </div>
+
+    <footer>
+      <p>
+        <a href="mailto:bennett.1755@osu.edu"
+          ><i class="fas fa-envelope"></i> Email</a
+        >
+        |
+        <a href="https://orcid.org/0000-0001-7309-4915" target="_blank"
+          ><i class="fab fa-orcid"></i> ORCID</a
+        >
+        |
+        <a href="https://github.com/MurraySBennett" target="_blank"
+          ><i class="fab fa-github"></i> GitHub</a
+        >
+      </p>
+      <p>&copy; <span id="current-year"></span> Murray S. Bennett</p>
+    </footer>
+
+    <!-- Link to the JavaScript file that will load the specific demo -->
+    <script src="js/experiment-demo-loader.js"></script>
+    <script>
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+    </script>
+  </body>
+</html>

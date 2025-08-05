@@ -1,0 +1,194 @@
+[
+  {
+    "id": "censoring-accumulator-models",
+    "title": "Censoring Accumulator Models",
+    "category": "Cognitive Modeling & Decision Science",
+    "summary": "Examining censoring methods for response time data in evidence accumulation models (EAMs) to improve the accuracy and interpretability of cognitive insights. This project delves into how different approaches to handling response time outliers impact model parameter estimation and theoretical conclusions.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Censoring+EAMs",
+    "background": "Evidence Accumulation Models (EAMs) are powerful tools for understanding cognitive processes underlying decision-making, particularly when analyzing response time and accuracy data. However, real-world response time data often contains 'outliers' or 'censored' observations (e.g., very fast guesses, very slow responses due to distraction). The method used to handle these observations can significantly influence model parameter estimates and, consequently, the psychological interpretations drawn from the model. This project systematically investigates various censoring techniques and their effects on model fit and parameter recovery.",
+    "analyses": [
+      "Simulations comparing parameter recovery under different censoring methods (e.g., fixed cutoff, quantile-based, likelihood-based).",
+      "Application of optimal censoring methods to empirical datasets to demonstrate improved model fit and more robust parameter estimates.",
+      "Comparison of model-based inferences (e.g., drift rate, boundary separation) across different censoring strategies."
+    ],
+    "interactive_demo_link": "",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "confidnet",
+    "title": "ConfidNet: Confidence Estimation for Melanoma Classification",
+    "category": "Human-AI Collaboration & Machine Learning",
+    "summary": "Generating and evaluating confidence estimates for melanoma classification from AI models, focusing on how these estimates can foster more robust and transparent human-AI collaboration in medical diagnosis.",
+    "image": "https://placehold.co/600x400/FF69B4/FFF?text=ConfidNet",
+    "background": "In critical domains like medical diagnosis, AI systems are increasingly used to assist human experts. However, for effective collaboration, humans need to understand not just an AI's prediction, but also its confidence in that prediction. This project develops and evaluates novel methods for generating reliable confidence estimates from Convolutional Neural Networks (CNNs) for melanoma classification. The goal is to provide human dermatologists with actionable insights into the AI's internal state, enabling better-informed decisions and appropriate trust calibration.",
+    "analyses": [
+      "Development of post-hoc calibration techniques for CNN confidence scores.",
+      "Evaluation of confidence metrics (e.g., Expected Calibration Error, Brier Score) on diverse melanoma datasets.",
+      "Analysis of human trust and reliance on AI predictions based on provided confidence levels."
+    ],
+    "interactive_demo_link": "interactive-confidnet-analysis.html",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "cdnn-knn",
+    "title": "Decisions from a CDNN based on kNN Similarity Metrics",
+    "category": "Human-AI Collaboration & Machine Learning",
+    "summary": "Analyzing decisions from a CDNN (Convolutional Deep Neural Network) based on kNN (k-Nearest Neighbors) similarity metrics across various activation layers, providing insights into AI's internal representations for melanoma identification.",
+    "image": "https://placehold.co/600x400/FF69B4/FFF?text=CDNN+kNN+Similarity",
+    "background": "Understanding how deep neural networks make decisions is crucial for their deployment in high-stakes applications. This project explores the internal representations learned by a CDNN trained for melanoma classification by applying k-Nearest Neighbors similarity metrics to activation layers. By examining which training examples are 'nearest' to a given test image in different layers' feature spaces, we can gain insights into the features the network prioritizes at various stages of processing, thereby enhancing AI transparency.",
+    "analyses": [
+      "Visualization of kNN neighbors in different CDNN layers for melanoma and benign lesions.",
+      "Quantification of feature similarity changes across layers and their correlation with final classification decisions.",
+      "Identification of 'critical features' that drive CDNN decisions through kNN analysis."
+    ],
+    "interactive_demo_link": "interactive-cdnn-knn.html",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "discrete-choice-rating",
+    "title": "Discrete Choice vs. Rating Scale Decision Elicitation",
+    "category": "Cognitive Modeling & Decision Science",
+    "summary": "Comparing discrete choice and rating scale decision elicitation methods using ground-truth perceptual stimuli, with implications for understanding human perception and decision-making processes.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Discrete+vs+Rating",
+    "background": "In psychological research, decisions are often collected using either discrete choices (e.g., 'yes' or 'no') or rating scales (e.g., '1-7 confidence'). This project investigates whether these different elicitation methods yield equivalent insights into underlying perceptual and decision processes, especially when ground-truth stimuli are available. Using carefully controlled perceptual tasks, we compare the sensitivity, bias, and consistency of data obtained from discrete choice versus rating scale paradigms, informing best practices for experimental design.",
+    "analyses": [
+      "Signal Detection Theory (SDT) analysis comparing sensitivity (d') and bias (c) across elicitation methods.",
+      "Cognitive modeling (e.g., diffusion model) applied to both discrete and rating data to assess parameter consistency.",
+      "Analysis of response time distributions for both decision types."
+    ],
+    "interactive_demo_link": "",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "dutch-auction",
+    "title": "Competitive Decision Making in Dutch Auctions",
+    "category": "Cognitive Modeling & Decision Science",
+    "summary": "Examining competitive decision making in Dutch auctions among groups through the lens of Prospect Theory and other cognitive models, focusing on factors influencing group performance and individual bidding strategies.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Dutch+Auction",
+    "background": "Dutch auctions, where prices decrease until a bidder claims the item, offer a unique setting to study competitive decision-making under uncertainty. This project investigates how individuals and groups behave in these auctions, particularly focusing on the role of risk perception and framing effects as described by Prospect Theory. We analyze bidding patterns, response times, and group dynamics to understand the cognitive mechanisms driving decisions in high-stakes, competitive environments.",
+    "analyses": [
+      "Modeling individual bidding behavior using Prospect Theory parameters.",
+      "Analysis of group coordination and emergent strategies.",
+      "Comparison of individual vs. group performance efficiency in various auction conditions."
+    ],
+    "interactive_demo_link": "interactive-dutch-auction-analysis.html",
+    "experiment_demo_link": "experiments-dutch-auction.html",
+    "osf_link": ""
+  },
+  {
+    "id": "noisy-grt",
+    "title": "Noisy General Recognition Theory (GRT)",
+    "category": "Cognitive Modeling & Decision Science",
+    "summary": "Developing General Recognition Theory (GRT) models that explicitly incorporate noise and dimensional collapse, providing a more nuanced understanding of perceptual decision-making, particularly relevant for complex stimuli like medical images.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Noisy+GRT",
+    "background": "General Recognition Theory (GRT) is a powerful framework for modeling multidimensional perceptual decision-making. However, real-world perception often involves inherent noise and the 'collapse' of information across dimensions (i.g., ignoring irrelevant features). This project extends traditional GRT models to account for these complexities, leading to more accurate descriptions of human perceptual processes, especially in tasks involving high-dimensional stimuli like dermatological images where subtle features are critical but can be noisy or correlated.",
+    "analyses": [
+      "Mathematical derivation and implementation of GRT models with noise and dimensional collapse parameters.",
+      "Goodness-of-fit analysis comparing noisy GRT to traditional GRT on simulated and empirical data.",
+      "Interpretation of noise and dimensional collapse parameters in the context of perceptual expertise."
+    ],
+    "interactive_demo_link": "",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "wheel-of-fortune",
+    "title": "Wheel of Fortune: Unbiased Mental Representations",
+    "category": "Cognitive Modeling & Decision Science",
+    "summary": "Examining unbiased mental representations of symbolic numerals, using a 'Wheel of Fortune' paradigm to investigate how humans process and represent numerical information without explicit biases.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Wheel+of+Fortune",
+    "background": "Numerical cognition research often explores how humans represent and use numbers. This project utilizes a modified 'Wheel of Fortune' task to probe the underlying mental representations of symbolic numerals (e.g., digits). By manipulating the task structure, we aim to uncover whether these representations are inherently unbiased or if they are influenced by contextual factors and cognitive heuristics. The findings contribute to our understanding of fundamental numerical processing and decision-making.",
+    "analyses": [
+      "Analysis of response distributions and biases in numerical estimation.",
+      "Modeling of underlying mental number line representations.",
+      "Comparison of performance across different numerical ranges and presentation formats."
+    ],
+    "interactive_demo_link": "",
+    "experiment_demo_link": "experiments-wheel-of-fortune.html",
+    "osf_link": ""
+  },
+  {
+    "id": "abc-feature-rating",
+    "title": "ABC Feature Rating for Melanoma Identification",
+    "category": "Perception & Applied Vision (Melanoma Identification)",
+    "summary": "Developing a continuous quantitative measure of the perceptual strength of shape asymmetry, border irregularity, and color variance (ABC features) for melanoma identification, crucial for both human and AI diagnostic accuracy.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=ABC+Features",
+    "background": "The ABCDE rule (Asymmetry, Border irregularity, Color variance, Diameter, Evolving) is a widely used mnemonic for melanoma detection. This project focuses on the 'ABC' features, aiming to develop a continuous, quantitative method for rating their perceptual strength. This goes beyond simple binary presence/absence and provides a more fine-grained measure that can be used to train human experts, evaluate AI systems, and improve the consistency of dermatological assessments.",
+    "analyses": [
+      "Development and validation of a psychophysical rating scale for ABC features.",
+      "Correlation analysis between subjective ABC ratings and objective image metrics.",
+      "Assessment of inter-rater reliability for the continuous ABC rating system."
+    ],
+    "interactive_demo_link": "interactive-abc-feature-rating.html",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "abc-feature-interactions",
+    "title": "ABC Feature Interactions in Melanoma Identification",
+    "category": "Perception & Applied Vision (Melanoma Identification)",
+    "summary": "Evaluating perceptual interactions among ABC features in melanoma identification, investigating how the combination of asymmetry, border irregularity, and color variance influences diagnostic judgments.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=ABC+Interactions",
+    "background": "While individual ABC features are important for melanoma detection, real-world lesions present a complex interplay of these characteristics. This project specifically examines how human perception integrates and weighs these features when they appear in combination. Understanding these perceptual interactions is critical for improving diagnostic training, developing more effective decision aids, and creating AI systems that align with human perceptual expertise.",
+    "analyses": [
+      "Experimental design to manipulate combinations of ABC features.",
+      "Analysis of human judgments (e.g., malignancy ratings, confidence) in response to interacting features.",
+      "Cognitive modeling (e.g., General Recognition Theory) to quantify the independence or integration of feature processing."
+    ],
+    "interactive_demo_link": "interactive-abc-interactions.html",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "melnet-training",
+    "title": "MelNet: Training Human Perceptual Expertise",
+    "category": "Human-AI Collaboration & Machine Learning",
+    "summary": "Training human perceptual expertise using CDNN (Convolutional Deep Neural Network) activations, aiming to transfer AI insights to human learners for improved melanoma identification.",
+    "image": "https://placehold.co/600x400/FF69B4/FFF?text=MelNet+Training",
+    "background": "While AI excels at complex pattern recognition, transferring its learned 'expertise' to humans remains a challenge. This project explores a novel approach where human learners are trained using visual feedback derived directly from the activation patterns of a CDNN trained for melanoma identification. The goal is to investigate whether exposing humans to the features that an AI 'sees' can accelerate and enhance their own perceptual learning, creating a synergistic human-AI training paradigm.",
+    "analyses": [
+      "Design and implementation of a human training paradigm using CDNN activation visualizations.",
+      "Evaluation of human diagnostic accuracy and confidence pre- and post-training.",
+      "Analysis of how human perceptual strategies change after AI-guided training."
+    ],
+    "interactive_demo_link": "",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "team-spirit",
+    "title": "Team Spirit: Evaluating Group Performance Efficiency",
+    "category": "Human-AI Collaboration & Machine Learning",
+    "summary": "Evaluating group performance efficiency among human and human-machine teams, focusing on the dynamics and factors that contribute to optimal collective decision-making and task execution.",
+    "image": "https://placehold.co/600x400/FF69B4/FFF?text=Team+Spirit",
+    "background": "As AI becomes more integrated into collaborative workflows, understanding the efficiency of human-AI teams is paramount. This project investigates various aspects of group performance, comparing purely human teams with human-machine teams on complex tasks. We examine communication patterns, division of labor, trust dynamics, and overall task efficiency to identify best practices for designing effective human-AI collaborative systems and maximizing collective intelligence.",
+    "analyses": [
+      "Quantitative analysis of team decision accuracy, response times, and resource utilization.",
+      "Qualitative analysis of communication and interaction patterns within teams.",
+      "Development of metrics for 'human-AI team fluency' and 'collective confidence'."
+    ],
+    "interactive_demo_link": "",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  },
+  {
+    "id": "implicit-attitudes",
+    "title": "Implicit Attitudes Task (IAT) Processing Independence",
+    "category": "Cognitive Modeling & Decision Science",
+    "summary": "Empirically testing processing independence in the Implicit Attitudes Task (IAT), a widely used measure in social psychology, to refine our understanding of automatic cognitive processes.",
+    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Implicit+Attitudes",
+    "background": "The Implicit Attitudes Task (IAT) is a cornerstone of implicit social cognition research, designed to measure automatic associations between concepts. A key theoretical assumption underlying the IAT is the independence of different processing components (e.g., target-attribute association vs. response mapping). This project empirically tests this assumption using advanced cognitive modeling techniques and carefully controlled experimental manipulations, contributing to the ongoing debate about the IAT's validity and interpretation.",
+    "analyses": [
+      "Application of process dissociation procedures to IAT data.",
+      "Cognitive modeling (e.g., multinomial processing tree models) to disentangle independent processing components.",
+      "Analysis of how experimental manipulations affect different components of IAT performance."
+    ],
+    "interactive_demo_link": "",
+    "experiment_demo_link": "",
+    "osf_link": ""
+  }
+]

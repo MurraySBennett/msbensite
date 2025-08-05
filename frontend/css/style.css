@@ -1,22 +1,29 @@
 body {
-  font-family: "Inter", sans-serif;
-  background-color: #f0f8ff;
-  color: #333;
+  font-family: "Inter", sans-serif; /* New font for body text */
+  background-color: #f0f8ff; /* AliceBlue - a very soft, light background */
+  color: #333; /* Dark grey for text for good readability */
   margin: 0;
   padding: 0;
   line-height: 1.6;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  overflow-x: hidden;
+  min-height: 100vh; /* Ensures the footer stays at the bottom */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
+/* Headings will keep the retro font */
 h1,
 h2,
 h3 {
   font-family: "Press Start 2P", cursive;
 }
 
+/* Explicitly set all paragraphs to Inter font for readability */
+p {
+  font-family: "Inter", sans-serif;
+}
+
+/* Container for main content to center and limit width */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -76,115 +83,124 @@ nav ul li a {
 
 nav ul li a:hover,
 nav ul li a.active {
-  background-color: #ff69b4;
+  /* 'active' class for the current page */
+  background-color: #ff69b4; /* HotPink - a vibrant pastel */
   color: #fff;
   border-color: #ff69b4;
-  transform: translateY(-3px);
+  transform: translateY(-3px); /* Slight lift effect */
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Main Content Section Styles */
 section {
   padding: 40px 20px;
   margin-bottom: 20px;
-  background-color: #ffffff;
+  background-color: #ffffff; /* Pure white for content blocks */
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 section h2 {
-  color: #6a5acd;
+  color: #6a5acd; /* SlateBlue - a slightly darker pastel purple */
   font-size: 2em;
   margin-bottom: 20px;
   text-align: center;
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles imported from index.html */
 .profile-section {
   display: flex;
   align-items: center;
   gap: 2em;
   margin-bottom: 2em;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 .profile-photo {
   width: 150px;
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #7b68ee;
+  border: 3px solid #7b68ee; /* Using a pastel color from your theme */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 .profile-section h1 {
-  font-size: 2em;
+  font-size: 2em; /* Adjusted for better fit with existing h1 */
   margin-top: 0;
   margin-bottom: 5px;
-  color: #6a5acd;
+  color: #6a5acd; /* SlateBlue */
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
+/* Removed redundant font-family from .profile-section p */
 .profile-section p {
   margin-bottom: 10px;
   font-size: 1em;
   color: #333;
-  font-family: "Inter", sans-serif;
 }
 .research-areas {
   display: flex;
   justify-content: space-around;
-  gap: 25px;
+  gap: 25px; /* Consistent with research-grid gap */
   margin-top: 2em;
   text-align: center;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 .research-card {
-  background-color: #f0f8ff;
-  border: 2px solid #add8e6;
+  background-color: #f0f8ff; /* AliceBlue */
+  border: 2px solid #add8e6; /* LightBlue */
   border-radius: 10px;
   padding: 20px;
   flex: 1;
-  min-width: 280px;
+  min-width: 280px; /* Ensure cards don't get too small */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .research-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  border-color: #ffd700;
+  border-color: #ffd700; /* Gold accent on hover */
 }
 .research-card h3 {
   margin-top: 0;
-  color: #4682b4;
+  color: #4682b4; /* SteelBlue */
   font-size: 1.5em;
   text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
+/* Removed redundant font-family from .research-card p */
 .research-card p {
   font-size: 0.9em;
   color: #555;
-  font-family: "Inter", sans-serif;
 }
 
+/* Placeholder for Research Project Tiles (kept for consistency with initial style.css) */
 .research-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(280px, 1fr)
+  ); /* Responsive grid */
   gap: 25px;
   padding: 20px 0;
 }
 
+/* Footer Styles */
 footer {
-  background-color: #7b68ee;
-  color: #e0ffff;
+  background-color: #7b68ee; /* MediumSlateBlue */
+  color: #e0ffff; /* LightCyan */
   text-align: center;
   padding: 20px 0;
-  margin-top: auto;
-  border-radius: 15px 15px 0 0;
+  margin-top: auto; /* Pushes footer to the bottom */
+  border-radius: 15px 15px 0 0; /* Rounded top corners */
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
 }
 
 footer p {
   margin: 0;
   font-size: 0.9em;
-  font-family: "Inter", sans-serif;
+  /* Removed redundant font-family from footer p */
 }
 
+/* Utility Classes for Responsiveness */
 @media (max-width: 768px) {
   header h1 {
     font-size: 2em;
@@ -196,6 +212,7 @@ footer p {
   nav ul li {
     margin: 10px 0;
   }
+  /* Media queries for responsiveness for new elements */
   .profile-section {
     flex-direction: column;
     text-align: center;
@@ -205,9 +222,45 @@ footer p {
     align-items: center;
   }
   .research-card {
-    width: 90%;
+    width: 90%; /* Make cards take more width on small screens */
   }
   .research-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stack tiles on small screens */
   }
+}
+
+/* Teaching Page Specific Styles */
+details {
+  border: 1px solid #add8e6; /* LightBlue - a soft pastel border */
+  border-radius: 10px; /* Rounded corners for consistency */
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #ffffff; /* White background for the details block */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+details summary {
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+  padding: 5px 0;
+  color: #6a5acd; /* SlateBlue - consistent with section H2s */
+  font-family: "Press Start 2P", cursive; /* Keep summary retro */
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+}
+
+.teaching-entry {
+  margin-bottom: 1.5em;
+  padding: 1em;
+  background-color: #f0f8ff; /* AliceBlue - soft background for entries */
+  border-left: 4px solid #7b68ee; /* MediumSlateBlue - a soft purple accent */
+  border-radius: 5px; /* Rounded corners for entries */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.teaching-entry p {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif; /* Ensure Inter for entry paragraphs */
 }

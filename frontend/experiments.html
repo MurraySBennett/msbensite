@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Murray S. Bennett - Experiment Demos</title>
+    <!-- Link to Google Fonts for the clean body text (load first) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Link to Google Fonts for the retro arcade style (load second) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Link to your custom CSS file -->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Link to Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <header>
+      <h1>My Research Arcade!</h1>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="research.html">Research</a></li>
+          <li>
+            <a href="experiments.html" class="active">Experiment Demos</a>
+          </li>
+          <li><a href="teaching.html">Teaching</a></li>
+          <li><a href="cv.html">CV</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="container">
+      <section id="demos-intro">
+        <h2>Experiment Demos</h2>
+        <p>
+          Welcome to the interactive zone! Here you'll find various experiment
+          demos and interactive visualizations related to my research. Click on
+          a demo tile to launch the experiment or explore the interactive
+          element.
+        </p>
+        <p>
+          These demos are designed to provide a hands-on experience with some of
+          the concepts and methodologies from my projects.
+        </p>
+        <hr />
+      </section>
+
+      <section id="demo-list">
+        <h2>Available Demos</h2>
+        <div class="research-grid">
+          <!-- Example Demo Tile 1: Dutch Auction Experiment -->
+          <a
+            href="experiment-demo-viewer.html?demo=dutch-auction"
+            class="research-tile"
+          >
+            <img
+              src="https://placehold.co/300x200/ADD8E6/4682B4?text=Dutch+Auction+Demo"
+              alt="Dutch Auction Experiment Demo"
+              style="
+                width: 100%;
+                height: auto;
+                border-radius: 5px;
+                margin-bottom: 10px;
+              "
+            />
+            <h3>Dutch Auction Experiment</h3>
+            <p>
+              Participate in a simulated Dutch auction to explore competitive
+              decision-making.
+            </p>
+          </a>
+
+          <!-- Example Demo Tile 2: Wheel of Fortune Experiment -->
+          <a
+            href="experiment-demo-viewer.html?demo=wheel-of-fortune"
+            class="research-tile"
+          >
+            <img
+              src="https://placehold.co/300x200/FF69B4/FFF?text=Wheel+of+Fortune+Demo"
+              alt="Wheel of Fortune Experiment Demo"
+              style="
+                width: 100%;
+                height: auto;
+                border-radius: 5px;
+                margin-bottom: 10px;
+              "
+            />
+            <h3>Wheel of Fortune Experiment</h3>
+            <p>
+              Test your numerical representation in an interactive Wheel of
+              Fortune task.
+            </p>
+          </a>
+
+          <!-- Add more demo tiles here as you develop them -->
+          <a href="#" class="research-tile">
+            <img
+              src="https://placehold.co/300x200/E0FFFF/7B68EE?text=Coming+Soon"
+              alt="New Demo Coming Soon"
+              style="
+                width: 100%;
+                height: auto;
+                border-radius: 5px;
+                margin-bottom: 10px;
+              "
+            />
+            <h3>New Demo</h3>
+            <p>
+              An exciting new interactive experiment is currently under
+              development!
+            </p>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>
+        <a href="mailto:bennett.1755@osu.edu"
+          ><i class="fas fa-envelope"></i> Email</a
+        >
+        |
+        <a href="https://orcid.org/0000-0001-7309-4915" target="_blank"
+          ><i class="fab fa-orcid"></i> ORCID</a
+        >
+        |
+        <a href="https://github.com/MurraySBennett" target="_blank"
+          ><i class="fab fa-github"></i> GitHub</a
+        >
+      </p>
+      <p>&copy; <span id="current-year"></span> Murray S. Bennett</p>
+    </footer>
+
+    <script>
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+    </script>
+  </body>
+</html>
