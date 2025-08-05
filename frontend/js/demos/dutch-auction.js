@@ -338,7 +338,6 @@ const demoHtml = `
                 1px -1px 0 black,   /* Top-right shadow */
                 -1px 1px 0 black,   /* Bottom-left shadow */
                 1px 1px 0 black;    /* Bottom-right shadow */
- 
         }
 
         #start-button:hover, #restart-button:hover {
