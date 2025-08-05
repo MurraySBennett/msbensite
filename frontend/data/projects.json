@@ -68,15 +68,15 @@
     "title": "Competitive Decision Making in Dutch Auctions",
     "category": "Cognitive Modeling & Decision Science",
     "summary": "Examining competitive decision making in Dutch auctions among groups through the lens of Prospect Theory and other cognitive models, focusing on factors influencing group performance and individual bidding strategies.",
-    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Dutch+Auction",
+    "image": "assets/images/project-icons/dutch-auction-demo.png",
     "background": "Dutch auctions, where prices decrease until a bidder claims the item, offer a unique setting to study competitive decision-making under uncertainty. This project investigates how individuals and groups behave in these auctions, particularly focusing on the role of risk perception and framing effects as described by Prospect Theory. We analyze bidding patterns, response times, and group dynamics to understand the cognitive mechanisms driving decisions in high-stakes, competitive environments.",
     "analyses": [
       "Modeling individual bidding behavior using Prospect Theory parameters.",
       "Analysis of group coordination and emergent strategies.",
       "Comparison of individual vs. group performance efficiency in various auction conditions."
     ],
-    "interactive_demo_link": "interactive-dutch-auction-analysis.html",
-    "experiment_demo_link": "experiments-dutch-auction.html",
+    "interactive_demo_link": "",
+    "experiment_demo_link": "experiment-demo-viewer.html?demo=dutch-auction",
     "osf_link": ""
   },
   {
