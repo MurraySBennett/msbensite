@@ -46,12 +46,10 @@ const wheelOfFortuneHtml = `
             margin: 0; /* Remove auto margin here, parent handles centering */
             position: relative; /* For absolute positioning of overlays and buttons */
             min-height: 600px; /* Ensure enough space for the canvases */
-                       /* --- NEW RETRO BORDER STYLES --- */
             border-radius: 0; /* Make edges square */
             border: 4px solid #FFD700; /* Outer orange border */
             box-shadow: 0 0 0 4px #FFA500, /* Inner yellow panel */
                         0 0 0 8px rgb(255, 77, 0); /* Outer red panel (extends beyond the yellow) */
-            /* --- END NEW RETRO BORDER STYLES --- */
         }
 
         #trial-info {
@@ -209,7 +207,6 @@ const wheelOfFortuneHtml = `
                     <h2>Wheel of Fortune Task Demo</h2>
                     <p>Your task is to identify the number displayed in the center, which will be briefly shown and then masked.</p>
                     <p>After the mask, select the number you saw by clicking the corresponding button from the wheel of buttons surrounding the display.</p>
-                    <p>This demo has a simplified number of trials for quick demonstration.</p>
                     <button id="start-demo-button" class="overlay-button">Start Demo</button>
                 </div>
             </div>

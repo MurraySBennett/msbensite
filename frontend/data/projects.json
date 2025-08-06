@@ -86,7 +86,7 @@
     "title": "Wheel of Fortune: Unbiased Mental Representations",
     "category": "Cognitive Modeling & Decision Science",
     "summary": "Examining unbiased mental representations of symbolic numerals, using a 'Wheel of Fortune' paradigm to investigate how humans process and represent numerical information without explicit biases.",
-    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Wheel+of+Fortune",
+    "image": "assets/images/project-icons/wheel-of-fortune-demo.png",
     "background": "Numerical cognition research often explores how humans represent and use numbers. This project utilizes a modified 'Wheel of Fortune' task to probe the underlying mental representations of symbolic numerals (e.g., digits). By manipulating the task structure, we aim to uncover whether these representations are inherently unbiased or if they are influenced by contextual factors and cognitive heuristics. The findings contribute to our understanding of fundamental numerical processing and decision-making.",
     "analyses": [
       "Analysis of response distributions and biases in numerical estimation.",
