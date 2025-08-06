@@ -28,6 +28,10 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Wheel of Fortune Experiment",
       scriptPath: "js/demos/wheel-of-fortune.js",
     },
+    "team-spirit-hh": {
+      title: "Team Spirit: Human Teams",
+      scriptPath: "js/demos/team-spirit-hh.js",
+    },
     // Add more demos here as you create them:
   };
 

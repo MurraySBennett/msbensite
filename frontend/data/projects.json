@@ -146,11 +146,11 @@
     "osf_link": ""
   },
   {
-    "id": "team-spirit",
+    "id": "team-spirit-hh",
     "title": "Team Spirit: Evaluating Group Performance Efficiency",
     "category": "Human-AI Collaboration & Machine Learning",
     "summary": "Evaluating group performance efficiency among human and human-machine teams, focusing on the dynamics and factors that contribute to optimal collective decision-making and task execution.",
-    "image": "https://placehold.co/600x400/FF69B4/FFF?text=Team+Spirit",
+    "image": "asstets/images/project-icons/team-spirit-demo.png",
     "background": "As AI becomes more integrated into collaborative workflows, understanding the efficiency of human-AI teams is paramount. This project investigates various aspects of group performance, comparing purely human teams with human-machine teams on complex tasks. We examine communication patterns, division of labor, trust dynamics, and overall task efficiency to identify best practices for designing effective human-AI collaborative systems and maximizing collective intelligence.",
     "analyses": [
       "Quantitative analysis of team decision accuracy, response times, and resource utilization.",
@@ -158,7 +158,7 @@
       "Development of metrics for 'human-AI team fluency' and 'collective confidence'."
     ],
     "interactive_demo_link": "",
-    "experiment_demo_link": "",
+    "experiment_demo_link": "experiment-demo-viewer.html?demo=team-spirit-hh",
     "osf_link": ""
   },
   {
