@@ -113,6 +113,14 @@ section h2 {
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
 }
 
+section h3 {
+  color: #4682b4; /* SteelBlue - a soft blue for subheadings */
+  font-size: 0.9em;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+}
+
 /* Styles imported from index.html */
 .profile-section {
   display: flex;
@@ -186,6 +194,34 @@ section h2 {
   ); /* Responsive grid */
   gap: 25px;
   padding: 20px 0;
+}
+
+.research-tile {
+  display: block; /* Ensures the link takes up full space */
+  text-decoration: none; /* Remove underline from links */
+  color: inherit; /* Inherit text color from parent */
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.research-tile:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.research-tile img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: block;
+    margin: 0 auto 10px auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Footer Styles */
@@ -269,3 +305,4 @@ details summary {
   padding: 0;
   font-family: "Inter", sans-serif; /* Ensure Inter for entry paragraphs */
 }
+                                                   

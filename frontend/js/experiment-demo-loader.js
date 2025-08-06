@@ -20,6 +20,10 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Dutch Auction Experiment",
       scriptPath: "js/demos/dutch-auction.js",
     },
+    "dc-rs": {
+      title: "Discrete Choice vs Rating Scale Decisions",
+      scriptPath: "js/demos/dc-rs.js",
+    },
     "wheel-of-fortune": {
       title: "Wheel of Fortune Experiment",
       scriptPath: "js/demos/wheel-of-fortune.js",

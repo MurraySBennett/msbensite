@@ -52,15 +52,16 @@
     "title": "Discrete Choice vs. Rating Scale Decision Elicitation",
     "category": "Cognitive Modeling & Decision Science",
     "summary": "Comparing discrete choice and rating scale decision elicitation methods using ground-truth perceptual stimuli, with implications for understanding human perception and decision-making processes.",
-    "image": "https://placehold.co/600x400/ADD8E6/4682B4?text=Discrete+vs+Rating",
+    "image": "assets/images/project-icons/dc-rs-demo.png",
     "background": "In psychological research, decisions are often collected using either discrete choices (e.g., 'yes' or 'no') or rating scales (e.g., '1-7 confidence'). This project investigates whether these different elicitation methods yield equivalent insights into underlying perceptual and decision processes, especially when ground-truth stimuli are available. Using carefully controlled perceptual tasks, we compare the sensitivity, bias, and consistency of data obtained from discrete choice versus rating scale paradigms, informing best practices for experimental design.",
     "analyses": [
       "Signal Detection Theory (SDT) analysis comparing sensitivity (d') and bias (c) across elicitation methods.",
       "Cognitive modeling (e.g., diffusion model) applied to both discrete and rating data to assess parameter consistency.",
       "Analysis of response time distributions for both decision types."
     ],
+    "outcomes": "Preliminary findings suggest that while both methods can capture similar underlying perceptual sensitivities, rating scales may provide richer information about confidence and uncertainty. However, discrete choices tend to be more robust to certain types of noise. These insights have important implications for experimental design in cognitive psychology and related fields.",
     "interactive_demo_link": "",
-    "experiment_demo_link": "",
+    "experiment_demo_link": "experiment-demo-viewer.html?demo=dc-rs",
     "osf_link": ""
   },
   {
@@ -75,6 +76,7 @@
       "Analysis of group coordination and emergent strategies.",
       "Comparison of individual vs. group performance efficiency in various auction conditions."
     ],
+    "outcomes": "Initial results indicate that individuals often deviate from optimal bidding strategies due to loss aversion and risk-seeking behavior in certain contexts. Groups tend to perform better than individuals, likely due to shared information and diverse strategies, but are still influenced by cognitive biases. These findings contribute to our understanding of decision-making in competitive environments and have practical implications for auction design.",
     "interactive_demo_link": "",
     "experiment_demo_link": "experiment-demo-viewer.html?demo=dutch-auction",
     "osf_link": ""

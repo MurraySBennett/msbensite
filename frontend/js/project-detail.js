@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectSummaryElem = document.getElementById("project-summary");
   const projectBackgroundElem = document.getElementById("project-background");
   const projectAnalysesElem = document.getElementById("project-analyses");
+  const projectOutcomesElem = document.getElementById("project-outcomes");
   const projectLinksContainerElem = document.getElementById(
     "project-links-container"
   ); // Container for links section
@@ -30,10 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!projectId) {
       projectTitleElem.textContent = "Project Not Found";
       projectSummaryElem.textContent = "No project ID provided in the URL.";
-      projectBackgroundElem.textContent = ""; // Clear background
-      projectAnalysesElem.innerHTML = ""; // Clear analyses
-      projectImageElem.style.display = "none"; // Hide image
-      projectLinksContainerElem.style.display = "none"; // Hide links container
+      projectBackgroundElem.textContent = "";
+      projectAnalysesElem.innerHTML = "";
+      projectOutcomesElem.innerHTML = "";
+      projectImageElem.style.display = "none";
+      projectLinksContainerElem.style.display = "none";
       return;
     }
 
@@ -49,14 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const project = projects.find((p) => p.id === projectId);
 
       if (project) {
-        // Update the page title
         document.title = `${project.title} - Murray S. Bennett`;
 
-        // Populate the HTML elements with project data
         projectTitleElem.textContent = project.title;
         projectImageElem.src = project.image;
         projectImageElem.alt = `${project.title} Image`;
-        projectImageElem.style.display = "block"; // Ensure image is visible
+        projectImageElem.style.display = "block";
 
         projectSummaryElem.textContent = project.summary;
         projectBackgroundElem.textContent = project.background;
@@ -74,6 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
           li.textContent = "No specific analyses details provided yet.";
           projectAnalysesElem.appendChild(li);
         }
+
+        projectOutcomesElem.textContent = project.outcomes;
 
         // Assume no links initially, then check each one
         let hasLinks = false;
