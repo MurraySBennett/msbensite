@@ -32,6 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Team Spirit: Human Teams",
       scriptPath: "js/demos/team-spirit-hh.js",
     },
+    "mel-features": {
+      title: "Melanoma Lesion Feature Rating",
+      scriptPath: "js/demos/mel-features.js",
+    },
     // Add more demos here as you create them:
   };
 

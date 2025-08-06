@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectImageElem = document.getElementById("project-image");
   const projectSummaryElem = document.getElementById("project-summary");
   const projectBackgroundElem = document.getElementById("project-background");
-  const projectAnalysesElem = document.getElementById("project-analyses");
-  const projectOutcomesElem = document.getElementById("project-outcomes");
+  const projectAnalysesElem = document.getElementById("project-analyses"); // This will now contain <p> elements
+  const projectOutcomesElem = document.getElementById("project-outcomes"); // This will now contain <p> elements
   const projectLinksContainerElem = document.getElementById(
     "project-links-container"
   ); // Container for links section
@@ -31,11 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!projectId) {
       projectTitleElem.textContent = "Project Not Found";
       projectSummaryElem.textContent = "No project ID provided in the URL.";
-      projectBackgroundElem.textContent = "";
-      projectAnalysesElem.innerHTML = "";
-      projectOutcomesElem.innerHTML = "";
-      projectImageElem.style.display = "none";
-      projectLinksContainerElem.style.display = "none";
+      projectBackgroundElem.textContent = ""; // Clear background
+      projectAnalysesElem.innerHTML = ""; // Clear analyses
+      projectOutcomesElem.innerHTML = ""; // Clear analyses
+      projectImageElem.style.display = "none"; // Hide image
+      projectLinksContainerElem.style.display = "none"; // Hide links container
       return;
     }
 
@@ -51,31 +51,101 @@ document.addEventListener("DOMContentLoaded", () => {
       const project = projects.find((p) => p.id === projectId);
 
       if (project) {
+        // Update the page title
         document.title = `${project.title} - Murray S. Bennett`;
 
+        // Populate the HTML elements with project data
         projectTitleElem.textContent = project.title;
         projectImageElem.src = project.image;
         projectImageElem.alt = `${project.title} Image`;
-        projectImageElem.style.display = "block";
+        projectImageElem.style.display = "block"; // Ensure image is visible
 
         projectSummaryElem.textContent = project.summary;
-        projectBackgroundElem.textContent = project.background;
 
-        // Clear existing list items and add new ones for analyses
-        projectAnalysesElem.innerHTML = "";
-        if (project.analyses && project.analyses.length > 0) {
-          project.analyses.forEach((analysis) => {
-            const li = document.createElement("li");
-            li.textContent = analysis;
-            projectAnalysesElem.appendChild(li);
+        projectBackgroundElem.innerHTML = "";
+        // projectBackgroundElem.textContent = project.background;
+        if (project.background && project.background.length > 0) {
+          project.background.forEach((background) => {
+            const p = document.createElement("p");
+            if (background.trim().startsWith("<img")) {
+              p.innerHTML = background;
+              const img = p.querySelector("img");
+              if (img) {
+                img.style.maxWidth = "100%";
+                img.style.height = "auto";
+                img.style.display = "block"; // Ensure it's a block element for margin
+                img.style.margin = "10px auto"; // Center the image
+                img.style.borderRadius = "8px"; // Match site's aesthetic
+                img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+              }
+            } else {
+              p.textContent = background;
+            }
+            projectBackgroundElem.appendChild(p);
           });
         } else {
-          const li = document.createElement("li");
-          li.textContent = "No specific analyses details provided yet.";
-          projectAnalysesElem.appendChild(li);
+          const p = document.createElement("p");
+          p.textContent = "Background coming soon.";
+          projectBackgroundElem.appendChild(p);
+        }
+        // Clear existing content and add new ones for analyses as paragraph tags
+        projectAnalysesElem.innerHTML = ""; // Clear previous content
+        if (project.analyses && project.analyses.length > 0) {
+          project.analyses.forEach((analysis) => {
+            const p = document.createElement("p"); // Create a <p> tag
+
+            // Check if the analysis string starts with an image tag
+            if (analysis.trim().startsWith("<img")) {
+              // If it's an image tag, set innerHTML to render it
+              p.innerHTML = analysis;
+              // Optional: Add some basic styling to the image within the paragraph
+              const img = p.querySelector("img");
+              if (img) {
+                img.style.maxWidth = "100%";
+                img.style.height = "auto";
+                img.style.display = "block"; // Ensure it's a block element for margin
+                img.style.margin = "10px auto"; // Center the image
+                img.style.borderRadius = "8px"; // Match site's aesthetic
+                img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+              }
+            } else {
+              // Otherwise, it's plain text, set textContent
+              p.textContent = analysis;
+            }
+            projectAnalysesElem.appendChild(p);
+          });
+        } else {
+          const p = document.createElement("p"); // Create a <p> tag for no content
+          p.textContent = "No specific analyses details provided yet.";
+          projectAnalysesElem.appendChild(p);
         }
 
-        projectOutcomesElem.textContent = project.outcomes;
+        // projectOutcomesElem.textContent = project.outcomes;
+        projectOutcomesElem.innerHTML = "";
+        if (project.outcomes && project.outcomes.length > 0) {
+          project.outcomes.forEach((outcome) => {
+            const p = document.createElement("p");
+            if (outcome.trim().startsWith("<img")) {
+              p.innerHTML = outcome;
+              const img = p.querySelector("img");
+              if (img) {
+                img.style.maxWidth = "100%";
+                img.style.height = "auto";
+                img.style.display = "block"; // Ensure it's a block element for margin
+                img.style.margin = "10px auto"; // Center the image
+                img.style.borderRadius = "8px"; // Match site's aesthetic
+                img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+              }
+            } else {
+              p.textContent = outcome;
+            }
+            projectOutcomesElem.appendChild(p);
+          });
+        } else {
+          const p = document.createElement("p");
+          p.textContent = "Outcomes coming soon.";
+          projectOutcomesElem.appendChild(p);
+        }
 
         // Assume no links initially, then check each one
         let hasLinks = false;
