@@ -32,22 +32,6 @@
     "osf_link": ""
   },
   {
-    "id": "cdnn-knn",
-    "title": "Decisions from a CDNN based on kNN Similarity Metrics",
-    "category": "Human-AI Collaboration & Machine Learning",
-    "summary": "Analyzing decisions from a CDNN (Convolutional Deep Neural Network) based on kNN (k-Nearest Neighbors) similarity metrics across various activation layers, providing insights into AI's internal representations for melanoma identification.",
-    "image": "https://placehold.co/600x400/FF69B4/FFF?text=CDNN+kNN+Similarity",
-    "background": "Understanding how deep neural networks make decisions is crucial for their deployment in high-stakes applications. This project explores the internal representations learned by a CDNN trained for melanoma classification by applying k-Nearest Neighbors similarity metrics to activation layers. By examining which training examples are 'nearest' to a given test image in different layers' feature spaces, we can gain insights into the features the network prioritizes at various stages of processing, thereby enhancing AI transparency.",
-    "analyses": [
-      "Visualization of kNN neighbors in different CDNN layers for melanoma and benign lesions.",
-      "Quantification of feature similarity changes across layers and their correlation with final classification decisions.",
-      "Identification of 'critical features' that drive CDNN decisions through kNN analysis."
-    ],
-    "interactive_demo_link": "interactive-cdnn-knn.html",
-    "experiment_demo_link": "",
-    "osf_link": ""
-  },
-  {
     "id": "discrete-choice-rating",
     "title": "Discrete Choice vs. Rating Scale Decision Elicitation",
     "category": "Cognitive Modeling & Decision Science",
@@ -110,7 +94,7 @@
       "Comparison of performance across different numerical ranges and presentation formats."
     ],
     "interactive_demo_link": "",
-    "experiment_demo_link": "experiments-wheel-of-fortune.html",
+    "experiment_demo_link": "experiment-demo-viewer.html?demo=wheel-of-fortune",
     "osf_link": ""
   },
   {
