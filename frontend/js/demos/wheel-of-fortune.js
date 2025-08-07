@@ -1,4 +1,4 @@
-// --- Configuration ---
+/// --- Configuration ---
 const conf = {
   stimulusCanvasWidth: 200, // pixels
   stimulusCanvasHeight: 200, // pixels
@@ -60,7 +60,6 @@ const wheelOfFortuneHtml = `
             text-align: center;
             width: 100%; /* Occupy full width within its parent */
             padding: 10px 0; /* Add some padding for visual separation */
-            /* No need for position: absolute here, it will flow naturally */
         }
 
         #stimulus-canvas {
@@ -68,7 +67,9 @@ const wheelOfFortuneHtml = `
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             background-color: white; /* Ensure a white background for drawing */
-            /* margin-bottom: 20px; Removed as buttons are now circular */
+            /* Added fluid sizing for responsiveness */
+            max-width: 90%;
+            height: auto;
         }
 
         #stimulus-canvas {
@@ -97,6 +98,8 @@ const wheelOfFortuneHtml = `
             text-align: center;
             max-width: 600px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            /* Added fluid padding for smaller screens */
+            padding: 20px;
         }
 
         .overlay-content h2 {
@@ -187,21 +190,39 @@ const wheelOfFortuneHtml = `
             padding: 8px 13px !important; /* Reduce padding by 2px on each side (top/bottom, left/right) */
             box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); /* Subtle green glow */
         }
+
+        /* --- New Media Query for Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            #wheel-container {
+                /* Reduce the overall border thickness to save space */
+                border: 2px solid #FFD700;
+                box-shadow: 0 0 0 2px #FFA500,
+                            0 0 0 4px rgb(255, 77, 0);
+            }
+            .overlay-content {
+                padding: 15px;
+            }
+            .overlay-content h2 {
+                font-size: 1.5em; /* Scale down headings */
+            }
+            .overlay-content p {
+                font-size: 1em; /* Scale down paragraph text */
+            }
+            .response-button {
+                min-width: 30px; /* Make buttons smaller */
+                padding: 8px 10px; /* Reduce button padding */
+                font-size: 1em; /* Reduce font size in buttons */
+            }
+        }
     </style>
 
     <div id="main-app-container">
-        <div id="trial-info">Trial 0 / ${conf.nTrialsPerBlock}</div> <!-- Moved outside and above wheel-container -->
-
-        <div id="wheel-container">
-            <!-- Canvas for the central noisy stimulus -->
+        <div id="trial-info">Trial 0 / ${conf.nTrialsPerBlock}</div> <div id="wheel-container">
             <canvas id="stimulus-canvas" width="200" height="200"></canvas>
 
-            <!-- Response buttons container -->
             <div id="response-buttons">
-                <!-- Buttons will be dynamically generated here -->
-            </div>
+                </div>
 
-            <!-- Instructions Overlay -->
             <div id="instructions-overlay">
                 <div class="overlay-content">
                     <h2>Wheel of Fortune Task Demo</h2>
@@ -211,7 +232,6 @@ const wheelOfFortuneHtml = `
                 </div>
             </div>
 
-            <!-- Completion Overlay -->
             <div id="completion-overlay" style="display:none;">
                 <div class="overlay-content">
                     <h2>Demo Complete!</h2>
@@ -274,8 +294,9 @@ function initializeDemoElements() {
     $responseButtonsContainer.parentElement.getBoundingClientRect();
   const containerCenterX = containerRect.width / 2;
   const containerCenterY = containerRect.height / 2;
+  const canvasRect = $stimulusCanvas.getBoundingClientRect();
   const buttonCircleRadius =
-    Math.max(conf.stimulusCanvasWidth, conf.stimulusCanvasHeight) / 2 + 80;
+    Math.max(canvasRect.width, canvasRect.height) / 2 + 80;
   const numButtons = 9;
   const angleIncrement = (2 * Math.PI) / numButtons;
 

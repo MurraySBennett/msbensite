@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectImageElem = document.getElementById("project-image");
   const projectSummaryElem = document.getElementById("project-summary");
   const projectBackgroundElem = document.getElementById("project-background");
-  const projectAnalysesElem = document.getElementById("project-analyses"); // This will now contain <p> elements
-  const projectOutcomesElem = document.getElementById("project-outcomes"); // This will now contain <p> elements
+  const projectAnalysesElem = document.getElementById("project-analyses");
+  const projectOutcomesElem = document.getElementById("project-outcomes");
   const projectLinksContainerElem = document.getElementById(
     "project-links-container"
-  ); // Container for links section
+  );
   const projectOSFLinkElem = document.getElementById("osf-link");
   const interactiveDemoLinkElem = document.getElementById(
     "interactive-demo-link"
@@ -26,16 +26,45 @@ document.addEventListener("DOMContentLoaded", () => {
     "experiment-demo-link"
   );
 
+  // Helper function to process and append content, handling HTML and images
+  function appendContent(element, contentArray, noContentMessage) {
+    element.innerHTML = ""; // Clear previous content
+
+    if (contentArray && contentArray.length > 0) {
+      contentArray.forEach((content) => {
+        const div = document.createElement("div");
+        div.innerHTML = content;
+
+        // Find all images within the created div and apply styling
+        const images = div.querySelectorAll("img");
+        images.forEach((img) => {
+          img.style.maxWidth = "100%";
+          img.style.height = "auto";
+          img.style.display = "block";
+          img.style.margin = "10px auto";
+          img.style.borderRadius = "8px";
+          img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+        });
+
+        element.appendChild(div);
+      });
+    } else {
+      const p = document.createElement("p");
+      p.textContent = noContentMessage;
+      element.appendChild(p);
+    }
+  }
+
   // Function to load project details
   async function loadProjectDetails() {
     if (!projectId) {
       projectTitleElem.textContent = "Project Not Found";
       projectSummaryElem.textContent = "No project ID provided in the URL.";
-      projectBackgroundElem.textContent = ""; // Clear background
-      projectAnalysesElem.innerHTML = ""; // Clear analyses
-      projectOutcomesElem.innerHTML = ""; // Clear analyses
-      projectImageElem.style.display = "none"; // Hide image
-      projectLinksContainerElem.style.display = "none"; // Hide links container
+      appendContent(projectBackgroundElem, null, "");
+      appendContent(projectAnalysesElem, null, "");
+      appendContent(projectOutcomesElem, null, "");
+      projectImageElem.style.display = "none";
+      projectLinksContainerElem.style.display = "none";
       return;
     }
 
@@ -58,94 +87,26 @@ document.addEventListener("DOMContentLoaded", () => {
         projectTitleElem.textContent = project.title;
         projectImageElem.src = project.image;
         projectImageElem.alt = `${project.title} Image`;
-        projectImageElem.style.display = "block"; // Ensure image is visible
+        projectImageElem.style.display = "block";
 
         projectSummaryElem.textContent = project.summary;
 
-        projectBackgroundElem.innerHTML = "";
-        // projectBackgroundElem.textContent = project.background;
-        if (project.background && project.background.length > 0) {
-          project.background.forEach((background) => {
-            const p = document.createElement("p");
-            if (background.trim().startsWith("<img")) {
-              p.innerHTML = background;
-              const img = p.querySelector("img");
-              if (img) {
-                img.style.maxWidth = "100%";
-                img.style.height = "auto";
-                img.style.display = "block"; // Ensure it's a block element for margin
-                img.style.margin = "10px auto"; // Center the image
-                img.style.borderRadius = "8px"; // Match site's aesthetic
-                img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
-              }
-            } else {
-              p.textContent = background;
-            }
-            projectBackgroundElem.appendChild(p);
-          });
-        } else {
-          const p = document.createElement("p");
-          p.textContent = "Background coming soon.";
-          projectBackgroundElem.appendChild(p);
-        }
-        // Clear existing content and add new ones for analyses as paragraph tags
-        projectAnalysesElem.innerHTML = ""; // Clear previous content
-        if (project.analyses && project.analyses.length > 0) {
-          project.analyses.forEach((analysis) => {
-            const p = document.createElement("p"); // Create a <p> tag
-
-            // Check if the analysis string starts with an image tag
-            if (analysis.trim().startsWith("<img")) {
-              // If it's an image tag, set innerHTML to render it
-              p.innerHTML = analysis;
-              // Optional: Add some basic styling to the image within the paragraph
-              const img = p.querySelector("img");
-              if (img) {
-                img.style.maxWidth = "100%";
-                img.style.height = "auto";
-                img.style.display = "block"; // Ensure it's a block element for margin
-                img.style.margin = "10px auto"; // Center the image
-                img.style.borderRadius = "8px"; // Match site's aesthetic
-                img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
-              }
-            } else {
-              // Otherwise, it's plain text, set textContent
-              p.textContent = analysis;
-            }
-            projectAnalysesElem.appendChild(p);
-          });
-        } else {
-          const p = document.createElement("p"); // Create a <p> tag for no content
-          p.textContent = "No specific analyses details provided yet.";
-          projectAnalysesElem.appendChild(p);
-        }
-
-        // projectOutcomesElem.textContent = project.outcomes;
-        projectOutcomesElem.innerHTML = "";
-        if (project.outcomes && project.outcomes.length > 0) {
-          project.outcomes.forEach((outcome) => {
-            const p = document.createElement("p");
-            if (outcome.trim().startsWith("<img")) {
-              p.innerHTML = outcome;
-              const img = p.querySelector("img");
-              if (img) {
-                img.style.maxWidth = "100%";
-                img.style.height = "auto";
-                img.style.display = "block"; // Ensure it's a block element for margin
-                img.style.margin = "10px auto"; // Center the image
-                img.style.borderRadius = "8px"; // Match site's aesthetic
-                img.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
-              }
-            } else {
-              p.textContent = outcome;
-            }
-            projectOutcomesElem.appendChild(p);
-          });
-        } else {
-          const p = document.createElement("p");
-          p.textContent = "Outcomes coming soon.";
-          projectOutcomesElem.appendChild(p);
-        }
+        // Use the helper function to render background, analyses, and outcomes
+        appendContent(
+          projectBackgroundElem,
+          project.background,
+          "Background coming soon."
+        );
+        appendContent(
+          projectAnalysesElem,
+          project.analyses,
+          "No specific analyses details provided yet."
+        );
+        appendContent(
+          projectOutcomesElem,
+          project.outcomes,
+          "Outcomes coming soon."
+        );
 
         // Assume no links initially, then check each one
         let hasLinks = false;
@@ -153,36 +114,32 @@ document.addEventListener("DOMContentLoaded", () => {
         // Handle OSF link
         if (project.osf_link) {
           projectOSFLinkElem.href = project.osf_link;
-          projectOSFLinkElem.style.display = "inline-block"; // Show the button
+          projectOSFLinkElem.style.display = "inline-block";
           hasLinks = true;
         } else {
-          projectOSFLinkElem.style.display = "none"; // Hide if no link
+          projectOSFLinkElem.style.display = "none";
         }
 
         // Handle interactive demo link
         if (project.interactive_demo_link) {
           interactiveDemoLinkElem.href = project.interactive_demo_link;
-          interactiveDemoLinkElem.style.display = "inline-block"; // Show the button
+          interactiveDemoLinkElem.style.display = "inline-block";
           hasLinks = true;
         } else {
-          interactiveDemoLinkElem.style.display = "none"; // Hide if no link
+          interactiveDemoLinkElem.style.display = "none";
         }
 
         // Handle experiment demo link
         if (project.experiment_demo_link) {
           experimentDemoLinkElem.href = project.experiment_demo_link;
-          experimentDemoLinkElem.style.display = "inline-block"; // Show the button
+          experimentDemoLinkElem.style.display = "inline-block";
           hasLinks = true;
         } else {
-          experimentDemoLinkElem.style.display = "none"; // Hide if no link
+          experimentDemoLinkElem.style.display = "none";
         }
 
         // Show/hide the entire links container based on whether any links exist
-        if (hasLinks) {
-          projectLinksContainerElem.style.display = "block"; // Or 'flex' if you style it that way
-        } else {
-          projectLinksContainerElem.style.display = "none";
-        }
+        projectLinksContainerElem.style.display = hasLinks ? "block" : "none";
       } else {
         // Project not found in JSON
         projectTitleElem.textContent = "Project Not Found";
@@ -191,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         projectBackgroundElem.textContent = "";
         projectAnalysesElem.innerHTML = "";
         projectImageElem.style.display = "none";
-        projectLinksContainerElem.style.display = "none"; // Hide links container
+        projectLinksContainerElem.style.display = "none";
       }
     } catch (error) {
       console.error("Error loading project details:", error);
@@ -200,8 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "There was an error loading the project details. Please try again later.";
       projectBackgroundElem.textContent = "";
       projectAnalysesElem.innerHTML = "";
-      projectImageElem.style.display = "none"; // Corrected
-      projectLinksContainerElem.style.display = "none"; // Corrected
+      projectImageElem.style.display = "none";
+      projectLinksContainerElem.style.display = "none";
     }
   }
 

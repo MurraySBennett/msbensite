@@ -178,23 +178,37 @@
     "id": "team-spirit-hh",
     "title": "Team Spirit: Evaluating Group Performance Efficiency",
     "category": "Human-AI Collaboration",
-    "summary": "Evaluating group performance efficiency among human and human-machine teams, focusing on the dynamics and factors that contribute to optimal collective decision-making and task execution.",
-    "image": "assets/images/project-icons/team-spirit-demo.png",
+    "summary": "This project investigates the performance and cognitive dynamics of human teams working on a novel, dynamic task. It provides a quantitative framework for measuring team efficiency and understanding the cognitive costs of teamwork in both collaborative and competitive settings.",
+    "image": "assets/images/project-icons/team-spirit-welcome.png",
     "background": [
-      "As AI becomes more integrated into collaborative workflows, understanding the efficiency of human-AI teams is paramount. This project investigates various aspects of group performance, comparing purely human teams with human-machine teams on complex tasks. We examine behavioural patterns, division of labor, and overall task efficiency to identify group conditions that lead to effective human-AI collaborative systems."
+      "It's well-known that teams can accomplish more than individuals. Taking your friend to the supermarket allows you to pick up more items than if you had gone alone, but is it better to work through the shopping list together or split it in two, go about the aisles separately, then meet back at the checkout? While teamwork is often beneficial, it isn't always particularly efficient! (Perhaps a more powerful example is that of a group assignment, but let's not go there!). In this project we develop a reliable and objective measure of team performance efficiency and simultaneously examine the cognitive cost to individuals when they have to coordinate their efforts with a teammate. We designed a unique experiment using a dynamic, online game inspired by the classic 'Pong'. <a href='experiment-demo-viewer.html?demo=team-spirit-hh'>Try it yourself here.</a>"
     ],
     "analyses": [
-      "Quantitative analysis of team performance metrics and response times.",
-      "Quantitative analysis of behavioural patterns within teams.",
-      "Development of metrics for 'human-AI team efficiency'.",
-      "<img src='assets/images/project-icons/team-spirit-demo.png' alt='Team Spirit Demo'>"
+      "<h4>Playing Space and Task</h4>",
+      "Participant pairs played a simple computer game where players moved paddles to deflect incoming balls. The experiment included three group conditions: a <strong>Separate</strong> condition where players worked independently, a <strong>Collaborative</strong> condition where they worked together for a single team score, and a <strong>Competitive</strong> condition where they tried to outscore their opponent. This allowed for the direct comparison of individual performance with both collaborative and competitive teamwork.",
+      "<img src='assets/images/team-spirit-hh/team-high-drtOff.png' alt='Playing screen examples in the team group condition' style='width:50%'>",
+      "<h4>Workload Capacity Analysis</h4>",
+      "Workload capacity is a measure that goes beyond a simple team-score and allows us to evaluate the <em>efficiency</em> of teamwork. By comparing the team performance to the theoretical UCIP benchmark (Unlimited Capacity Independent and Parallel). This benchmark representes what two players would achieve if they worked independently of each other and at the same time (parallel). By comparing observed performance to this theoretical benchmark, we can quantitatively determine if teamwork introduced a cost or benefit to the overall performance. This analysis provides a robust quantitative tool to examine the quality of team processes.",
+      "<h4>Detection Response Task (DRT)</h4>",
+      "We also implemented a secondary signal detection task that was presented concurrently with the game to assess individual cognitive load. Participants had to respond to a brief flash of light, where slower response times or lower accuracy on this task indicate that a participant is experiencing a higher <em>cognitive load</em> from the demands of the main game and from the act of teamwork itself.",
+      "<h4>n-Balls Maintained Transformation</h4>",
+      "A novel way to interpret the main game's miss rate data. This analysis converted miss rates into a more intuitive metric: the number of balls a player or team could maintain at a fixed accuracy level. For example, it showed that while individuals could handle about 4 balls, a collaborative team could handle about 7, providing a more tangible measure for comparing performance across different group conditions.",
+      "<img src='assets/images/team-spirit-hh/nBalls_maintained.png' alt='A visual representation of the n-balls maintained transformation' style='width:50%'>"
     ],
     "outcomes": [
-      "Teams outperform individuals, but team dynamics lead to inefficient group performance in some cases. Human teams are more efficient than human-machine teams, displaying a reduced cost to performance from teaming."
+      "<h4>Teams are More Productive, but Less Efficient</h4>",
+      "While both collaborative and competitive teams kept more balls in play than individuals, the workload capacity analysis revealed that teamwork introduced a measurable cost. In the figure below, data points below the gray horizontal line at 0 (the UCIP benchmark) indicate a performance <em>cost</em>. This <emlimited capacity</em> meant that teams were not performing as well as one would expect from two independently working individuals. This indicates that the dynamics of teamwork, regardless of the goal, can be a source of inefficiency.",
+      "<img src='assets/images/team-spirit-hh/HH-CapacityMR.png' alt='Workload capacity metrics for collaborative and competitive human teams' style='width:50%'>",
+      "<h4>Collaboration is a More Efficient Strategy</h4>",
+      "We found that collaborative teams had a significantly smaller performance cost than competitive teams. This suggests that the dynamics of working together towards a common goal are inherently more efficient than the behaviors that emerge from trying to outscore a teammate. This finding has practical implications for designing systems that foster cooperation to optimize performance.",
+      "<h4>Teamwork Increases Cognitive Load</h4>",
+      "The DRT data showed that participants in both collaborative and competitive groups experienced a higher cognitive load than individuals. This suggests that the mental effort of coordinating with another person, even without direct communication, consumes valuable cognitive resources. However, it’s important to note that the task's high difficulty led to a ceiling effect, meaning this result was primarily evident in the lowest workload condition.",
+      "<h4>Conclusion</h4>",
+      "This project provides a compelling application of workload capacity analysis for dynamic team environments. It demonstrates the utility of a psychometrically sound approach to quantifying team efficiency and identifying the specific costs of different group conditions. This framework can now be used in future research to examine how other features of an individual or team (such as working with an AI teammate) might influence performance costs."
     ],
     "interactive_demo_link": "",
     "experiment_demo_link": "experiment-demo-viewer.html?demo=team-spirit-hh",
-    "osf_link": ""
+    "osf_link": "https://osf.io/mtazf/"
   },
   {
     "id": "implicit-attitudes",
