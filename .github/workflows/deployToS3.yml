@@ -10,12 +10,55 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: jakejarvis/s3-sync-action@master
+
+      # Sync and set Content-Type for HTML files
+      - name: Sync HTML Files
+        uses: jakejarvis/s3-sync-action@master
         with:
-          args: --follow-symlinks --delete --exclude '.git*/*' --content-type text/html --include '*.html' --content-type text/css --include '*.css' --content-type application/javascript --include '*.js' --content-type image/png --include '*.png' --content-type image/jpeg --include '*.jpg' --content-type image/JPG --include '*.JPG'
+          args: --delete --exclude '*' --include '*.html'
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-2
           SOURCE_DIR: "frontend"
+          CONTENT_TYPE: "text/html"
+
+      # Sync and set Content-Type for CSS files
+      - name: Sync CSS Files
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete --exclude '*' --include '*.css'
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
+          SOURCE_DIR: "frontend"
+          CONTENT_TYPE: "text/css"
+
+      # Sync and set Content-Type for JavaScript files
+      - name: Sync JS Files
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete --exclude '*' --include '*.js'
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
+          SOURCE_DIR: "frontend"
+          CONTENT_TYPE: "application/javascript"
+
+      # Sync and set Content-Type for all image files
+      - name: Sync Image Files
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete --exclude '*' --include '*.png' --include '*.jpg' --include '*.JPG'
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
+          SOURCE_DIR: "frontend"
+          CONTENT_TYPE: "image/jpeg" # Using image/jpeg for both JPG and PNG
