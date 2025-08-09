@@ -693,12 +693,16 @@ body.konami-mode::before {
   text-shadow: 0 0 4px #9a86c0, 0 0 6px #d291ff, 0 0 10px #ffb3ff;
 }
 
-#pixel-chaser {
+#pixel-chaser,
+#pong {
   text-shadow: 0 0 2px #7b68ee, 0 0 3px #d291ff;
   cursor: pointer;
   transition: transform 0.2s ease, text-shadow 0.2s ease;
+  margin-bottom: 0.2em;
+  margin-top: 0.2em;
 }
-#pixel-chaser:hover {
+#pixel-chaser:hover,
+#pong:hover {
   transform: translateY(-2px);
   text-shadow: 0 0 4px #9a86c0, 0 0 6px #d291ff, 0 0 10px #ffb3ff;
 }
