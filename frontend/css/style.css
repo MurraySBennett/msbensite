@@ -1,44 +1,84 @@
-body {
-  font-family: "Inter", sans-serif; /* New font for body text */
-  background-color: #f0f8ff; /* AliceBlue - a very soft, light background */
-  color: #333; /* Dark grey for text for good readability */
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Ensures the footer stays at the bottom */
-  overflow-x: hidden; /* Prevent horizontal scroll */
+/* Pastel flicker + noise drift in one animation */
+@keyframes pastelFlickerDrift {
+  0% {
+    opacity: 0.25;
+    background-position: 0 0, 0 0;
+  }
+  50% {
+    opacity: 0.3;
+    background-position: 0 50px, 0 0;
+  }
+  100% {
+    opacity: 0.25;
+    background-position: 0 100px, 0 0;
+  }
 }
 
-/* Headings will keep the retro font */
+/* Stronger pastel overlay with synced drift */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    /* Noise texture - vertical lines */ repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      rgba(0, 0, 0, 0.02) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    /* Diagonal stripes */
+      repeating-linear-gradient(
+        0deg,
+        rgba(106, 90, 205, 0.12) 0px,
+        rgba(106, 90, 205, 0.12) 2px,
+        rgba(240, 248, 255, 0.12) 2px,
+        rgba(240, 248, 255, 0.12) 4px
+      );
+
+  background-blend-mode: overlay;
+  animation: pastelFlickerDrift 15s linear infinite;
+}
+
+/* Keep content above */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Headings keep retro font */
 h1,
 h2,
 h3 {
   font-family: "Press Start 2P", cursive;
 }
 
-/* Explicitly set all paragraphs to Inter font for readability */
 p {
   font-family: "Inter", sans-serif;
 }
 
-/* Container for main content to center and limit width */
+/* Content container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  flex-grow: 1; /* Allows content to push footer down */
+  flex-grow: 1;
 }
 
-/* Header Styles */
+/* Header */
 header {
-  background-color: #7b68ee; /* MediumSlateBlue - a soft purple */
-  color: #e0ffff; /* LightCyan - for contrast */
+  background-color: #7b68ee; /* MediumSlateBlue */
+  color: #e0ffff; /* LightCyan */
   padding: 20px 0;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 0 0 15px 15px; /* Rounded bottom corners */
+  border-radius: 0 0 15px 15px;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -47,10 +87,10 @@ header {
 header h1 {
   margin: 0;
   font-size: 2.5em;
-  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2); /* Retro shadow effect */
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
 }
 
-/* Navigation Styles */
+/* Navigation */
 nav {
   margin-top: 15px;
 }
@@ -75,35 +115,34 @@ nav ul li a {
   padding: 8px 15px;
   border: 2px solid #e0ffff;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: transform 0.15s steps(2, start), box-shadow 0.15s steps(2, start);
   display: block;
-  text-shadow: -1px -1px 0 black, /* Top-left shadow */ 1px -1px 0 black,
-    /* Top-right shadow */ -1px 1px 0 black,
-    /* Bottom-left shadow */ 1px 1px 0 black; /* Bottom-right shadow */
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
+    1px 1px 0 black;
   font-family: "Press Start 2P", cursive;
 }
 
 nav ul li a:hover,
 nav ul li a.active {
-  /* 'active' class for the current page */
-  background-color: #ff69b4; /* HotPink - a vibrant pastel */
+  background-color: #ff69b4; /* HotPink */
   color: #fff;
-  border-color: #ff69b4;
-  transform: translateY(-3px); /* Slight lift effect */
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  border: 2px solid #6e224a;
+  border-radius: 6px;
+  transform: translateY(-4px);
+  box-shadow: 2px 2px 0 #333;
 }
 
-/* Main Content Section Styles */
+/* Section */
 section {
   padding: 40px 20px;
   margin-bottom: 20px;
-  background-color: #ffffff; /* Pure white for content blocks */
+  background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 section h2 {
-  color: #6a5acd; /* SlateBlue - a slightly darker pastel purple */
+  color: #6a5acd; /* SlateBlue */
   font-size: 2em;
   margin-bottom: 20px;
   text-align: center;
@@ -111,92 +150,86 @@ section h2 {
 }
 
 section h3 {
-  color: #4682b4; /* SteelBlue - a soft blue for subheadings */
+  color: #4682b4; /* SteelBlue */
   font-size: 0.9em;
   margin-top: 20px;
   margin-bottom: 10px;
   text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
 
-/* Styles imported from index.html */
+/* Profile Section */
 .profile-section {
   display: flex;
   align-items: center;
   gap: 2em;
   margin-bottom: 2em;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  flex-wrap: wrap;
 }
-.profile-photo {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #7b68ee; /* Using a pastel color from your theme */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+
 .profile-section h1 {
-  font-size: 2em; /* Adjusted for better fit with existing h1 */
-  margin-top: 0;
-  margin-bottom: 5px;
-  color: #6a5acd; /* SlateBlue */
+  font-size: 2em;
+  margin: 0 0 5px;
+  color: #6a5acd;
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
-/* Removed redundant font-family from .profile-section p */
+
 .profile-section p {
   margin-bottom: 10px;
   font-size: 1em;
   color: #333;
 }
+
+/* Research Areas */
 .research-areas {
   display: flex;
   justify-content: space-around;
-  gap: 25px; /* Consistent with research-grid gap */
+  gap: 25px;
   margin-top: 2em;
   text-align: center;
   flex-wrap: wrap;
 }
+
 .research-card {
-  background-color: #f0f8ff; /* AliceBlue */
-  border: 2px solid #add8e6; /* LightBlue */
+  background-color: #f0f8ff;
+  border: 2px solid #add8e6;
   border-radius: 10px;
   padding: 20px;
   flex: 1;
-  min-width: 280px; /* Ensure cards don't get too small */
+  min-width: 280px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
+
 .research-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  border-color: #ffd700; /* Gold accent on hover */
+  border-color: #ffd700;
 }
+
 .research-card h3 {
   margin-top: 0;
-  color: #4682b4; /* SteelBlue */
+  color: #4682b4;
   font-size: 1.5em;
   text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
-/* Removed redundant font-family from .research-card p */
+
 .research-card p {
   font-size: 0.9em;
   color: #555;
 }
 
-/* Placeholder for Research Project Tiles (kept for consistency with initial style.css) */
+/* Research Grid & Tiles */
 .research-grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(280px, 1fr)
-  ); /* Responsive grid */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
   padding: 20px 0;
 }
 
 .research-tile {
-  display: block; /* Ensures the link takes up full space */
-  text-decoration: none; /* Remove underline from links */
-  color: inherit; /* Inherit text color from parent */
+  display: block;
+  text-decoration: none;
+  color: inherit;
   background-color: #fff;
   padding: 15px;
   border-radius: 10px;
@@ -214,21 +247,19 @@ section h3 {
   height: auto;
   object-fit: cover;
   border-radius: 5px;
-  margin-bottom: 10px;
-  display: block;
-  margin: 0 auto 10px auto;
+  margin: 0 auto 10px;
   border: 1px solid #ddd;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Footer Styles */
+/* Footer */
 footer {
-  background-color: #7b68ee; /* MediumSlateBlue */
-  color: #e0ffff; /* LightCyan */
+  background-color: #7b68ee;
+  color: #e0ffff;
   text-align: center;
   padding: 20px 0;
-  margin-top: auto; /* Pushes footer to the bottom */
-  border-radius: 15px 15px 0 0; /* Rounded top corners */
+  margin-top: auto;
+  border-radius: 15px 15px 0 0;
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -237,7 +268,7 @@ footer p {
   font-size: 0.9em;
 }
 
-/* Utility Classes for Responsiveness */
+/* Responsive */
 @media (max-width: 480px) {
   header h1 {
     font-size: 1.5em;
@@ -269,7 +300,6 @@ footer p {
     font-size: 0.9em;
     padding: 6px 12px;
   }
-  /* Media queries for responsiveness for new elements */
   .profile-section {
     flex-direction: column;
     text-align: center;
@@ -279,20 +309,20 @@ footer p {
     align-items: center;
   }
   .research-card {
-    width: 90%; /* Make cards take more width on small screens */
+    width: 90%;
   }
   .research-grid {
-    grid-template-columns: 1fr; /* Stack tiles on small screens */
+    grid-template-columns: 1fr;
   }
 }
 
-/* Teaching Page Specific Styles */
+/* Teaching Page */
 details {
-  border: 1px solid #add8e6; /* LightBlue - a soft pastel border */
-  border-radius: 10px; /* Rounded corners for consistency */
+  border: 1px solid #add8e6;
+  border-radius: 10px;
   margin-bottom: 15px;
   padding: 10px;
-  background-color: #ffffff; /* White background for the details block */
+  background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -300,24 +330,224 @@ details summary {
   font-size: 1.5em;
   font-weight: bold;
   cursor: pointer;
-  outline: none;
   padding: 5px 0;
-  color: #6a5acd; /* SlateBlue - consistent with section H2s */
-  font-family: "Press Start 2P", cursive; /* Keep summary retro */
+  color: #6a5acd;
+  font-family: "Press Start 2P", cursive;
   text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
 }
 
 .teaching-entry {
   margin-bottom: 1.5em;
   padding: 1em;
-  background-color: #f0f8ff; /* AliceBlue - soft background for entries */
-  border-left: 4px solid #7b68ee; /* MediumSlateBlue - a soft purple accent */
-  border-radius: 5px; /* Rounded corners for entries */
+  background-color: #f0f8ff;
+  border-left: 4px solid #7b68ee;
+  border-radius: 5px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .teaching-entry p {
   margin: 0;
-  padding: 0;
-  font-family: "Inter", sans-serif; /* Ensure Inter for entry paragraphs */
+}
+
+/* Konami Mode */
+body.konami-mode {
+  background-color: #0d0f1a !important;
+  color: #00ff00 !important;
+}
+
+body.konami-mode section,
+body.konami-mode .research-card,
+body.konami-mode .research-tile,
+body.konami-mode details,
+body.konami-mode .teaching-entry {
+  background-color: #1a1a2e !important;
+  color: #00ff00 !important;
+  border-color: #00ff00 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.3) !important;
+}
+
+body.konami-mode h1,
+body.konami-mode h2,
+body.konami-mode h3,
+body.konami-mode summary {
+  color: #00ff00 !important;
+  text-shadow: 0 0 3px lime, 0 0 6px lime; /* toned down glow */
+}
+
+body.konami-mode nav ul li a {
+  color: black !important;
+  background-color: lime !important;
+  border-color: black !important;
+  text-shadow: none !important;
+}
+
+body.konami-mode nav ul li a:hover {
+  background-color: #222 !important;
+  color: lime !important;
+  border-color: lime !important;
+  box-shadow: 0 0 5px lime !important;
+}
+
+body.konami-mode .research-card p,
+body.konami-mode .teaching-entry p,
+body.konami-mode .profile-section p {
+  color: #00ff00 !important;
+}
+
+body.konami-mode .profile-photo {
+  border-color: #00ff00 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+}
+
+body.konami-mode header,
+body.konami-mode footer {
+  background-color: lime !important;
+  color: black !important;
+  box-shadow: 0 0 8px lime !important;
+}
+
+/* CRT flicker + noise drift in one animation */
+@keyframes crtFlickerDrift {
+  0% {
+    opacity: 0.9;
+    background-position: 0 0, 0 0;
+  }
+  50% {
+    opacity: 1;
+    background-position: 0 50px, 0 0;
+  }
+  100% {
+    opacity: 0.9;
+    background-position: 0 100px, 0 0;
+  }
+}
+
+body.konami-mode::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    /* Noise texture - vertical lines */ repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    /* Bright RGB scanlines */
+      repeating-linear-gradient(
+        0deg,
+        rgba(255, 0, 0, 0.05) 0px,
+        rgba(0, 255, 0, 0.05) 1px,
+        rgba(0, 0, 255, 0.05) 2px,
+        transparent 3px
+      );
+
+  background-blend-mode: screen;
+  animation: crtFlickerDrift 8s linear infinite;
+}
+
+#pacman-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  overflow: visible;
+}
+
+#profile-pacman {
+  width: 100%;
+  transition: transform 0.3s ease;
+}
+
+.profile-photo.bite {
+  transform: scaleX(1.2) scaleY(1) rotate(-15deg); /* Pacman mouth open effect */
+  transition: transform 0.3s ease;
+}
+
+#pacman-container.shake {
+  animation: shake 0.5s;
+}
+
+#game-area {
+  width: 600px;
+  height: 128px;
+  overflow: hidden;
+  margin-top: 0; /* no extra margin */
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-5px, 0);
+  }
+  40% {
+    transform: translate(5px, 0);
+  }
+  60% {
+    transform: translate(-5px, 0);
+  }
+  80% {
+    transform: translate(5px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.profile-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #7b68ee;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+  /* animation: pulse 1.5s infinite; */
+}
+#profile-photo:active {
+  transform: scale(0.95); /* Shrinks the button slightly on press */
+  box-shadow: 0 2px 5px rgba(255, 255, 0, 0.5); /* Reduces shadow to simulate being pressed down */
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 255, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 0, 0);
+  }
+}
+
+.sprite {
+  position: absolute;
+  top: 50%;
+  max-height: 64px; /* same height as pacman container */
+  max-width: 64px;
+  user-select: none;
+  pointer-events: none;
+  transition: left 0.1s linear;
+  transform: translateY(-50%);
+  object-fit: contain;
+}
+
+.top-row {
+  display: flex;
+  align-items: center; /* vertically center photo & game */
+  gap: 20px; /* spacing between photo & game */
+}
+
+.profile-info {
+  margin-top: 20px; /* some space below game/photo row */
 }

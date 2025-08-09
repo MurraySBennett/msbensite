@@ -21,6 +21,8 @@
       referrerpolicy="no-referrer"
     />
   </head>
+  <script src="js/konami-mode.js"></script>
+  <script src="js/activate-konami.js" defer></script>
   <body>
     <header>
       <!-- <h1>Welcome to My Research Arcade!</h1> -->
@@ -38,12 +40,42 @@
     <div class="container">
       <section id="profile-and-intro">
         <div class="profile-section">
-          <img
+          <div
+            class="top-row"
+            style="display: flex; align-items: center; gap: 20px"
+          >
+            <div
+              id="pacman-container"
+              style="position: relative; width: 128px; height: 128px"
+            >
+              <img
+                src="assets/images/murray_small.png"
+                alt="A photo of Murray S. Bennett"
+                class="profile-photo"
+                id="profile-photo"
+                tabindex="0"
+                style="width: 100%; transition: transform 0.3s ease"
+              />
+            </div>
+            <div
+              id="game-area"
+              style="
+                position: relative;
+                width: 600px;
+                height: 128px;
+                overflow: hidden;
+                margin-top: 0; /* Remove margin to align with photo */
+              "
+            ></div>
+          </div>
+          <!-- <img
             src="assets/images/murray_small.png"
             alt="A photo of Murray S. Bennett"
             class="profile-photo"
-          />
-          <div>
+            id="profile-photo"
+            tabindex="0"
+          /> -->
+          <div class="profile-info">
             <h1>Murray S. Bennett</h1>
             <p>Postdoctoral Scholar | The Ohio State University</p>
             <p>
