@@ -233,7 +233,7 @@ section h3 {
   background-color: #fff;
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(65, 60, 60, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -540,6 +540,10 @@ body.konami-mode::before {
   transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
   /* animation: pulse 1.5s infinite; */
 }
+.profile-photo:hover {
+  transform: translateY(-2px);
+}
+
 #profile-photo:active {
   transform: scale(0.95); /* Shrinks the button slightly on press */
   box-shadow: 0 2px 5px rgba(255, 255, 0, 0.5); /* Reduces shadow to simulate being pressed down */

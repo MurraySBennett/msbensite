@@ -1,18 +1,66 @@
+const konamiCode = [
+  "ArrowUp",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+  "b",
+  "a",
+];
+let inputSequence = [];
+
+function toggleKonamiMode() {
+  document.body.classList.toggle("konami-mode");
+  showKonamiToggleButton();
+}
+
+// Show a toggle button to exit Konami Mode
+function showKonamiToggleButton() {
+  let toggleButton = document.getElementById("konami-toggle");
+  if (!toggleButton) {
+    toggleButton = document.createElement("button");
+    toggleButton.id = "konami-toggle";
+    toggleButton.textContent = "Exit Retro Mode";
+    toggleButton.style.position = "fixed";
+    toggleButton.style.bottom = "20px";
+    toggleButton.style.right = "20px";
+    toggleButton.style.zIndex = "10000";
+    toggleButton.style.padding = "10px 15px";
+    toggleButton.style.fontFamily = "'Press Start 2P', cursive";
+    toggleButton.style.backgroundColor = "lime";
+    toggleButton.style.color = "black";
+    toggleButton.style.border = "2px solid black";
+    toggleButton.style.borderRadius = "8px";
+    toggleButton.style.cursor = "pointer";
+    toggleButton.style.boxShadow = "0 4px 10px rgba(0,0,0,0.5)";
+
+    toggleButton.addEventListener("click", () => {
+      document.body.classList.remove("konami-mode");
+      toggleButton.remove();
+    });
+
+    document.body.appendChild(toggleButton);
+  }
+}
+
 const gameArea = document.getElementById("game-area");
 const pacman = document.getElementById("profile-photo");
 const pacmanContainer = document.getElementById("pacman-container");
 
 const originalSpritesData = [
-  { key: "up", imgSrc: "assets/images/button-icons/button-up.png" },
-  { key: "up", imgSrc: "assets/images/button-icons/button-up.png" },
-  { key: "down", imgSrc: "assets/images/button-icons/button-down.png" },
-  { key: "down", imgSrc: "assets/images/button-icons/button-down.png" },
-  { key: "left", imgSrc: "assets/images/button-icons/button-left.png" },
-  { key: "right", imgSrc: "assets/images/button-icons/button-right.png" },
-  { key: "left", imgSrc: "assets/images/button-icons/button-left.png" },
-  { key: "right", imgSrc: "assets/images/button-icons/button-right.png" },
-  { key: "b", imgSrc: "assets/images/button-icons/button-b.png" },
-  { key: "a", imgSrc: "assets/images/button-icons/button-a.png" },
+  { key: "up", imgSrc: "../assets/images/button-icons/button-up.png" },
+  { key: "up", imgSrc: "../assets/images/button-icons/button-up.png" },
+  { key: "down", imgSrc: "../assets/images/button-icons/button-down.png" },
+  { key: "down", imgSrc: "../assets/images/button-icons/button-down.png" },
+  { key: "left", imgSrc: "../assets/images/button-icons/button-left.png" },
+  { key: "right", imgSrc: "../assets/images/button-icons/button-right.png" },
+  { key: "left", imgSrc: "../assets/images/button-icons/button-left.png" },
+  { key: "right", imgSrc: "../assets/images/button-icons/button-right.png" },
+  { key: "b", imgSrc: "../assets/images/button-icons/button-b.png" },
+  { key: "a", imgSrc: "../assets/images/button-icons/button-a.png" },
 ];
 
 let spritesData = [...originalSpritesData];
@@ -137,6 +185,11 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
   }
   const pressedKey = keyMap[e.key] || e.key;
+  inputSequence.push(e.key);
+  inputSequence.splice(
+    -konamiCode.length - 1,
+    inputSequence.length - konamiCode.length
+  );
 
   for (const spriteObj of activeSprites) {
     if (
@@ -160,8 +213,13 @@ window.addEventListener("keydown", (e) => {
         activeSprites = activeSprites.filter((s) => s !== spriteObj);
 
         // If no sprites left to spawn and none active, player wins
-        if (spritesData.length === 0 && activeSprites.length === 0) {
+        if (
+          spritesData.length === 0 &&
+          activeSprites.length === 0 &&
+          inputSequence.join("") === konamiCode.join("")
+        ) {
           //   alert("You win! All sprites caught!");
+          toggleKonamiMode();
           resetGame();
         }
       }, 300);
