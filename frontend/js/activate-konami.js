@@ -13,8 +13,14 @@ const konamiCode = [
 let inputSequence = [];
 
 function toggleKonamiMode() {
-  document.body.classList.toggle("konami-mode");
-  showKonamiToggleButton();
+  let activeKonami = document.body.classList.contains("konami-mode");
+  if (!activeKonami) {
+    document.body.classList.add("konami-mode");
+    showKonamiToggleButton();
+  } else {
+    document.body.classList.remove("konami-mode");
+    hideKonamiToggleButton();
+  }
 }
 
 // Show a toggle button to exit Konami Mode
@@ -45,8 +51,14 @@ function showKonamiToggleButton() {
     document.body.appendChild(toggleButton);
   }
 }
+function hideKonamiToggleButton() {
+  const toggleButton = document.getElementById("konami-toggle");
+  if (toggleButton) {
+    toggleButton.remove();
+  }
+}
 
-const gameArea = document.getElementById("game-area");
+const konamiGameArea = document.getElementById("game-area");
 const pacman = document.getElementById("profile-photo");
 const pacmanContainer = document.getElementById("pacman-container");
 
@@ -70,6 +82,8 @@ let gameRunning = false;
 const spriteSpeed = 4; // pixels per frame
 const spawnInterval = 500; // 1 second between sprites
 const responseWindow = 1500;
+const responseLocationStart = 250; // pixels from the edge of the container -- needs to lign up with the photo.
+const responseLocationEnd = 0;
 
 // Create sprite element and tracking object
 function createSprite(spriteInfo) {
@@ -77,13 +91,13 @@ function createSprite(spriteInfo) {
   img.src = spriteInfo.imgSrc;
   img.classList.add("sprite");
   img.dataset.key = spriteInfo.key;
-  img.style.left = gameArea.offsetWidth + "px";
-  gameArea.appendChild(img);
+  img.style.left = konamiGameArea.offsetWidth + "px";
+  konamiGameArea.appendChild(img);
 
   return {
     img,
     key: spriteInfo.key,
-    x: gameArea.offsetWidth,
+    x: konamiGameArea.offsetWidth,
     waitingForInput: false,
     inputTimeout: null,
     caught: false,
@@ -99,7 +113,7 @@ function moveSprites() {
     spriteObj.img.style.left = spriteObj.x + "px";
 
     // Start waiting for input if near Pacman
-    if (spriteObj.x <= 50 && !spriteObj.waitingForInput) {
+    if (spriteObj.x <= responseLocationStart && !spriteObj.waitingForInput) {
       spriteObj.waitingForInput = true;
       console.log(`Press this key: "${spriteObj.key}"`);
       spriteObj.inputTimeout = setTimeout(() => {
@@ -108,7 +122,7 @@ function moveSprites() {
     }
 
     // If sprite moves completely off screen without being caught
-    if (spriteObj.x + spriteObj.img.offsetWidth < -150) {
+    if (spriteObj.x + spriteObj.img.offsetWidth < responseLocationEnd) {
       console.log(spriteObj);
       endGame("Sprite escaped!");
     }
@@ -143,6 +157,7 @@ function startSpawning() {
 
 // End game and reset
 function endGame(message) {
+  window.gameActive = false;
   gameRunning = false;
   cancelAnimationFrame(animationFrameId);
   animationFrameId = null;
@@ -218,9 +233,10 @@ window.addEventListener("keydown", (e) => {
           activeSprites.length === 0 &&
           inputSequence.join("") === konamiCode.join("")
         ) {
-          //   alert("You win! All sprites caught!");
           toggleKonamiMode();
           resetGame();
+          window.gameActive = false;
+          gameRunning = false;
         }
       }, 300);
 
@@ -231,7 +247,8 @@ window.addEventListener("keydown", (e) => {
 
 // Start game when profile pic is clicked
 pacman.addEventListener("click", () => {
-  console.log("Start!");
+  if (window.gameActive) return;
+  window.gameActive = true;
   if (gameRunning) return;
   resetGame();
   startSpawning();

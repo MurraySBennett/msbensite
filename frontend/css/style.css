@@ -161,7 +161,6 @@ section h3 {
 .profile-section {
   display: flex;
   align-items: center;
-  gap: 2em;
   margin-bottom: 2em;
   flex-wrap: wrap;
 }
@@ -461,6 +460,7 @@ body.konami-mode::before {
   width: 150px;
   height: 150px;
   overflow: visible;
+  z-index: 10;
 }
 
 #profile-pacman {
@@ -505,10 +505,98 @@ body.konami-mode::before {
 }
 
 #game-area {
-  width: 600px;
-  height: 128px;
+  flex-grow: 1;
+  height: 200px;
   overflow: hidden;
-  margin-top: 0; /* no extra margin */
+  margin-top: 0px;
+
+  margin-left: -175px;
+  padding-left: 175px;
+  position: relative;
+  border-radius: 12px;
+
+  background-color: rgba(46, 43, 95, 0.75);
+  border: 2px solid rgba(90, 77, 154, 0.8);
+
+  /* Initial glow */
+  box-shadow: 0 0 6px rgba(123, 104, 238, 0.5),
+    0 0 12px rgba(210, 145, 255, 0.4), inset 0 0 6px rgba(160, 128, 255, 0.35);
+
+  border-radius: 12px;
+
+  /* Animation */
+  animation: arcadeGlow 4s ease-in-out infinite;
+}
+#game-area .score-display {
+  position: absolute;
+  font-family: "Press Start 2P", cursive;
+  top: 5px;
+  left: 20px;
+  color: lime;
+  font-size: 18px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+}
+
+@keyframes arcadeGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(123, 104, 238, 0.5),
+      0 0 12px rgba(210, 145, 255, 0.4), inset 0 0 6px rgba(160, 128, 255, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(123, 104, 238, 0.6),
+      0 0 20px rgba(210, 145, 255, 0.5), inset 0 0 8px rgba(160, 128, 255, 0.4);
+  }
+}
+#game-area::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.05) 0,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 10;
+  border-radius: 12px;
+}
+#game-area canvas {
+  display: block;
+  width: calc(100% - 10px);
+  height: 100%;
+  margin-left: 10px;
+  background: #1c162b;
+  animation: fadeIn 0.3s ease-in forwards;
+}
+
+#game-area.game-over canvas {
+  animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes shake {
@@ -535,12 +623,13 @@ body.konami-mode::before {
 .profile-photo {
   width: 150px;
   height: 150px;
-  border-radius: 50%;
+  border-radius: 10%;
   object-fit: cover;
   border: 3px solid #7b68ee;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+  margin-left: 25px;
   /* animation: pulse 1.5s infinite; */
 }
 .profile-photo:hover {
@@ -578,8 +667,9 @@ body.konami-mode::before {
 
 .top-row {
   display: flex;
-  align-items: center; /* vertically center photo & game */
-  gap: 20px; /* spacing between photo & game */
+  align-items: center;
+  gap: 20px;
+  width: 100%;
 }
 
 .profile-info {
@@ -590,4 +680,45 @@ body.konami-mode::before {
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: normal;
+}
+.profile-info h1 {
+  cursor: pointer;
+  color: #6a5acd;
+  text-shadow: 0 0 2px #7b68ee, 0 0 3px #d291ff;
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+}
+
+.profile-info h1:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 0 4px #9a86c0, 0 0 6px #d291ff, 0 0 10px #ffb3ff;
+}
+
+#pixel-chaser {
+  text-shadow: 0 0 2px #7b68ee, 0 0 3px #d291ff;
+  cursor: pointer;
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+}
+#pixel-chaser:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 0 4px #9a86c0, 0 0 6px #d291ff, 0 0 10px #ffb3ff;
+}
+.rainbow-sprite {
+  position: absolute;
+  /* width: 64px;
+  height: 64px; */
+  /* border-radius: 50%; */
+  cursor: pointer;
+  filter: drop-shadow(0 0 5px white);
+  z-index: 10;
+}
+
+.trail-pixel {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: red;
+  opacity: 0.8;
+  /* border-radius: 2px; */
+  pointer-events: none;
+  z-index: 9;
 }
