@@ -231,6 +231,7 @@ window.addEventListener("keydown", (e) => {
 
 // Start game when profile pic is clicked
 pacman.addEventListener("click", () => {
+  console.log("Start!");
   if (gameRunning) return;
   resetGame();
   startSpawning();
