@@ -283,6 +283,9 @@ footer p {
     width: 100px;
     height: 100px;
   }
+  .profile-info {
+    width: 100px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -580,5 +583,11 @@ body.konami-mode::before {
 }
 
 .profile-info {
-  margin-top: 20px; /* some space below game/photo row */
+  margin-top: 20px;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
