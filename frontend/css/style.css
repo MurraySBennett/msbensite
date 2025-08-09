@@ -465,9 +465,36 @@ body.konami-mode::before {
   transition: transform 0.3s ease;
 }
 
-.profile-photo.bite {
-  transform: scaleX(1.2) scaleY(1) rotate(-15deg); /* Pacman mouth open effect */
-  transition: transform 0.3s ease;
+#profile-photo.bite {
+  border-color: #00ff00;
+  animation: bitePulse 0.3s ease-out;
+}
+
+@keyframes bitePulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.7);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px 5px #00ff00;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 0, 0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 255, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 0, 0);
+  }
 }
 
 #pacman-container.shake {
@@ -533,8 +560,8 @@ body.konami-mode::before {
 .sprite {
   position: absolute;
   top: 50%;
-  max-height: 64px; /* same height as pacman container */
-  max-width: 64px;
+  height: 64px; /* same height as pacman container */
+  width: 64px;
   user-select: none;
   pointer-events: none;
   transition: left 0.1s linear;

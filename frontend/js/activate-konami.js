@@ -3,25 +3,25 @@ const pacman = document.getElementById("profile-photo");
 const pacmanContainer = document.getElementById("pacman-container");
 
 const originalSpritesData = [
-  { key: "up", imgSrc: "assets/images/button-icons/up-arrow.png" },
-  { key: "up", imgSrc: "assets/images/button-icons/up-arrow.png" },
-  { key: "down", imgSrc: "assets/images/button-icons/down-arrow.png" },
-  { key: "down", imgSrc: "assets/images/button-icons/down-arrow.png" },
-  { key: "left", imgSrc: "assets/images/button-icons/left-arrow.png" },
-  { key: "right", imgSrc: "assets/images/button-icons/right-arrow.png" },
-  { key: "left", imgSrc: "assets/images/button-icons/left-arrow.png" },
-  { key: "right", imgSrc: "assets/images/button-icons/right-arrow.png" },
-  { key: "b", imgSrc: "assets/images/button-icons/b-key.png" },
-  { key: "a", imgSrc: "assets/images/button-icons/a-key.png" },
+  { key: "up", imgSrc: "assets/images/button-icons/button-up.png" },
+  { key: "up", imgSrc: "assets/images/button-icons/button-up.png" },
+  { key: "down", imgSrc: "assets/images/button-icons/button-down.png" },
+  { key: "down", imgSrc: "assets/images/button-icons/button-down.png" },
+  { key: "left", imgSrc: "assets/images/button-icons/button-left.png" },
+  { key: "right", imgSrc: "assets/images/button-icons/button-right.png" },
+  { key: "left", imgSrc: "assets/images/button-icons/button-left.png" },
+  { key: "right", imgSrc: "assets/images/button-icons/button-right.png" },
+  { key: "b", imgSrc: "assets/images/button-icons/button-b.png" },
+  { key: "a", imgSrc: "assets/images/button-icons/button-a.png" },
 ];
 
 let spritesData = [...originalSpritesData];
 let activeSprites = []; // Array to hold all active sprites
 let gameRunning = false;
 
-const spriteSpeed = 6; // pixels per frame
+const spriteSpeed = 4; // pixels per frame
 const spawnInterval = 500; // 1 second between sprites
-const responseWindow = 2000;
+const responseWindow = 1500;
 
 // Create sprite element and tracking object
 function createSprite(spriteInfo) {
