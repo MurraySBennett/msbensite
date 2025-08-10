@@ -24,6 +24,7 @@
   <script>
     window.gameActive = false;
   </script>
+  <script src="js/nav-burger.js"></script>
   <script src="js/activate-pixel-chaser.js" defer></script>
   <script src="js/activate-konami.js" defer></script>
   <script src="js/activate-snake.js" defer></script>
@@ -34,6 +35,26 @@
     <header>
       <!-- <h1>Welcome to My Research Arcade!</h1> -->
       <nav>
+        <button
+          class="hamburger"
+          aria-expanded="false"
+          aria-controls="nav-links"
+        >
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <div class="nav-links" id="nav-links">
+          <ul>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="research.html">Research</a></li>
+            <li><a href="experiments.html">Experiment Demos</a></li>
+            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="cv.html">CV</a></li>
+          </ul>
+        </div>
+      </nav>
+      <!-- <nav>
         <ul>
           <li><a href="index.html" class="active">Home</a></li>
           <li><a href="research.html">Research</a></li>
@@ -41,7 +62,7 @@
           <li><a href="teaching.html">Teaching</a></li>
           <li><a href="cv.html">CV</a></li>
         </ul>
-      </nav>
+      </nav> -->
     </header>
 
     <div class="container">
@@ -169,11 +190,11 @@
     <div id="virtual-gamepad">
       <div class="dpad">
         <button id="up-key" data-key="ArrowUp" class="dpad-btn up-btn">
-          ▲
+          <img src="assets/images/button-icons/button-up.png" alt="Up" />
         </button>
         <div class="dpad-horizontal">
           <button id="left-key" data-key="ArrowLeft" class="dpad-btn left-btn">
-            ◀
+            <img src="assets/images/button-icons/button-left.png" alt="Left" />
           </button>
           <div class="dpad-center"></div>
           <button
@@ -181,19 +202,25 @@
             data-key="ArrowRight"
             class="dpad-btn right-btn"
           >
-            ▶
+            <img
+              src="assets/images/button-icons/button-right.png"
+              alt="Right"
+            />
           </button>
         </div>
         <button id="down-key" data-key="ArrowDown" class="dpad-btn down-btn">
-          ▼
+          <img src="assets/images/button-icons/button-down.png" alt="Down" />
         </button>
       </div>
       <div class="action-buttons">
-        <button id="a-key" data-key="a" class="action-btn a-btn">A</button>
-        <button id="b-key" data-key="b" class="action-btn b-btn">B</button>
+        <button id="a-key" data-key="a" class="action-btn a-btn">
+          <img src="assets/images/button-icons/button-a.png" alt="A" />
+        </button>
+        <button id="b-key" data-key="b" class="action-btn b-btn">
+          <img src="assets/images/button-icons/button-b.png" alt="B" />
+        </button>
       </div>
     </div>
-
     <script>
       document.getElementById("current-year").textContent =
         new Date().getFullYear();

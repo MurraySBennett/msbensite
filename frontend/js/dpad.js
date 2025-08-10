@@ -5,20 +5,28 @@ function isMobile() {
 
 // Function to handle virtual key presses
 function dispatchKeyEvent(key, eventType) {
-  window.dispatchEvent(
-    new KeyboardEvent(eventType, {
-      key: key,
-      code: key,
-      bubbles: true,
-    })
-  );
+  // Only dispatch the event if a game is active
+  if (window.gameActive) {
+    window.dispatchEvent(
+      new KeyboardEvent(eventType, {
+        key: key,
+        code: key,
+        bubbles: true,
+      })
+    );
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const virtualGamepad = document.getElementById("virtual-gamepad");
 
   if (isMobile() && virtualGamepad) {
-    virtualGamepad.style.display = "flex"; // Show the gamepad on mobile
+    // only show the gamepad when a game is active
+    if (window.gameActive) {
+      virtualGamepad.style.display = "flex";
+    }
+
+    virtualGamepad.style.display = "flex";
     const buttons = virtualGamepad.querySelectorAll("button");
 
     buttons.forEach((button) => {
