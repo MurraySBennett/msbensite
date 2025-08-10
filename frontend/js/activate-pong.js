@@ -251,14 +251,39 @@ pongTrigger.addEventListener("click", () => {
     resetBall();
     canvas.style.display = "block";
     update();
+
+    // Add these event listeners ONLY when the game starts
+    document.addEventListener("keydown", handlePongKeyDown);
+    document.addEventListener("keyup", handlePongKeyUp);
   } else {
+    // Game is running, this branch should be for ending the game
     window.gameActive = false;
     pongRunning = false;
     cancelAnimationFrame(pongAnimationId);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     canvas.style.display = "none";
+
+    // REMOVE the listeners when the game ends
+    document.removeEventListener("keydown", handlePongKeyDown);
+    document.removeEventListener("keyup", handlePongKeyUp);
   }
 });
 
-// Hide canvas initially
+// Move your keydown/keyup functions here and rename them
+function handlePongKeyDown(e) {
+  if (e.key === "ArrowUp") {
+    e.preventDefault();
+    leftPaddleSpeed = -5; // move paddle up
+  } else if (e.key === "ArrowDown") {
+    leftPaddleSpeed = 5; // move paddle down
+    e.preventDefault();
+  }
+}
+
+function handlePongKeyUp(e) {
+  if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    leftPaddleSpeed = 0; // stop paddle when key released
+  }
+}
+
 canvas.style.display = "none";
