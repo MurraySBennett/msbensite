@@ -29,6 +29,7 @@
   <script src="js/activate-snake.js" defer></script>
   <script src="js/activate-pong.js" defer></script>
   <script src="js/steal-the-doi.js" defer></script>
+  <script src="js/dpad.js" defer></script>
   <body>
     <header>
       <!-- <h1>Welcome to My Research Arcade!</h1> -->
@@ -57,13 +58,6 @@
             </div>
             <div id="game-area"></div>
           </div>
-          <!-- <img
-            src="assets/images/murray_small.png"
-            alt="A photo of Murray S. Bennett"
-            class="profile-photo"
-            id="profile-photo"
-            tabindex="0"
-          /> -->
           <div class="profile-info">
             <h1>Murray S. Bennett</h1>
             <p id="pixel-chaser"><strong>Postdoctoral Scholar</strong></p>
@@ -171,6 +165,34 @@
 
       <h1 id="doi-counter">27</h1>
     </footer>
+
+    <div id="virtual-gamepad">
+      <div class="dpad">
+        <button id="up-key" data-key="ArrowUp" class="dpad-btn up-btn">
+          ▲
+        </button>
+        <div class="dpad-horizontal">
+          <button id="left-key" data-key="ArrowLeft" class="dpad-btn left-btn">
+            ◀
+          </button>
+          <div class="dpad-center"></div>
+          <button
+            id="right-key"
+            data-key="ArrowRight"
+            class="dpad-btn right-btn"
+          >
+            ▶
+          </button>
+        </div>
+        <button id="down-key" data-key="ArrowDown" class="dpad-btn down-btn">
+          ▼
+        </button>
+      </div>
+      <div class="action-buttons">
+        <button id="a-key" data-key="a" class="action-btn a-btn">A</button>
+        <button id="b-key" data-key="b" class="action-btn b-btn">B</button>
+      </div>
+    </div>
 
     <script>
       document.getElementById("current-year").textContent =
