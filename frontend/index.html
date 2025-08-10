@@ -28,6 +28,7 @@
   <script src="js/activate-konami.js" defer></script>
   <script src="js/activate-snake.js" defer></script>
   <script src="js/activate-pong.js" defer></script>
+  <script src="js/steal-the-doi.js" defer></script>
   <body>
     <header>
       <!-- <h1>Welcome to My Research Arcade!</h1> -->
@@ -74,11 +75,21 @@
               >. My research focuses on understanding human cognition and AI
               features to promote efficient interaction. I leverage cognitive
               models and machine learning techniques to analyze information
-              processing in both human and AI systems. My current work seeks to
-              bridge the gap between human and AI perception to improve melanoma
-              identification by developing methods to assess AI's internal
-              representations and enhance confidence estimation, ultimately
-              fostering more robust and transparent human-AI collaboration.
+              processing in both human and AI systems.
+            </p>
+            <p>
+              My current work seeks to bridge the gap between human and AI
+              perception to improve melanoma identification by developing
+              methods to assess AI's internal representations and enhance
+              confidence estimation, ultimately fostering more robust and
+              transparent human-AI collaboration.
+            </p>
+            <p>
+              Explore my core areas of research on the
+              <a href="research.html">Research page</a>, dive right in to some
+              hands-on demos on the
+              <a href="experiments.html">Experiment Demos page</a>, or hunt for
+              hidden bonuses scattered across the home page.
             </p>
             <p style="text-align: center">
               <a href="mailto:bennett.1755@osu.edu"
@@ -95,16 +106,9 @@
             </p>
           </div>
         </div>
-
         <hr />
 
         <h2>Research Highlights</h2>
-        <p>
-          Explore my core areas of research on the
-          <a href="research.html">Research page</a>, or dive right in to some
-          hands-on demos on the
-          <a href="experiments.html">Experiment Demos page</a>.
-        </p>
 
         <div class="research-areas">
           <div class="research-card">
@@ -142,6 +146,13 @@
     </div>
 
     <footer>
+      <div id="doi-container">
+        <img
+          id="doi-gif"
+          src="assets/images/sprites/raincloud.gif"
+          alt="Nicolas Cage stealing the Declaration"
+        />
+      </div>
       <p>
         <a href="mailto:bennett.1755@osu.edu"
           ><i class="fas fa-envelope"></i> Email</a
@@ -155,7 +166,10 @@
           ><i class="fab fa-github"></i> GitHub</a
         >
       </p>
+
       <p>&copy; <span id="current-year"></span> Murray S. Bennett</p>
+
+      <h1 id="doi-counter">27</h1>
     </footer>
 
     <script>

@@ -54,7 +54,7 @@ jobs:
       - name: Sync Image Files
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --delete --exclude '*' --include '*.png' --include '*.jpg' --include '*.JPG' --include '*.gif'
+          args: --delete --exclude '*' --include '*.png' --include '*.jpg' --include '*.JPG' --include '*.gif' --include '*.mp3'
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

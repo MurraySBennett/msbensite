@@ -23,7 +23,7 @@ const ballRadius = 6;
 const initialBallSpeedX = 3;
 const initialBallSpeedY = 2;
 const maxBallSpeed = 8;
-const speedIncrement = 0.01;
+const speedIncrement = 0.005;
 
 let leftPaddleY = (canvas.height - paddleHeight) / 2;
 let rightPaddleY = (canvas.height - paddleHeight) / 2;
@@ -35,7 +35,7 @@ let ballSpeedY = 2;
 function moveRightPaddle() {
   const paddleCenter = rightPaddleY + paddleHeight / 2;
   const diff = ballY - paddleCenter;
-  const speed = 3;
+  const speed = 4;
 
   if (Math.abs(diff) > 5) {
     rightPaddleY += diff > 0 ? speed : -speed;
@@ -90,10 +90,10 @@ function draw() {
   ctx.fillText(rightScore, canvas.width - 50, 20);
 
   if (gameOver) {
-    ctx.fillStyle = "#0f0";
-    ctx.font = "16px 'Press Start 2P', monospace";
-    const winner = leftScore === winningScore ? "Left Player" : "Right Player";
-    const text = `${winner} Wins!`;
+    ctx.fillStyle = leftScore === winningScore ? "#0f0" : "#f00";
+    ctx.font = "1rem 'Press Start 2P', monospace";
+    const winner = leftScore === winningScore ? "You Won!" : "You Lost!";
+    const text = `${winner}`;
     const textWidth = ctx.measureText(text).width;
     ctx.fillText(text, (canvas.width - textWidth) / 2, canvas.height / 2);
   }

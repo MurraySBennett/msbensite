@@ -55,7 +55,6 @@ function startRainbowChase() {
   sprite.classList.add("rainbow-sprite");
   sprite.style.position = "absolute";
 
-  // Smaller sprite size (24x24)
   const spriteSize = 64;
   sprite.style.width = spriteSize + "px";
   sprite.style.height = spriteSize + "px";
