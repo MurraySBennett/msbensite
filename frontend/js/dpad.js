@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const virtualGamepad = document.getElementById("virtual-gamepad");
 
   if (isMobile() && virtualGamepad) {
-    // only show the gamepad when a game is active
+    // show the gamepad only when a game is active
     if (window.gameActive) {
       virtualGamepad.style.display = "flex";
     }
