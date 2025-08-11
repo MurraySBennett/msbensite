@@ -1,3 +1,6 @@
+window.handlePongKeyDown = handlePongKeyDown;
+window.handlePongKeyUp = handlePongKeyUp;
+
 // Pong game canvas and logic
 const pongGameArea = document.getElementById("game-area");
 const pongTrigger = document.getElementById("pong");
@@ -102,6 +105,11 @@ function draw() {
 // Game update loop
 
 function update() {
+  if (!window.gameActive) {
+    stopPong();
+    return;
+  }
+
   if (gameOver) {
     draw(); // Draw the final frame with the winning message
 
@@ -220,57 +228,10 @@ function resetBall() {
 // });
 let leftPaddleSpeed = 0; // vertical speed of the paddle
 
-document.addEventListener("keydown", (e) => {
-  if (!pongRunning) return; // only react if game is running
-  if (e.key === "ArrowUp") {
-    e.preventDefault();
-    leftPaddleSpeed = -5; // move paddle up
-  } else if (e.key === "ArrowDown") {
-    leftPaddleSpeed = 5; // move paddle down
-    e.preventDefault();
-  }
-});
-
-document.addEventListener("keyup", (e) => {
-  if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-    leftPaddleSpeed = 0; // stop paddle when key released
-  }
-});
-
-// Toggle Pong game on clicking the pong <p>
-pongTrigger.addEventListener("click", () => {
-  if (window.gameActive) {
-    return;
-  }
-  window.gameActive = true;
-  if (!pongRunning) {
-    pongRunning = true;
-    gameOver = false;
-    leftScore = 0;
-    rightScore = 0;
-    resetBall();
-    canvas.style.display = "block";
-    update();
-
-    // Add these event listeners ONLY when the game starts
-    document.addEventListener("keydown", handlePongKeyDown);
-    document.addEventListener("keyup", handlePongKeyUp);
-  } else {
-    // Game is running, this branch should be for ending the game
-    window.gameActive = false;
-    pongRunning = false;
-    cancelAnimationFrame(pongAnimationId);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.style.display = "none";
-
-    // REMOVE the listeners when the game ends
-    document.removeEventListener("keydown", handlePongKeyDown);
-    document.removeEventListener("keyup", handlePongKeyUp);
-  }
-});
-
-// Move your keydown/keyup functions here and rename them
+// Your keydown/keyup functions should be defined here
+// and only be used by the event listeners inside pongTrigger.
 function handlePongKeyDown(e) {
+  // console.log(e.key);
   if (e.key === "ArrowUp") {
     e.preventDefault();
     leftPaddleSpeed = -5; // move paddle up
@@ -285,5 +246,47 @@ function handlePongKeyUp(e) {
     leftPaddleSpeed = 0; // stop paddle when key released
   }
 }
+
+function stopPong() {
+  window.gameActive = false;
+  pongRunning = false;
+  cancelAnimationFrame(pongAnimationId);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = "none";
+
+  document.removeEventListener("keydown", handlePongKeyDown);
+  document.removeEventListener("keyup", handlePongKeyUp);
+}
+
+// Toggle Pong game on clicking the pong <p>
+// Toggle Pong game on clicking the pong <p>
+pongTrigger.addEventListener("click", () => {
+  if (window.gameActive) return;
+
+  // START Pong
+  if (!pongRunning) {
+    window.gameActive = true;
+    window.stopCurrentGame = stopPong;
+    pongRunning = true;
+    gameOver = false;
+    leftScore = 0;
+    rightScore = 0;
+    resetBall();
+    // Clear game area before appending canvas
+    pongGameArea.innerHTML = "";
+    pongGameArea.appendChild(canvas);
+    canvas.style.display = "block";
+    update();
+
+    // Keyboard controls for desktop
+    document.addEventListener("keydown", handlePongKeyDown);
+    document.addEventListener("keyup", handlePongKeyUp);
+  }
+
+  // STOP Pong
+  else {
+    stopPong();
+  }
+});
 
 canvas.style.display = "none";

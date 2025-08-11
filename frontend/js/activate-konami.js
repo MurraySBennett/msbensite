@@ -51,6 +51,7 @@ function showKonamiToggleButton() {
     document.body.appendChild(toggleButton);
   }
 }
+
 function hideKonamiToggleButton() {
   const toggleButton = document.getElementById("konami-toggle");
   if (toggleButton) {
@@ -76,14 +77,23 @@ const originalSpritesData = [
 ];
 
 let spritesData = [...originalSpritesData];
-let activeSprites = []; // Array to hold all active sprites
+let activeSprites = [];
 let gameRunning = false;
 
-const spriteSpeed = 4; // pixels per frame
-const spawnInterval = 500; // 1 second between sprites
+const spriteSpeed = 3;
+const spawnInterval = 600;
 const responseWindow = 1500;
-const responseLocationStart = 250; // pixels from the edge of the container -- needs to lign up with the photo.
+const responseLocationStart = 250;
 const responseLocationEnd = 0;
+
+const keyMap = {
+  ArrowUp: "up",
+  ArrowDown: "down",
+  ArrowLeft: "left",
+  ArrowRight: "right",
+  b: "b",
+  a: "a",
+};
 
 // Create sprite element and tracking object
 function createSprite(spriteInfo) {
@@ -104,26 +114,28 @@ function createSprite(spriteInfo) {
   };
 }
 
-// Move sprites independently
 function moveSprites() {
+  if (!window.gameActive) {
+    endGame("Exited");
+    return;
+  }
+
   activeSprites.forEach((spriteObj, index) => {
-    if (spriteObj.caught) return; // Skip caught sprites
+    if (spriteObj.caught) return;
 
     spriteObj.x -= spriteSpeed;
     spriteObj.img.style.left = spriteObj.x + "px";
 
-    // Start waiting for input if near Pacman
     if (spriteObj.x <= responseLocationStart && !spriteObj.waitingForInput) {
       spriteObj.waitingForInput = true;
-      console.log(`Press this key: "${spriteObj.key}"`);
+      // console.log(`Press this key: "${spriteObj.key}"`);
       spriteObj.inputTimeout = setTimeout(() => {
         endGame("Missed the sprite!");
       }, responseWindow);
     }
 
-    // If sprite moves completely off screen without being caught
     if (spriteObj.x + spriteObj.img.offsetWidth < responseLocationEnd) {
-      console.log(spriteObj);
+      // console.log(spriteObj);
       endGame("Sprite escaped!");
     }
   });
@@ -168,7 +180,7 @@ function endGame(message) {
   activeSprites.forEach((s) => {
     if (s.inputTimeout) clearTimeout(s.inputTimeout);
   });
-  console.log(message);
+  // console.log(message);
 
   pacmanContainer.classList.add("shake");
   setTimeout(() => pacmanContainer.classList.remove("shake"), 500);
@@ -188,19 +200,15 @@ function resetGame() {
 }
 
 // Listen for key presses to catch any matching sprite waiting for input
-const keyMap = {
-  ArrowUp: "up",
-  ArrowDown: "down",
-  ArrowLeft: "left",
-  ArrowRight: "right",
-};
-
 window.addEventListener("keydown", (e) => {
-  if (gameRunning && (e.key.startsWith("Arrow") || e.key == " ")) {
+  const pressedKey = keyMap[e.key] || e.key; // Map ArrowUp to up, etc.
+  // console.log(`Pressed: ${e.key}, Mapped: ${pressedKey}`);
+
+  if (gameRunning && (e.key.startsWith("Arrow") || e.key === " ")) {
     e.preventDefault();
   }
-  const pressedKey = keyMap[e.key] || e.key;
-  inputSequence.push(e.key);
+
+  inputSequence.push(e.key); // Store raw key (ArrowUp, a, b) for konamiCode
   inputSequence.splice(
     -konamiCode.length - 1,
     inputSequence.length - konamiCode.length
@@ -224,10 +232,8 @@ window.addEventListener("keydown", (e) => {
         }
         pacman.classList.remove("bite");
 
-        // Remove sprite from activeSprites array
         activeSprites = activeSprites.filter((s) => s !== spriteObj);
 
-        // If no sprites left to spawn and none active, player wins
         if (
           spritesData.length === 0 &&
           activeSprites.length === 0 &&
@@ -249,6 +255,7 @@ window.addEventListener("keydown", (e) => {
 pacman.addEventListener("click", () => {
   if (window.gameActive) return;
   window.gameActive = true;
+  window.stopCurrentGame = () => endGame("Exited");
   if (gameRunning) return;
   resetGame();
   startSpawning();

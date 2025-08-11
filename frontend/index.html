@@ -152,13 +152,22 @@
     </div>
 
     <footer>
-      <div id="doi-container">
-        <img
-          id="doi-gif"
-          src="assets/images/sprites/raincloud.gif"
-          alt="Nicolas Cage stealing the Declaration"
-        />
+      <img
+        id="doi-countdown-initiator"
+        src="assets/images/sprites/seeing-eye.gif"
+        alt="A mysterious seeing eye icon"
+      />
+      <img
+        id="doi-gif"
+        alt="I'm going to steal the Declaration"
+        style="display: none"
+      />
+
+      <div id="countdown-display" style="display: none">
+        <!-- <h1 id="doi-counter"></h1> -->
+        <div id="doi-fact" class="doi-fact"></div>
       </div>
+
       <p>
         <a href="mailto:bennett.1755@osu.edu"
           ><i class="fas fa-envelope"></i> Email</a
@@ -172,12 +181,8 @@
           ><i class="fab fa-github"></i> GitHub</a
         >
       </p>
-
       <p>&copy; <span id="current-year"></span> Murray S. Bennett</p>
-
-      <h1 id="doi-counter">27</h1>
     </footer>
-
     <div id="virtual-gamepad">
       <div class="dpad">
         <button id="up-key" data-key="ArrowUp" class="dpad-btn up-btn">

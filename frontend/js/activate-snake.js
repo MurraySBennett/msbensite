@@ -6,6 +6,7 @@ document
 function startSnakeGame() {
   if (window.gameActive) return;
   window.gameActive = true;
+  window.stopCurrentGame = endGame;
 
   const snakeGameArea = document.getElementById("game-area");
   snakeGameArea.innerHTML = ""; // Clear existing content
@@ -37,8 +38,7 @@ function startSnakeGame() {
     };
   }
 
-  // Controls
-  document.addEventListener("keydown", changeDirection);
+  // Handle arrow keys
   function changeDirection(e) {
     if (e.key === "ArrowUp" && direction.y === 0) {
       e.preventDefault();
@@ -56,17 +56,23 @@ function startSnakeGame() {
       e.preventDefault();
       direction = { x: 1, y: 0 };
     }
-    if (e.key === "Escape") endGame(); // Allow quitting
+    if (e.key === "Escape") endGame();
   }
 
+  document.addEventListener("keydown", changeDirection);
+
+  // Game loop
   function gameLoop() {
-    if (!gameRunning) return;
+    if (!gameRunning || !window.gameActive) {
+      endGame();
+      return;
+    }
 
     // Move snake
     const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
     snake.unshift(head);
 
-    // Check collision with food
+    // Eat food or move forward
     if (head.x === food.x && head.y === food.y) {
       score++;
       food = randomFood();
@@ -75,7 +81,7 @@ function startSnakeGame() {
     }
     scoreDisplay.textContent = `Score: ${score}`;
 
-    // Check collision with walls or self
+    // Collision check
     if (
       head.x < 0 ||
       head.y < 0 ||
@@ -87,10 +93,11 @@ function startSnakeGame() {
       return;
     }
 
-    // Draw
+    // Draw background
     ctx.fillStyle = canvasColour;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Draw snake
     ctx.fillStyle = "lime";
     snake.forEach((part) =>
       ctx.fillRect(
@@ -101,6 +108,7 @@ function startSnakeGame() {
       )
     );
 
+    // Draw food
     ctx.fillStyle = "red";
     ctx.fillRect(
       food.x * gridSize,
@@ -117,19 +125,32 @@ function startSnakeGame() {
     ctx.fillStyle = "yellow";
     ctx.font = "20px 'Press Start 2P'";
     ctx.fillText("GAME OVER", canvas.width / 2 - 50, canvas.height / 2);
-    setTimeout(() => {
-      endGame();
-    }, 1500);
+    setTimeout(endGame, 1500); // Call endGame after showing "GAME OVER"
   }
 
   function endGame() {
+    gameRunning = false;
+    window.gameActive = false; // Ensure global flag is reset
+    window.stopCurrentGame = null; // Clear stop function
+    const snakeGameArea = document.getElementById("game-area");
     snakeGameArea.classList.add("game-over");
-    setTimeout(() => {
-      snakeGameArea.innerHTML = ""; // Clear the game & score display
+
+    // Clear canvas and game area immediately
+    if (snakeGameArea) {
+      snakeGameArea.innerHTML = "";
       snakeGameArea.classList.remove("game-over");
-    }, 500);
+    }
+
+    // Remove event listener
     document.removeEventListener("keydown", changeDirection);
-    window.gameActive = false;
+
+    // Ensure D-pad is hidden
+    const virtualGamepad = document.getElementById("virtual-gamepad");
+    if (virtualGamepad) {
+      virtualGamepad.classList.remove("active");
+    }
+
+    // console.log("Snake game ended and cleaned up"); // Debug log
   }
 
   gameLoop();
