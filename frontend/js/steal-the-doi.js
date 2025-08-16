@@ -7,6 +7,7 @@ const countdownDisplay = document.getElementById("countdown-display");
 const steal_the_doi = document.getElementById("doi-gif");
 const factDisplay = document.getElementById("doi-fact");
 let gifShowing = false;
+let timeoudId;
 
 let countdown_stats = [
   { counter: 10, fact: "10 total award nominations." },
@@ -26,13 +27,11 @@ let countdown_stats = [
 ];
 
 let clicksLeft;
-
-// A flag to check if the countdown is active
 let countdownActive = false;
 
 countdownInitiator.addEventListener("click", () => {
   if (gifShowing) {
-    steal_the_doi.src = "";
+    clearTimeout(timeoutId);
     steal_the_doi.style.display = "none";
     gifShowing = false;
     return;
@@ -65,13 +64,11 @@ countdownInitiator.addEventListener("click", () => {
     countdownDisplay.style.display = "none";
     countdownActive = false;
     gifShowing = true;
-  }
 
-  // steal_the_doi.onload = () => {
-  //   const gifDuration = 2000;
-  //   setTimeout(() => {
-  //     cinemaScreen.style.display = "none";
-  //     steal_the_doi.src = "";
-  //   }, gifDuration);
-  // };
+    timeoutId = setTimeout(() => {
+      steal_the_doi.style.display = "none";
+      steal_the_doi.src = "";
+      gifShowing = false;
+    }, 23000);
+  }
 });
