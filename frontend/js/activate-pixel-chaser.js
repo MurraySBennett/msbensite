@@ -59,6 +59,11 @@ function startRainbowChase() {
   sprite.style.width = spriteSize + "px";
   sprite.style.height = spriteSize + "px";
 
+  let minChaserTime = 1000;
+  let maxChaserTime = 3500;
+  const pixelGameDuration =
+    Math.random() * (maxChaserTime - minChaserTime) + minChaserTime;
+
   // Random start position within game area
   let pos = {
     x: Math.random() * (pixelGameArea.clientWidth - spriteSize),
@@ -66,7 +71,7 @@ function startRainbowChase() {
   };
 
   // Random initial velocity direction and speed
-  const speed = 3;
+  const speed = 4;
   let angle = Math.random() * 2 * Math.PI;
   let velocity = {
     x: Math.cos(angle) * speed,
@@ -200,6 +205,13 @@ function startRainbowChase() {
   }
 
   animate();
+
+  // End the game after 3 seconds
+  setTimeout(() => {
+    cancelAnimationFrame(animationId);
+    cleanup();
+    window.gameActive = false;
+  }, pixelGameDuration);
 }
 
 function cleanup() {
