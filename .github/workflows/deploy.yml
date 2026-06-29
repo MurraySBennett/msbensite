@@ -1,0 +1,70 @@
+name: Deploy to S3
+
+# Triggers on every push to the main branch.
+# To deploy: commit your changes and push to main (or merge a PR into main).
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Sync to S3 and invalidate CloudFront
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configure AWS credentials from GitHub Secrets.
+      #    You must add these three secrets in your GitHub repo:
+      #    Settings → Secrets and variables → Actions → New repository secret
+      #    - AWS_ACCESS_KEY_ID
+      #    - AWS_SECRET_ACCESS_KEY
+      #    - AWS_REGION (e.g. us-east-1)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 3. Sync the repository to S3.
+      #    - Excludes .git, .github, and any dev-only files
+      #    - --delete removes files from S3 that no longer exist locally
+      #    - Cache-control headers:
+      #        HTML files: no-cache (always revalidated by the browser)
+      #        Everything else: 1 year (CDN will cache aggressively)
+      - name: Sync HTML files to S3 (no-cache)
+        run: |
+          aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "*.py" \
+            --exclude "*.md" \
+            --exclude "node_modules/*" \
+            --include "*.html" \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --delete
+
+      - name: Sync static assets to S3 (long cache)
+        run: |
+          aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "*.py" \
+            --exclude "*.md" \
+            --exclude "node_modules/*" \
+            --exclude "*.html" \
+            --cache-control "public, max-age=31536000, immutable" \
+            --delete
+
+      # 4. Invalidate the CloudFront distribution so visitors see the new version
+      #    immediately. Add this secret too:
+      #    - CLOUDFRONT_DISTRIBUTION_ID
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"

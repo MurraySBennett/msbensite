@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project — Murray S. Bennett</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  </head>
+  <body data-page="research">
+    <script src="/js/components.js" defer></script>
+    <script src="/js/project-detail.js" defer></script>
+    <div id="nav-placeholder"></div>
+
+    <div class="container">
+      <section id="project-detail-content">
+
+        <!-- Project header -->
+        <div class="project-header">
+          <h2 id="project-title">Loading…</h2>
+          <div id="project-status"></div>
+          <div id="project-tags" class="tag-list" style="display:none"></div>
+        </div>
+
+        <!-- Thumbnail image -->
+        <img id="project-thumbnail" src="" alt="" class="project-thumbnail" style="display:none" />
+
+        <!-- Summary -->
+        <div class="project-summary-block">
+          <p id="project-summary"></p>
+        </div>
+
+        <!-- Links (OSF, demos, paper) -->
+        <div id="project-links-container" style="display:none">
+          <div class="project-links">
+            <a id="link-osf" href="#" class="button" style="display:none" target="_blank">
+              OSF Project <i class="fas fa-external-link-alt"></i>
+            </a>
+            <a id="link-experiment-demo" href="#" class="button" style="display:none">
+              Experiment Demo <i class="fas fa-flask"></i>
+            </a>
+            <a id="link-interactive-demo" href="#" class="button" style="display:none">
+              Interactive Demo <i class="fas fa-chart-bar"></i>
+            </a>
+            <a id="link-publication" href="#" class="button" style="display:none" target="_blank">
+              Read the Paper <i class="fas fa-file-alt"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Markdown content (background, analyses, outcomes) -->
+        <div id="project-content" class="project-content markdown-body"></div>
+
+        <!-- Related publications -->
+        <div id="project-publications" class="project-publications" style="display:none">
+          <h3>Related Publications</h3>
+          <ul class="pub-list"></ul>
+        </div>
+
+        <hr />
+        <p><a href="/research.html"><i class="fas fa-arrow-left"></i> Back to Research</a></p>
+      </section>
+    </div>
+
+    <div id="footer-placeholder"></div>
+  </body>
+</html>

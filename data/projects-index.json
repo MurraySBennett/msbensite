@@ -1,0 +1,62 @@
+[
+  {
+    "id": "team-spirit-hh",
+    "category": "Human-AI Collaboration",
+    "status": "published"
+  },
+  {
+    "id": "confidnet",
+    "category": "Human-AI Collaboration",
+    "status": "in-progress"
+  },
+  {
+    "id": "cdnn-knn",
+    "category": "Human-AI Collaboration",
+    "status": "in-progress"
+  },
+  {
+    "id": "melnet-training",
+    "category": "Human-AI Collaboration",
+    "status": "in-progress"
+  },
+  {
+    "id": "discrete-choice-rating",
+    "category": "Cognitive Modeling & Decision Science",
+    "status": "published"
+  },
+  {
+    "id": "dutch-auction",
+    "category": "Cognitive Modeling & Decision Science",
+    "status": "published"
+  },
+  {
+    "id": "censoring-accumulator-models",
+    "category": "Cognitive Modeling & Decision Science",
+    "status": "in-progress"
+  },
+  {
+    "id": "noisy-grt",
+    "category": "Cognitive Modeling & Decision Science",
+    "status": "in-progress"
+  },
+  {
+    "id": "implicit-attitudes",
+    "category": "Cognitive Modeling & Decision Science",
+    "status": "in-progress"
+  },
+  {
+    "id": "melanoma-features",
+    "category": "Perception & Applied Vision",
+    "status": "published"
+  },
+  {
+    "id": "wheel-of-fortune",
+    "category": "Perception & Applied Vision",
+    "status": "published"
+  },
+  {
+    "id": "abc-feature-interactions",
+    "category": "Perception & Applied Vision",
+    "status": "in-progress"
+  }
+]

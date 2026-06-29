@@ -1,0 +1,23 @@
+{
+  "id": "wheel-of-fortune",
+  "title": "Wheel of Fortune: Unbiased Mental Representations of Symbolic Numerals",
+  "category": "Perception & Applied Vision",
+  "status": "published",
+  "thumbnail": "/assets/images/project-icons/wheel-of-fortune-demo.png",
+  "thumbnail_alt": "Wheel of Fortune experiment interface screenshot",
+  "summary": "Bias-free confusion analysis and multidimensional scaling reveal that cultural expertise reshapes the mental organisation of numeral systems. Unfamiliar symbols (Thai numerals) are represented similarly across English and Chinese speakers; familiar symbols carry the imprint of experience. The study provides a methodological template for studying expertise-driven perceptual reorganisation in any domain.",
+  "tags": [
+    "perception",
+    "mental representation",
+    "numerals",
+    "multidimensional scaling",
+    "cross-cultural"
+  ],
+  "links": {
+    "osf": "",
+    "experiment_demo": "/experiment-demo-viewer.html?demo=wheel-of-fortune",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

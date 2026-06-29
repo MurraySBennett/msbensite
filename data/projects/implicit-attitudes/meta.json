@@ -1,0 +1,17 @@
+{
+  "id": "implicit-attitudes",
+  "title": "IAT Processing Independence",
+  "category": "Cognitive Modeling & Decision Science",
+  "status": "in-progress",
+  "thumbnail": "",
+  "thumbnail_alt": "IAT processing independence project placeholder",
+  "summary": "Empirically testing the assumption of processing independence in the Implicit Attitudes Task (IAT) using cognitive modelling techniques, contributing to the ongoing debate about the IAT's validity and the nature of automatic cognitive processes.",
+  "tags": ["IAT", "implicit attitudes", "cognitive modeling", "social psychology", "processing independence"],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "melnet-training",
+  "title": "MelNet: Training Human Perceptual Expertise",
+  "category": "Human-AI Collaboration",
+  "status": "in-progress",
+  "thumbnail": "",
+  "thumbnail_alt": "MelNet Training project placeholder",
+  "summary": "Training human perceptual expertise using activation patterns from a CDNN trained for melanoma identification, investigating whether AI-derived visual feedback can accelerate and enhance human diagnostic learning.",
+  "tags": ["perceptual learning", "neural networks", "melanoma", "training", "human-AI"],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

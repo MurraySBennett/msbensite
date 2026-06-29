@@ -1,0 +1,17 @@
+{
+  "id": "censoring-accumulator-models",
+  "title": "Censoring Methods in Evidence Accumulation Models",
+  "category": "Cognitive Modeling & Decision Science",
+  "status": "in-progress",
+  "thumbnail": "",
+  "thumbnail_alt": "Censoring EAMs project placeholder",
+  "summary": "Systematically examining how different methods for handling response time outliers affect parameter estimation and psychological interpretation in evidence accumulation models — with implications for any cognitive study that uses response time data.",
+  "tags": ["EAM", "response time", "outliers", "cognitive modeling", "parameter estimation"],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

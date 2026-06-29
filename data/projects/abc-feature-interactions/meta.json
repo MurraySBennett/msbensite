@@ -1,0 +1,17 @@
+{
+  "id": "abc-feature-interactions",
+  "title": "ABC Feature Interactions in Melanoma Identification",
+  "category": "Perception & Applied Vision",
+  "status": "in-progress",
+  "thumbnail": "",
+  "thumbnail_alt": "ABC feature interactions project placeholder",
+  "summary": "Examining how human perception integrates asymmetry, border irregularity, and colour variance when they appear in combination. Understanding these interactions is critical for improving diagnostic training and developing AI decision aids that align with human perceptual expertise.",
+  "tags": ["melanoma", "GRT", "perception", "feature integration", "decision making"],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

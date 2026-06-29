@@ -1,0 +1,23 @@
+{
+  "id": "confidnet",
+  "title": "Machine Metacognition: Latent-Space Uncertainty for Neural Networks",
+  "category": "Human-AI Collaboration",
+  "status": "under-review",
+  "thumbnail": "",
+  "thumbnail_alt": "",
+  "summary": "Neural networks are systematically overconfident, especially on the cases that matter most. Drawing on human metacognition research, this project uses k-nearest-neighbour analysis of penultimate-layer activations to produce a 'neighbourhood consistency' score \u2014 a second-order uncertainty signal grounded in the network's familiarity with each input. Combined with softmax outputs, this raises melanoma classification AUC from 0.94 to 0.97 and dramatically improves sensitivity to high-confidence errors.",
+  "tags": [
+    "confidence estimation",
+    "neural networks",
+    "melanoma",
+    "calibration",
+    "human-AI"
+  ],
+  "links": {
+    "osf": "https://osf.io/f34rm",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

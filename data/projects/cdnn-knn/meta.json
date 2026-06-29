@@ -1,0 +1,17 @@
+{
+  "id": "cdnn-knn",
+  "title": "CDNN Decisions with kNN Similarity",
+  "category": "Human-AI Collaboration",
+  "status": "in-progress",
+  "thumbnail": "",
+  "thumbnail_alt": "CDNN kNN project placeholder",
+  "summary": "Analysing decisions from a Convolutional Deep Neural Network (CDNN) based on k-Nearest Neighbour (kNN) similarity metrics across activation layers, providing insights into AI's internal representations for melanoma identification.",
+  "tags": ["neural networks", "kNN", "interpretability", "melanoma", "deep learning"],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

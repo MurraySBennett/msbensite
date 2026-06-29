@@ -1,0 +1,27 @@
+{
+  "id": "team-spirit-hh",
+  "title": "Team Spirit: Evaluating Group Performance Efficiency",
+  "category": "Human-AI Collaboration",
+  "status": "published",
+  "thumbnail": "/assets/images/project-icons/team-spirit-demo.png",
+  "thumbnail_alt": "Team Spirit experiment screenshot showing paddle game",
+  "summary": "Applying workload capacity analysis to human team performance reveals that teamwork introduces measurable efficiency costs \u2014 teams score more than individuals, but not as much more as two independently-working people would. Collaboration is more efficient than competition, and both impose cognitive load costs on individual members. Subsequent work extends this paradigm to AI teammates and real-time cognitive modelling.",
+  "tags": [
+    "workload capacity",
+    "teamwork",
+    "cognitive load",
+    "SFT",
+    "pong"
+  ],
+  "links": {
+    "osf": "https://osf.io/mtazf/",
+    "experiment_demo": "/experiment-demo-viewer.html?demo=team-spirit-hh",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": [
+    "bennett2023collective",
+    "bennett2022human",
+    "hedley2023relationship"
+  ]
+}

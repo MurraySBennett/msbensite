@@ -1,0 +1,23 @@
+{
+  "id": "discrete-choice-rating",
+  "title": "Discrete Choice vs. Rating Scale Decision Elicitation",
+  "category": "Cognitive Modeling & Decision Science",
+  "status": "published",
+  "thumbnail": "/assets/images/project-icons/dc-rs-demo.png",
+  "thumbnail_alt": "Discrete choice vs rating scale experiment screenshot",
+  "summary": "The first direct empirical test of whether discrete choice and rating scale tasks tap the same internal representation. Bayesian model comparison favours a shared latent representation for 71% of participants \u2014 but choice tasks produce more widely separated latent states, making them a more sensitive measurement instrument. The remaining 29% of participants show evidence of genuinely distinct representations across formats.",
+  "tags": [
+    "decision making",
+    "preference elicitation",
+    "cognitive modeling",
+    "Bayesian",
+    "latent representations"
+  ],
+  "links": {
+    "osf": "",
+    "experiment_demo": "/experiment-demo-viewer.html?demo=dc-rs",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

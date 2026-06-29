@@ -1,0 +1,25 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Node (if you ever add a build step)
+node_modules/
+
+# Local dev config
+.env.local
+*.local
+
+# AWS CLI cached credentials (never commit these)
+.aws/
