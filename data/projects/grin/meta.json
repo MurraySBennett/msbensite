@@ -1,0 +1,25 @@
+{
+  "id": "grin",
+  "title": "GRIN: Amortised Inference for General Recognition Theory",
+  "category": "Cognitive Modeling & Decision Science",
+  "status": "in-progress",
+  "thumbnail": "/assets/images/project-icons/grin-space-builder.png",
+  "thumbnail_alt": "GRIN perceptual-space explorer interface",
+  "summary": "A neural network trained to fit General Recognition Theory models to identification data in a single forward pass, with calibrated posterior uncertainty in place of a point estimate \u2014 validated against classical maximum likelihood on both simulated and published data. A live, fully client-side tool, not just a write-up.",
+  "tags": [
+    "General Recognition Theory",
+    "simulation-based inference",
+    "amortised Bayesian inference",
+    "perceptual independence",
+    "perceptual separability",
+    "neural networks",
+    "uncertainty quantification"
+  ],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "https://grin.murraysbennett.com",
+    "publication": ""
+  },
+  "publications": []
+}

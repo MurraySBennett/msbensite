@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tools — Murray S. Bennett</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body data-page="tools">
+    <script src="/js/components.js" defer></script>
+    <div id="nav-placeholder"></div>
+
+    <div class="container">
+      <section id="tools-intro">
+        <h2>Tools</h2>
+        <p>
+          Standalone tools built from my research — not one-off demos, but full
+          working software you can use on your own data. Each one is its own
+          self-contained project with its own documentation; click through and
+          it opens as its own site.
+        </p>
+        <p class="profile-links">
+          <a href="mailto:bennett.1755@osu.edu"
+            ><i class="fas fa-envelope"></i> Email</a
+          >
+          |
+          <a href="https://orcid.org/0000-0001-7309-4915" target="_blank"
+            ><i class="fab fa-orcid"></i> ORCID</a
+          >
+          |
+          <a href="https://github.com/MurraySBennett" target="_blank"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+        </p>
+      </section>
+
+      <section id="tools-list">
+        <h2>Available Tools</h2>
+        <div class="research-grid">
+          <a
+            href="https://grin.murraysbennett.com"
+            class="research-tile"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              src="/assets/images/project-icons/grin-space-builder.png"
+              alt="GRIN — amortised inference for General Recognition Theory"
+            />
+            <div class="tile-body">
+              <h3>GRIN</h3>
+              <p>
+                Fit General Recognition Theory models to identification data in
+                milliseconds, with calibrated uncertainty — a neural-network
+                amortization of the maximum likelihood approach, validated
+                against it directly.
+              </p>
+            </div>
+          </a>
+
+          <!--
+            Template for the next tool -- copy this block, point the href at its
+            subdomain, and add its icon under /assets/images/project-icons/.
+
+          <a href="https://NEXT-PROJECT.murraysbennett.com" class="research-tile" target="_blank" rel="noopener">
+            <img src="/assets/images/project-icons/NEXT-PROJECT-tool.png" alt="NEXT-PROJECT" />
+            <div class="tile-body">
+              <h3>NEXT-PROJECT</h3>
+              <p>One or two sentences: what it does and why it's useful.</p>
+            </div>
+          </a>
+          -->
+        </div>
+      </section>
+    </div>
+
+    <div id="footer-placeholder"></div>
+  </body>
+</html>
