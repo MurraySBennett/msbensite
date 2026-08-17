@@ -105,25 +105,28 @@
         // config change. In production DEV_CONFIG is always empty.
         if (state.config) {
           const sc = state.config;
-          // Timing: server is authoritative; DEV_CONFIG overrides only if > 0
-          trialDuration         = (DEV_CONFIG.trialDuration         > 0) ? DEV_CONFIG.trialDuration         : sc.trialDuration;
-          practiceTrialDuration = (DEV_CONFIG.practiceTrialDuration > 0) ? DEV_CONFIG.practiceTrialDuration : sc.practiceTrialDuration;
-          blockBreakTime        = (DEV_CONFIG.blockBreakTime        > 0) ? DEV_CONFIG.blockBreakTime        : sc.blockBreakTime;
-          trialBreakTime        = (DEV_CONFIG.trialBreakTime        > 0) ? DEV_CONFIG.trialBreakTime        : sc.trialBreakTime;
+          trialDuration         = sc.trialDuration;
+          practiceTrialDuration = sc.practiceTrialDuration;
+          blockBreakTime        = sc.blockBreakTime;
+          trialBreakTime        = sc.trialBreakTime;
           nBlocks               = sc.nBlocks || 3;
+          maxBallsPerPlayer     = sc.maxBallsPerPlayer || maxBallsPerPlayer;
           BALL_MODE_VALENCE     = sc.ballMode === 'valence';
+          PHYSICS_MODE          = sc.ballPhysics || 'classic';
+          show_drt              = sc.drtEnabled !== false;
           respWin               = sc.drtRespWin  ?? respWin;
           drtDur                = sc.drtDuration ?? drtDur;
-          // Study credentials from server config - replaces hardcoded values
+          if (Array.isArray(sc.playerTypes)) {
+            const otherPlayer = String(state.player_id) === '0' ? 1 : 0;
+            botratheon = sc.playerTypes[otherPlayer] !== 'human';
+            ambigubot = botratheon && Boolean(sc.botPretendHuman);
+          }
+          // Only public study contact/completion settings enter browser state.
           if (sc.platform) {
             const p = sc.platform;
             if (p.contactName)   CONTACT_NAME  = p.contactName;
             if (p.contactEmail)  CONTACT_EMAIL = p.contactEmail;
-            if (p.studyName)     STUDY_NAME    = p.studyName;
             if (p.prolificCode)  PROLIFIC_CODE = p.prolificCode;
-            if (p.sonaExpId)     SONA_EXP_ID   = p.sonaExpId;
-            if (p.sonaCreditToken) SONA_TOKEN  = p.sonaCreditToken;
-            if (p.sonaBaseUrl)   SONA_BASE_URL = p.sonaBaseUrl;
           }
         }
 
@@ -152,13 +155,6 @@
         fwCanvas = document.getElementById("fireworks");
         fwCtx = fwCanvas.getContext("2d");
         waitingRoomStart = Date.now();
-
-        if (botratheon) {
-          // hand is set by the bot after it joins; guard against it still
-          // being the default [] array if initialise() runs first.
-          const botHand = state.players[1].hand;
-          ambigubot = typeof botHand === "string" && botHand.split("-")[1] === "True";
-        }
 
         if (
           state.status === "ending" ||
@@ -246,7 +242,7 @@
               dispCont = true;
               startCount = 0;
               nCurrentTrial = state.trialNo;
-              endTrial(score1, score2, teamScore, 0, (state.block||{}).n_balls||1, state.block.block_type);
+              endTrial(score1, score2, teamScore, 0, 0, state.block.block_type);
             } else {
               blockInst(state.block.block_type, state.blockNo);
             }
@@ -270,12 +266,10 @@
               "Please make a selection to continue.";
           } else {
             data_consent_provided = true;
-            if (document.getElementById("removeData").checked) {
-              ws.send(JSON.stringify({ instructionProgress: username1 }));
-            }
+            const retain = document.getElementById("retainData").checked;
+            ws.send(JSON.stringify({ type: 'consent', retain: retain }));
             document.getElementById("datacheck").classList.remove("visible");
-            ws.send(JSON.stringify({ status: "ready" }));
-            intertrialWaiting();
+            expEnd();
           }
         };
 
@@ -283,7 +277,8 @@
         if (prolificReturn) {
           prolificReturn.onclick = function () {
             if (exp_completed) {
-              window.location.href = "https://app.prolific.co/submissions/complete?cc=80A936B0";
+              window.location.href = "https://app.prolific.co/submissions/complete?cc=" +
+                encodeURIComponent(PROLIFIC_CODE || "STUDY_COMPLETE");
             } else {
               window.location.href = "https://app.prolific.co/submissions/";
             }
@@ -390,13 +385,19 @@
             if (bInPractice) {
               hits1++;
             } else {
-              ws.send(JSON.stringify({ rt: stimTimes[0] - tRem }));
-              ws.send(JSON.stringify({ score: score1 + 1 }));
+              ws.send(JSON.stringify({
+                type: 'drt_response',
+                rt_ms: (stimTimes[0] - tRem) * 1000,
+                stimulus_onset_s: stimTimes[0]
+              }));
             }
             counter1 = false;
           } else {
             if (!bInPractice) {
-              ws.send(JSON.stringify({ fa: tRem }));
+              ws.send(JSON.stringify({
+                type: 'drt_false_alarm',
+                trial_elapsed_ms: (duration - tRem) * 1000
+              }));
             }
           }
           drtResp1 = false;
@@ -415,14 +416,18 @@
           drtPanels.draw(drtOn);
         }
         if (tRem < stimTimes[0] - respWin) {
-          onsets.push(stimTimes[0]);
-          stimTimes.shift();
+          const expiredOnset = stimTimes[0];
+          onsets.push(expiredOnset);
           if (counter1) {
             // if still true at this point then no response was made to this stimulus
-            ws.send(JSON.stringify({ rt: -1 }));
+            if (!bInPractice) ws.send(JSON.stringify({
+              type: 'drt_miss',
+              stimulus_onset_s: expiredOnset
+            }));
           } else {
             counter1 = true;
           }
+          stimTimes.shift();
         }
 
         expContext.fill();
@@ -731,9 +736,6 @@
       function expTrial() {
         OV.hide();
         INST.step = -1;
-        if (DEV_BLOCK_TYPE && DEV_BLOCK_TYPE !== '') {
-          state.block.block_type = DEV_BLOCK_TYPE;
-        }
         // Guard: if state.block isn't populated yet, abort gracefully
         if (!state.block || !state.block.block_type) {
           console.error('[expTrial] state.block not ready:', state.block);
@@ -812,7 +814,7 @@
         // standard → purple (sharedColour)
         // valence  → green (positive) or red (negative) by ball.value
         } else {
-          let totalBalls = sim_RL_team ? state.block.n_balls * 2 : state.block.n_balls * 2;
+          let totalBalls = state.block.n_balls * 2;
           for (let i = 0; i < totalBalls; i++) {
             let col = ballColour(state.balls[i], sharedColour);
             allBalls.push(new Ball(state.balls[i].x, col, state.balls[i].id, state.balls[i].angle, state.balls[i].value, state.balls[i].y));
@@ -833,7 +835,7 @@
           return new Promise((resolve) => setTimeout(resolve, time));
         };
 
-        while (true) {
+        while (ws.readyState === WebSocket.OPEN) {
           if (state.status === "playing" && paddle1) {
             if (sim_RL_team | sim_RLIO_team) {
               ws.send(
@@ -944,7 +946,7 @@
 
             if (
               state.status === "playing" &&
-              (received.status === "reading" || received.status === "ending") &&
+              (["reading", "postgame", "ending"].includes(received.status)) &&
               bInTrial
             ) {
               // Capture scores BEFORE Object.assign — server resets them on transition
@@ -953,14 +955,13 @@
               const _p1s  = (state.players[_pid] || {}).score || 0;
               const _p2s  = (state.players[_oid] || {}).score || 0;
               const _hits = (state.players[_pid] || {}).hits  || 0;
+              const _misses = (state.players[_pid] || {}).miss || 0;
               const _bt   = (state.block || {}).block_type || currentBlock;
-              const _nbRaw = (state.block || {}).n_balls || 1;
-              const _nb    = (_bt === 'nonCol') ? _nbRaw : _nbRaw * 2;
               const _teams = _p1s + _p2s;
               Object.assign(state, received);
               startCount = 0;
               moving = false;
-              endTrial(_p1s, _p2s, _teams, _hits, _nb, _bt);
+              endTrial(_p1s, _p2s, _teams, _hits, _misses, _bt);
             }
 
             let playerId = state.player_id;
@@ -1058,9 +1059,7 @@
         );
         if (sona_participants) {
           expContext.fillText(
-            "Participation credit for SONA ID " +
-              state.players[state.player_id].platformID +
-              " been granted.",
+            "Your participation credit will be reviewed and processed.",
             expCanvas.width / 2,
             expCanvas.height / 4 - 40
           );
@@ -1098,7 +1097,7 @@
           expCanvas.height / 4
         );
         expContext.fillText(
-          "Murray Bennett at murray.bennett@uon.edu.au",
+          CONTACT_EMAIL ? CONTACT_NAME + " at " + CONTACT_EMAIL : CONTACT_NAME,
           expCanvas.width / 2,
           expCanvas.height / 4 + 20
         );
@@ -1131,7 +1130,7 @@
 
         drawPracticeTrial();
       }
-      function endTrial(p1s, p2s, teams, myHits, nBalls, blockType) {
+      function endTrial(p1s, p2s, teams, myHits, myMisses, blockType) {
         cancelAnimationFrame(rAF);
         clearFrame();
         bInTrialBreak = true;
@@ -1181,9 +1180,9 @@
           const _p2s   = (p2s    !== undefined) ? p2s    : score2;
           const _teams = (teams  !== undefined) ? teams  : teamScore;
           const _hits  = (myHits !== undefined) ? myHits : 0;
-          const _nb    = (nBalls !== undefined) ? nBalls : ((state.block || {}).n_balls || 1);
+          const _misses = (myMisses !== undefined) ? myMisses : 0;
           const _bt    = (blockType !== undefined) ? blockType : currentBlock;
-          interTrial(_p1s, _p2s, _teams, _hits, _nb, _bt);
+          interTrial(_p1s, _p2s, _teams, _hits, _misses, _bt);
         }
       }
 
@@ -1245,11 +1244,12 @@
         scoreReset();
         proceed = false;
         bInTrialBreak = false;
-        if (state.trialNo == state.maxTrials - 1 && state.blockNo == 2 && !data_consent_provided) {
+        const finalTrial = state.trialNo == state.maxTrials - 1;
+        const finalBlock = state.blockNo == nBlocks - 1;
+        if (finalTrial && finalBlock && !data_consent_provided) {
           dataCheck();
         } else if (nCurrentTrial < state.maxTrials) {
           ws.send(JSON.stringify({ status: "ready" }));
-          if (!show_drt) ws.send(JSON.stringify({ rt: -999 }));
           intertrialWaiting();
         } else {
           if (state.trialNo + 1 >= state.maxTrials) {
@@ -1275,8 +1275,7 @@
         const isCol    = blockType === 'col' || blockType === 'shared';
         const isNonCol = blockType === 'nonCol';
 
-        // Hit rate (0–1) is comparable across ball counts.
-        // Use p1.hits / n_balls for nonCol, team.hits / (n_balls*2) for group.
+        // Hit rate is hits / (hits + observed misses), independent of ball count.
         const rates = scoreHistory.map(d => Math.min(1, Math.max(0, d.hitRate || 0)));
 
         const barW  = Math.max(2, Math.floor((W - 4) / totalTrials) - 1);
@@ -1334,7 +1333,7 @@
         ctx.fillText(rates.length + ' / ' + totalTrials, 4, 10);
       }
 
-      function interTrial(p1s, p2s, teams, myHits, nBalls, blockType) {
+      function interTrial(p1s, p2s, teams, myHits, myMisses, blockType) {
         drawCanvas(fontColour);
         drawFrame();
         drawTrialEnd();
@@ -1363,7 +1362,8 @@
           p2CumulativeScore  += parseFloat(p2s) || 0;
           teamCumulativeScore += parseFloat(teams) || 0;
           // Hit rate using pre-reset values passed in from endTrial()
-          const hitRate = (nBalls > 0) ? Math.min(1, (myHits || 0) / nBalls) : 0;
+          const opportunities = (myHits || 0) + (myMisses || 0);
+          const hitRate = opportunities > 0 ? (myHits || 0) / opportunities : 0;
           scoreHistory.push({
             p1:        parseFloat(p1s)   || 0,
             p2:        parseFloat(p2s)   || 0,

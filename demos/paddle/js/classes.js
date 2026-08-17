@@ -189,8 +189,8 @@
 
             if (state.block.block_type == "nonCol" || sim_RL_team) {
               if (
-                (ballId < 9 && playerId == 0) ||
-                (ballId >= 9 && playerId == 1)
+                (ballId < maxBallsPerPlayer && playerId == 0) ||
+                (ballId >= maxBallsPerPlayer && playerId == 1)
               )
                 p1 = true;
               else p2 = true;

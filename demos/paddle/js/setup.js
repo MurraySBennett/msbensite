@@ -34,7 +34,7 @@
             self._resolve_progress();
           };
 
-          let thing = fun(this.setProgress).then(
+          fun(this.setProgress).then(
             (result) => {
               this._reject_progress();
               this._resolve_result(result);
@@ -72,7 +72,6 @@
 
       let ws;
       let messages;
-      let player;
       let serverTimeDelta = null;  // null until first server message; see adjustedTime()
       let pingSent = Date.now();
       let roundTripTime = 0;
@@ -321,7 +320,6 @@
           const nextStep = this._computeNextStep(this.step);
           if (nextStep > this.maxStep) {
             // Done with instructions — go to block instructions
-            bInInstructionsEnd = false;
             blockInst(state.block.block_type, state.blockNo);
             teamCumulativeScore = 0; p1CumulativeScore = 0; p2CumulativeScore = 0;
             return;
@@ -331,7 +329,6 @@
           if (this.step === 3 && !this.practicesDone.has('paddle')) {
             this.practicesDone.add('paddle');
             bInPaddlePractice = true;
-            bInInstructions2 = false;
             drtActive = false;
             OV.hide();
             practiceTrial();
@@ -339,7 +336,6 @@
           }
           if (this.step === 4 && !this.practicesDone.has('drt') && show_drt) {
             this.practicesDone.add('drt');
-            bInInstructions3 = false;
             drtActive = true;
             bInDRTPractice = true;
             OV.hide();
@@ -348,7 +344,6 @@
           }
           if (this.step === 5 && !this.practicesDone.has('combined')) {
             this.practicesDone.add('combined');
-            bInInstructions4 = false;
             drtActive = show_drt;
             bInCombinedPractice = true;
             practiceTrialDuration = trialDuration;
@@ -398,8 +393,7 @@
           return step - 1;
         },
 
-        // Called by the old bInInstructions* code paths and by
-        // DEV_SKIP_INTRO — both eventually want to arrive at a step.
+        // Jump directly to a configured instruction step.
         goTo(step) { this.show(step); },
 
         // True if we are on any instruction page
@@ -415,7 +409,7 @@
         // These are defined in input.js which loads before setup.js runs.
         document.addEventListener('keydown', keyDownHandler, false);
         document.addEventListener('keyup',   keyUpHandler,   false);
-        document.addEventListener('blur',    lostFocus);
+        window.addEventListener('blur', lostFocus);
 
         let protocol = window.location.protocol === "http:" ? "ws:" : "wss:";
         let path = window.location.pathname.substring(
@@ -431,6 +425,33 @@
           ws.onerror = () => reject(new UnableToConnect());
         });
 
+        ws.send(JSON.stringify({
+          type: 'client_context',
+          viewport_width: window.innerWidth,
+          viewport_height: window.innerHeight,
+          screen_width: window.screen.width,
+          screen_height: window.screen.height,
+          device_pixel_ratio: window.devicePixelRatio || 1
+        }));
+        window.addEventListener('focus', () => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'client_lifecycle', event: 'focus' }));
+          }
+        });
+        window.addEventListener('blur', () => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'client_lifecycle', event: 'blur' }));
+          }
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: 'client_lifecycle',
+              event: document.hidden ? 'visibility_hidden' : 'visibility_visible'
+            }));
+          }
+        });
+
         messages = new ProgressStream((setProgress) => {
           ws.onmessage = (message) => setProgress(message.data);
           return new Promise((resolve, reject) => {
@@ -444,7 +465,7 @@
           // handles the UI — this catch just prevents a console error.
           if (!(e instanceof ConnectionLost)) console.error(e);
         });
-        writeMessages();
+        writeMessages().catch(e => console.error(e));
         await stateReady;
 
         initialise();
@@ -498,28 +519,21 @@
       var drawStartTime;      // timestamp for drawTrial first frame
       var expTimeout;         // setTimeout handle for experiment timing
       var xPos, yPos;         // general position vars used in animations
-      var tRem, timeRemaining;// timer display vars
       var waitType;           // waiting room display type
       var otherId;            // the other player's id ("0" or "1")
       var playerId;           // this player's id
-      var angle;              // general angle var used in rendering
 
       let platform_source = new URLSearchParams(
         document.location.search.substring(1)
       );
       var sona_participants     = platform_source.get("platform") === "sona";
       var prolific_participants = platform_source.get("platform") === "prolific";
-      var lab_participants      = !sona_participants && !prolific_participants;
 
       // Study contact details - overridden from state.config.platform in initialise()
       // Default values used until server config arrives.
       var CONTACT_NAME  = "the research team";
       var CONTACT_EMAIL = "";
-      var STUDY_NAME    = "paddle-exp";
       var PROLIFIC_CODE = "";
-      var SONA_EXP_ID   = "";
-      var SONA_TOKEN    = "";
-      var SONA_BASE_URL = "https://newcastle.sona-systems.com";
       var show_drt =
         platform_source.get("d") ==
         null; /*(d)isco or not - if we don't include it in params it should default to 'on'*/
@@ -532,7 +546,6 @@
       var sim_RL_team = platform_source.get("sim_RL_team") == "1";
       var sim_RLIO_team = platform_source.get("sim_RLIO_team") == "1";
 
-      username1 = platform_source.get("user_id");
       var exp_completed = false;
 
       // ----------------------------------------------------------------
@@ -589,10 +602,7 @@
       // Dev mode: skip all instruction/practice screens and jump straight
       // to the first trial. Set by the dev landing page.
       var DEV_SKIP_INTRO  = devGet("skipIntro", false);
-      var DEV_BLOCK_TYPE  = devGet("blockType", null);   // force a block type
-      var DEV_N_BALLS     = devGet("nBalls", null);      // force ball count
       var DEV_HAND        = devGet("hand", "Right");     // default hand for skip
-      var DEV_BALL_MODE   = devGet("ballMode", "standard"); // standard | valence
       // Ball physics mode. 'classic' = original behaviour (existing data).
       // 'breakout' = stronger contact-point steering, Arkanoid-style.
       // Never change 'classic' — existing data was collected under it.
@@ -601,29 +611,23 @@
       );
       // ----------------------------------------------------------------
 
-      drtChecks = [];
       // Define variables — all values read through devGet() so the
       // dev landing page can override any of them without touching this file.
-      if (sim_RL_team | sim_RLIO_team) {
-        var nBlocks = 2;
-      } else {
-        var nBlocks = devGet("nBlocks", 3);
-      }
+      var nBlocks = 3;
 
       // workload
-      var workloadLevels = [1, 3, 6, 9];
       var trialDuration        = devGet("trialDuration", 45);
       var practiceTrialDuration= devGet("practiceTrialDuration", 25);
       var dirInst              = 10;
       var blockBreakTime       = devGet("blockBreakTime", 20);
       var trialBreakTime       = devGet("trialBreakTime", 5);
-      var instructionsPause    = devGet("instructionsPause", 5);
 
       // Ball valence system.
       // In standard mode, all balls are the shared/player colour and worth +1.
       // In valence mode, ball colours and values come from state.balls[i].value
       // set by the server (game.py). The client reads them for display only.
-      var BALL_MODE_VALENCE    = (DEV_BALL_MODE === "valence");
+      var BALL_MODE_VALENCE    = false;
+      var maxBallsPerPlayer    = 9;
       // Valence ball colours.
       // Positive (high value) = blue  — matches p2Colour (RoyalBlue)
       // Negative (low value)  = red   — matches p1Colour (FireBrick)
@@ -689,7 +693,6 @@
       var fa2 = [];
       var missCode = -1;
       var waitingRoomStart;
-      var totalWait = 20; //60 * 10 // seconds * minutes
       var timeWaited;
       var drawWaitingRoomScientist;
 
@@ -708,15 +711,6 @@
       var currentBlock;
       var nCurrentTrial;
       var bInTrial = false;
-      // bInInstructions1-4/End/Online: removed — the INST manager (OV/INST)
-      // tracks instruction state. Kept as no-op assignments for backward compat
-      // in case any residual code still sets them.
-      var bInInstructions1 = false, bInInstructionsOnline = false,
-          bInInstructions2 = false, bInInstructions3 = false,
-          bInInstructions4 = false, bInInstructionsEnd   = false;
-      // These are set but never checked — safe to remove after confirming
-      // nothing in rendering.js reads them to gate drawing.
-      var bInEndOfBlock = false;
       var bInBlockInstructions = false;
       var bInPractice = false;
       var proceed = false;
@@ -728,12 +722,10 @@
       var bInDRTPractice = false;
       var bInCombinedPractice = false;
 
-      var username1;
       var data_consent_provided = false;
       // Trial Start
       let startCount = 0;
       let start;
-      var interval;
       var timeout;
 
       // Paddles
@@ -832,5 +824,3 @@
       var scrollTop;
 
       // Sprite Classes
-
-

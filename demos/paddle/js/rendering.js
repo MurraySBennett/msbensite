@@ -314,7 +314,7 @@
       function drawWaitingRoomTimer() {
         // draws the timer and returns the time remaining
         if (drawWaitingRoomScientist) {
-          expTimeout = waitingRoomTimer(totalWait, waitingRoomStart);
+          expTimeout = waitingRoomElapsed(waitingRoomStart);
           waiter = requestAnimationFrame(drawWaitingRoomTimer);
           // if (expTimeout <= 0){
           //     expTimeout = 0;
@@ -565,16 +565,10 @@
         OV.show('ov-waiting');
       }
 
-      function waitingRoomTimer(totalWaitTime, start) {
-        let timeRemaining;
-        let startTime = Date.now();
-        timeRemaining = (startTime - start) / 1000; //+totalWaitTime;
-        let dispTime = timeRemaining.toFixed(0);
-
-        return timeRemaining;
+      function waitingRoomElapsed(start) {
+        return (Date.now() - start) / 1000;
       }
       function userEntry() {
-        ws.send(JSON.stringify({ platformID: username1 }));
         if (state.status === "waiting") {
           drawWaitingRoomScientist = true;
           waitingRoom();
@@ -585,13 +579,11 @@
       }
 
       function instructions1() {
-        bInInstructions1 = true;
         drawCanvas(fontColour); drawFrame(); drawGameTitle();
         INST.show(1);
       }
 
             function instructionsOnline() {
-        bInInstructionsOnline = true;
         drawCanvas(fontColour); drawFrame(); drawGameTitle();
         let ptxt = document.getElementById('ov-partner-text');
         if (botratheon && ptxt) {
@@ -605,7 +597,6 @@
       }
 
             function instructions2() {
-        bInInstructions2 = true;
         drawCanvas(fontColour); drawFrame(); drawInstControls();
         INST.show(3);
       }
@@ -676,7 +667,6 @@
       }
 
             function instructions3() {
-        bInInstructions3 = true;
         drawCanvas(fontColour); drawFrame(); drawInstControls();
         if (plyr1DRTrespKey == RHdrtRespKey) {
           OV.buildKeys('ov-drt-keys', [{ label: 'Non-dominant (left) hand', keys: [{sym:'Z'}] }]);
@@ -687,7 +677,6 @@
       }
 
             function instructions4() {
-        bInInstructions4 = true;
         drawCanvas(fontColour); drawFrame();
         let t = document.getElementById('ov-inst5-text');
         if (t) t.textContent = show_drt
@@ -697,7 +686,6 @@
       }
 
             function instructionsEnd() {
-        bInInstructionsEnd = true;
         drawCanvas(fontColour); drawFrame();
         INST.show(6);
       }

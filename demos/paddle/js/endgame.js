@@ -12,6 +12,7 @@
 
       function expEnd() {
         exp_completed = true;
+        pointsLink();
         dispFireworks = true;
         drawFireWorks();
 
@@ -29,15 +30,11 @@
         const contactEl = document.getElementById("ov-end-contact");
 
         if (sona_participants) {
-          const pid = (state.players && state.players[state.player_id])
-                      ? (state.players[state.player_id].platformID || "") : "";
           if (bodyEl) bodyEl.innerHTML =
             "Thank you for your participation!<br><br>" +
-            (pid ? "Credit for ID <strong>" + pid + "</strong> has been granted." :
-                   "Your participation credit has been granted.");
+            "Your participation credit is being processed.";
           if (actionEl) actionEl.innerHTML =
             "<p style=\"font-size:.8rem;color:var(--text-muted)\">You may close this window.</p>";
-          pointsLink(pid);
 
         } else if (prolific_participants) {
           if (bodyEl) bodyEl.innerHTML =
@@ -81,20 +78,9 @@
         OV.show("ov-closed");
       }
 
-      function pointsLink(pid) {
-        if (!pid) return;
-        const expId = SONA_EXP_ID || "";
-        const token = SONA_TOKEN  || "";
-        const base  = SONA_BASE_URL || "https://newcastle.sona-systems.com";
-        if (!token || !expId) {
-          console.warn("[paddle-exp] SONA credit skipped: experiment_id or token not set in config.");
-          return;
-        }
-        const url = base + "/webstudy_credit.aspx?experiment_id=" +
-                    encodeURIComponent(expId) + "&credit_token=" +
-                    encodeURIComponent(token) + "&survey_code=" +
-                    encodeURIComponent(pid);
-        const x = new XMLHttpRequest();
-        x.open("GET", url, true);
-        x.send();
+      var completion_request_sent = false;
+      function pointsLink() {
+        if (completion_request_sent || !ws || ws.readyState !== WebSocket.OPEN) return;
+        completion_request_sent = true;
+        ws.send(JSON.stringify({ type: 'complete' }));
       }

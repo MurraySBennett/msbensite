@@ -953,16 +953,16 @@
       <div id="datacheck">
         <h1>Data Consent</h1>
         <div id="username_msg">
-          <p>Before commencing the final trial, we wish to confirm your consent to use the data collected.</p>
-          <p style="margin-top:8px">Please make a selection below. You will still be reimbursed regardless of your decision.</p>
+          <p>Now that the activity is complete, please tell us whether we may retain your data for research analysis.</p>
+          <p style="margin-top:8px">Your choice will not affect reimbursement. If you decline, the records are retained securely with an exclusion flag so the research team can follow up and keep them out of analysis.</p>
         </div>
         <div id="p2_type" style="display:none">
           <p>Our experiment examines behaviour when working with artificially intelligent machines. Player 2 in this experiment was a bot designed to maximise hits.</p>
           <p style="margin-top:8px">Some participants were aware of this from the start; others were not. We are seeking your consent to include your data in this analysis.</p>
         </div>
         <form id="data-retention">
-          <label><input type="radio" id="removeData" name="rmData"> I would like my data <strong>removed</strong> from analysis</label>
-          <label><input type="radio" id="retainData" name="rmData"> I would like my data <strong>included</strong> in analysis</label>
+          <label><input type="radio" id="removeData" name="rmData"> No, do not include my data in analysis</label>
+          <label><input type="radio" id="retainData" name="rmData"> Yes, retain and include my data in analysis</label>
         </form>
         <button type="button" id="submitData">Confirm</button>
         <p id="empty_response_msg"></p>
@@ -975,12 +975,11 @@
 
     </div><!-- #stage -->
 
-    <!-- Game scripts — v=1782587881 (bump version to force cache refresh) -->
-    <script src="js/setup.js?v=1782684162"></script>
-    <script src="js/classes.js?v=1782684162"></script>
-    <script src="js/input.js?v=1782684162"></script>
-    <script src="js/rendering.js?v=1782684162"></script>
-    <script src="js/gameflow.js?v=1782684162"></script>
-    <script src="js/endgame.js?v=1782684162"></script>
+    <script src="js/setup.js"></script>
+    <script src="js/classes.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/rendering.js"></script>
+    <script src="js/gameflow.js"></script>
+    <script src="js/endgame.js"></script>
   </body>
 </html>
