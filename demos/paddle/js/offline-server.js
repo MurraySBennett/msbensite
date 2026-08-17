@@ -25,30 +25,51 @@
   'use strict';
 
   const params = new URLSearchParams(window.location.search);
+
+  // Defaults follow config/base.yaml and CONDITION_MATRIX.md rather than
+  // being invented here: n_balls comes from n_balls_sequence [1,3,6,9], and
+  // valence values from condition_valence_bombs.yaml.
   const CONFIG = {
-    blockType: params.get('block_type') || 'nonCol',
+    // Solo play is the 'separate' condition — the workload-capacity baseline
+    // that establishes alone performance. 'col' and 'com' both require a
+    // second player, so they are not offered.
+    blockType: 'nonCol',
     nBalls: parseInt(params.get('n_balls') || '3', 10),
-    trialSec: parseFloat(params.get('trial_duration') || '20'),
+    trialSec: parseFloat(params.get('trial_duration') || '30'),
+    valence: params.get('valence') === 'valence',
   };
+
+  // From condition_valence_bombs.yaml.
+  const VALENCE = { positive: 1, negative: -5, negativeFraction: 0.5 };
 
   const NativeWebSocket = window.WebSocket;
 
-  // Ball angles, in degrees, spread across the downward arc. Matches the
-  // original generator's 60-120 range rather than inventing a distribution.
+  // Ball angles in degrees, across the downward arc. The 60-120 range matches
+  // the original generator rather than inventing a distribution.
   function spawnBalls(n) {
     const balls = [];
     const lo = 60, hi = 120;
     for (let i = 0; i < n; i++) {
-      // Even spread with jitter, so repeat plays are not identical but the
-      // difficulty is stable.
+      // Even spread with jitter, so repeat plays differ but difficulty holds.
       const frac = n === 1 ? 0.5 : i / (n - 1);
       const angle = lo + frac * (hi - lo) + (Math.random() - 0.5) * 8;
+
+      // value stays null in standard mode. The client activates valence
+      // colouring when it sees a non-null value, so null is what keeps the
+      // standard condition standard.
+      let value = null;
+      if (CONFIG.valence) {
+        value = Math.random() < VALENCE.negativeFraction
+          ? VALENCE.negative
+          : VALENCE.positive;
+      }
+
       balls.push({
         id: i,
         x: 0.12 + (n === 1 ? 0.38 : (i / Math.max(1, n - 1)) * 0.76),
         y: undefined,          // client falls back to its own spawn height
         angle: angle,
-        value: null,
+        value: value,
       });
     }
     return balls;

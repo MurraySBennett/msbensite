@@ -8,7 +8,7 @@
   :root {
     --bg:#14111f; --surface:#1e1a2c; --raised:#262138; --edge:#382f52;
     --ink:#e4e0f0; --mid:#b0a8c8; --dim:#8b83a8;
-    --pink:#f5a9b8; --cyan:#5bcefa; --mint:#7fe0c0;
+    --pink:#f5a9b8; --cyan:#5bcefa; --mint:#7fe0c0; --amber:#ffa96b;
   }
   *{box-sizing:border-box}
   body{
@@ -16,8 +16,8 @@
     font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:640px;margin:0 auto;padding:3rem 1.25rem 5rem;
-        display:flex;flex-direction:column;gap:2rem}
+  .wrap{max-width:660px;margin:0 auto;padding:3rem 1.25rem 5rem;
+        display:flex;flex-direction:column;gap:1.75rem}
   .kicker{font-family:ui-monospace,Menlo,monospace;font-size:.6875rem;
           letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin:0}
   h1{font-family:ui-monospace,Menlo,monospace;font-size:2rem;line-height:1.1;
@@ -26,7 +26,7 @@
   p strong{color:var(--ink)}
 
   .task{background:var(--surface);border:1px solid var(--edge);border-radius:8px;
-        padding:1.25rem;display:flex;flex-direction:column;gap:.75rem}
+        padding:1.15rem 1.25rem;display:flex;flex-direction:column;gap:.7rem}
   .task h2{font-family:ui-monospace,Menlo,monospace;font-size:.6875rem;
            text-transform:uppercase;letter-spacing:.16em;color:var(--dim);margin:0}
   .keys{display:flex;gap:.5rem;align-items:center;font-size:.9375rem;color:var(--mid)}
@@ -35,28 +35,37 @@
       border-radius:4px;padding:.15em .5em;color:var(--ink)}
 
   fieldset{border:1px solid var(--edge);border-radius:8px;padding:1.1rem 1.25rem;
-           margin:0;background:var(--surface);display:flex;flex-direction:column;gap:1rem}
+           margin:0;background:var(--surface);display:flex;flex-direction:column;gap:1.1rem}
   legend{font-family:ui-monospace,Menlo,monospace;font-size:.6875rem;
          text-transform:uppercase;letter-spacing:.16em;color:var(--dim);padding:0 .4rem}
-  .row{display:flex;flex-direction:column;gap:.35rem}
-  .row label{font-size:.875rem;font-weight:600}
-  .row .hint{font-size:.8125rem;color:var(--dim)}
-  select,input[type=range]{width:100%}
-  select{background:var(--raised);color:var(--ink);border:1px solid var(--edge);
-         border-radius:5px;padding:.5rem .6rem;font:inherit;font-size:.9375rem}
-  select:focus,input:focus{outline:2px solid var(--cyan);outline-offset:1px}
-  .inline{display:flex;align-items:center;gap:.6rem}
-  .val{font-family:ui-monospace,Menlo,monospace;color:var(--cyan);
-       font-size:.875rem;min-width:2.5rem;text-align:right}
+  .row{display:flex;flex-direction:column;gap:.4rem}
+  .row > label{font-size:.875rem;font-weight:650}
+  .hint{font-size:.8125rem;color:var(--dim)}
+
+  .seg{display:flex;gap:.4rem;flex-wrap:wrap}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg label{flex:1;min-width:4.5rem;text-align:center;cursor:pointer;
+             background:var(--raised);border:1px solid var(--edge);border-radius:6px;
+             padding:.5rem .4rem;font-size:.875rem;transition:.15s}
+  .seg input:checked + label{background:var(--cyan);color:#14111f;
+             border-color:var(--cyan);font-weight:650}
+  .seg input:focus-visible + label{outline:2px solid var(--pink);outline-offset:2px}
 
   .play{display:block;width:100%;padding:.9rem;border:0;border-radius:8px;
         background:var(--pink);color:#1a1626;font:inherit;font-weight:700;
-        font-size:1rem;cursor:pointer;transition:opacity .15s}
+        font-size:1rem;cursor:pointer;transition:opacity .15s;margin-top:1.25rem}
   .play:hover{opacity:.9}
-  .play:active{opacity:1}
 
-  .note{border-left:3px solid var(--cyan);padding:.5rem 0 .5rem .9rem;
-        font-size:.875rem;color:var(--dim)}
+  .note{border-left:3px solid var(--amber);background:var(--surface);
+        border-radius:0 6px 6px 0;padding:.85rem 1rem;
+        display:flex;flex-direction:column;gap:.5rem}
+  .note h3{font-family:ui-monospace,Menlo,monospace;font-size:.625rem;
+           text-transform:uppercase;letter-spacing:.14em;color:var(--amber);margin:0}
+  .note p{font-size:.875rem}
+  .note table{border-collapse:collapse;font-size:.8125rem;margin-top:.25rem}
+  .note td{padding:.2rem .8rem .2rem 0;color:var(--mid);vertical-align:top}
+  .note td:first-child{color:var(--ink);font-weight:600;white-space:nowrap;
+                       font-family:ui-monospace,Menlo,monospace;font-size:.75rem}
   a{color:var(--cyan)}
 </style>
 </head>
@@ -70,8 +79,8 @@
 
   <p>
     This is the <strong>actual experiment client</strong> — the same physics,
-    timing and rendering participants saw, running in your browser with no
-    server behind it. Pick a condition and play a short trial.
+    timing, scoring and rendering participants get, running in your browser with
+    no server behind it. Pick your settings and play a trial.
   </p>
 
   <div class="task">
@@ -81,82 +90,112 @@
       you can before the trial ends.
     </p>
     <div class="keys">
-      <kbd>&larr;</kbd><kbd>&rarr;</kbd>
-      <span>move the paddle</span>
+      <kbd>&larr;</kbd><kbd>&rarr;</kbd><span>move the paddle</span>
     </div>
   </div>
 
   <form onsubmit="play(event)">
     <fieldset>
-      <legend>Condition</legend>
+      <legend>Settings</legend>
 
       <div class="row">
-        <label for="blockType">Court</label>
-        <select id="blockType">
-          <option value="nonCol">Divided — you cover your own half</option>
-          <option value="col">Shared — the whole court is yours</option>
-        </select>
+        <label>Workload — number of balls</label>
+        <div class="seg">
+          <input type="radio" name="nb" id="nb1" value="1"><label for="nb1">1</label>
+          <input type="radio" name="nb" id="nb3" value="3" checked><label for="nb3">3</label>
+          <input type="radio" name="nb" id="nb6" value="6"><label for="nb6">6</label>
+          <input type="radio" name="nb" id="nb9" value="9"><label for="nb9">9</label>
+        </div>
         <span class="hint">
-          In the experiment this is the collaboration manipulation: whether two
-          players each defend a half, or share the full width.
+          The load manipulation. These are the four levels the experiment uses.
         </span>
       </div>
 
       <div class="row">
-        <label for="nBalls">Balls</label>
-        <div class="inline">
-          <input type="range" id="nBalls" min="1" max="9" step="2" value="3"
-                 oninput="document.getElementById('nBallsVal').textContent=this.value">
-          <span class="val" id="nBallsVal">3</span>
-        </div>
-        <span class="hint">The workload manipulation. More balls, more load.</span>
-      </div>
-
-      <div class="row">
-        <label for="trialDur">Trial length</label>
-        <div class="inline">
-          <input type="range" id="trialDur" min="10" max="45" step="5" value="20"
-                 oninput="document.getElementById('durVal').textContent=this.value+'s'">
-          <span class="val" id="durVal">20s</span>
+        <label>Trial length</label>
+        <div class="seg">
+          <input type="radio" name="dur" id="d15" value="15"><label for="d15">15s</label>
+          <input type="radio" name="dur" id="d30" value="30" checked><label for="d30">30s</label>
+          <input type="radio" name="dur" id="d45" value="45"><label for="d45">45s</label>
         </div>
       </div>
 
       <div class="row">
-        <label for="drt">Secondary task</label>
-        <select id="drt">
-          <option value="0">Off</option>
-          <option value="1">On — respond to the light</option>
-        </select>
+        <label>Ball values</label>
+        <div class="seg">
+          <input type="radio" name="val" id="vs" value="standard" checked><label for="vs">Standard</label>
+          <input type="radio" name="val" id="vv" value="valence"><label for="vv">Gains &amp; losses</label>
+        </div>
         <span class="hint">
-          A detection-response task, used to measure spare attentional capacity
-          while the main task runs.
+          Standard: every ball is worth +1. Gains &amp; losses: green adds 1, red
+          subtracts 5 — catch the green, dodge the red.
+        </span>
+      </div>
+
+      <div class="row">
+        <label>Physics</label>
+        <div class="seg">
+          <input type="radio" name="phys" id="pc" value="classic" checked><label for="pc">Classic</label>
+          <input type="radio" name="phys" id="pb" value="breakout"><label for="pb">Breakout</label>
+        </div>
+        <span class="hint">
+          Classic is the original — a subtle bias from where the ball meets the
+          paddle. Breakout steers far more strongly.
+        </span>
+      </div>
+
+      <div class="row">
+        <label>Secondary task</label>
+        <div class="seg">
+          <input type="radio" name="drt" id="drtoff" value="0" checked><label for="drtoff">Off</label>
+          <input type="radio" name="drt" id="drton" value="1"><label for="drton">On</label>
+        </div>
+        <span class="hint">
+          A detection-response task — respond to the light while playing. Used to
+          measure spare attentional capacity.
         </span>
       </div>
     </fieldset>
 
-    <p style="margin-top:1.25rem">
-      <button class="play" type="submit">Play a trial</button>
-    </p>
+    <button class="play" type="submit">Play a trial</button>
   </form>
 
-  <p class="note">
-    Solo only. The paired and bot conditions need a server — the bots are
-    Python, running alongside the real experiment. Nothing you do here is
-    recorded or leaves your browser.
-  </p>
+  <div class="note">
+    <h3>What this demo can't show</h3>
+    <p>
+      The experiment's main manipulation is <strong>coordination structure</strong>
+      — how scoring works between two players:
+    </p>
+    <table>
+      <tr><td>Separate</td><td>Each player hits only their own balls. Scored individually.</td></tr>
+      <tr><td>Collaborative</td><td>Both hit all balls. Scored as a team total.</td></tr>
+      <tr><td>Competitive</td><td>Both hit all balls. Scored individually, and each can see the other's score.</td></tr>
+    </table>
+    <p>
+      All three need a second player, so none can be demoed alone. What you play
+      here is the <strong>separate</strong> condition with one player — which in
+      the experiment is the baseline that establishes alone performance before
+      any group comparison is made.
+    </p>
+    <p>Nothing you do here is recorded or leaves your browser.</p>
+  </div>
 
 </div>
 
 <script>
+function pick(name) {
+  return document.querySelector('input[name="' + name + '"]:checked').value;
+}
 function play(e) {
   e.preventDefault();
   const p = new URLSearchParams({
-    block_type: document.getElementById('blockType').value,
-    n_balls: document.getElementById('nBalls').value,
-    trial_duration: document.getElementById('trialDur').value,
-    d: document.getElementById('drt').value,
-    skipIntro: '1',
-    offline: '1'
+    block_type: 'nonCol',          // solo is the separate / baseline condition
+    n_balls: pick('nb'),
+    trial_duration: pick('dur'),
+    valence: pick('val'),
+    physics: pick('phys'),
+    d: pick('drt'),
+    skipIntro: '1'
   });
   window.location.href = 'game.html?' + p.toString();
 }
