@@ -1,0 +1,25 @@
+{
+  "id": "adaptive-reliance",
+  "title": "Adaptive Reliance: Human–AI Collaboration Under Workload",
+  "category": "Human-AI Collaboration",
+  "status": "in-progress",
+  "thumbnail": "/assets/images/project-icons/adaptive-reliance.png",
+  "thumbnail_alt": "Human and AI evidence combining into a single decision",
+  "summary": "When does AI assistance improve the human–AI system, and when does it instead produce cognitive offloading and brittle reliance? A behavioural and modelling programme separating trust from reliance from calibration, with radiology report generation as the applied case.",
+  "tags": [
+    "human-AI teaming",
+    "reliance and calibration",
+    "cognitive offloading",
+    "trust",
+    "workload and fatigue",
+    "sequential sampling",
+    "radiology"
+  ],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}

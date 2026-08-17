@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<script src="js/offline-server.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Spirit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style>
+    /* ── Design system ─────────────────────────────────── */
+    :root {
+      /* Palette accents — used sparingly */
+      --stripe-blue:  #55CDFC;
+      --stripe-rose:  #F7A8B8;
+      --stripe-mid:   #FFFFFF;
+
+      /* Brand accent — matches shared ball colour */
+      --accent:       #963d97;
+      --accent-glow:  rgba(150, 61, 151, 0.15);
+
+      /* Player and ball colours */
+      --p1:           #C0392B;
+      --p2:           #2471A3;
+      --positive:     #27AE60;
+      --negative:     #E74C3C;
+
+      /* Light theme — matches the ivory game canvas */
+      --bg:           #FFFFF0;
+      --surface:      rgba(0,0,0,0.04);
+      --border:       rgba(0,0,0,0.10);
+      --border-accent: rgba(150,61,151,0.25);
+
+      /* Dark text on light background */
+      --text-primary:   #1a1a2e;
+      --text-secondary: #3d3d5c;
+      --text-muted:     #888899;
+
+      --font-body:    'DM Sans', system-ui, sans-serif;
+      --font-display: 'Space Grotesk', system-ui, sans-serif;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+
+      --shadow-glow: 0 0 16px var(--accent-glow);
+    }
+
+    /* ── Reset ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #d0d0c0;  /* neutral surround outside the stage */
+      font-family: var(--font-body);
+      color: var(--text-primary);
+    }
+
+    /* ── Letterbox wrapper ─────────────────────────────── */
+    /* Everything lives inside #stage which is scaled uniformly
+       to fit the window while preserving 800×600 aspect ratio.
+       Physics coordinates never change — only the CSS scale does. */
+    #stage {
+      position: absolute;
+      width:  800px;
+      height: 600px;
+      top: 0; left: 0;          /* JS sets transform to centre it */
+      transform-origin: top left;
+    }
+
+    /* ── Canvases ──────────────────────────────────────── */
+    #canvas, #fireworks {
+      position: absolute;
+      top: 0; left: 0;
+      width:  800px;
+      height: 600px;
+    }
+    #canvas    { z-index: 1; }
+    #fireworks { z-index: 2; pointer-events: none; }
+
+    /* ── Trans stripe ──────────────────────────────────── */
+    #accent-stripe {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      /* Subtle iridescent accent — barely there */
+      background: linear-gradient(90deg,
+        rgba(85,205,252,0.35)  0%   20%,
+        rgba(247,168,184,0.35) 20%  40%,
+        rgba(255,255,255,0.20) 40%  60%,
+        rgba(247,168,184,0.35) 60%  80%,
+        rgba(85,205,252,0.35)  80% 100%
+      );
+      z-index: 9999;
+    }
+
+    /* ── Letterbox bars (shown outside #stage) ─────────── */
+    #letterbox {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 0;
+    }
+
+    /* ── Screen-size warning ───────────────────────────── */
+    #size-warning {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 2rem;
+      text-align: center;
+    }
+    #size-warning.visible { display: flex; }
+    #size-warning h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+    #size-warning p {
+      color: var(--text-secondary);
+      font-size: .95rem;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+    /* size-warning stripe removed */
+
+    /* ── Overlay — instruction screens ────────────────────
+       Sits above the canvas (#stage z-index 3) during non-trial phases.
+       Hidden during trials. Uses real HTML/CSS so fonts render properly. */
+    #overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 800px; height: 600px;
+      z-index: 3;
+      display: none;           /* shown by JS when needed */
+      overflow: hidden;
+      background: transparent;
+    }
+    #overlay.visible { display: flex; flex-direction: column; }
+
+    /* scanline texture — sits BELOW nav buttons via z-index */
+    #overlay::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,.03) 3px,
+        rgba(0,0,0,.03) 4px
+      );
+      pointer-events: none;
+      z-index: 2;   /* below .ov-nav which is z-index 10 */
+    }
+
+    /* ── Overlay page component ────────────────────────── */
+    .ov-page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%; height: 100%;
+      padding: 0 52px 80px;  /* bottom pad keeps content above nav buttons */
+      background: rgba(255,255,242,0.98);
+      backdrop-filter: blur(1px);
+      position: relative;    /* stacking context for z-index children */
+      overflow: hidden;
+    }
+    .ov-page.active { display: flex; }
+
+    /* ── Corner accent panels (replaces entryPageStyling) ─ */
+    .ov-corner {
+      position: absolute;
+      top: 0; left: 0;
+      width: 60px; height: 60px;
+      pointer-events: none;
+      opacity: 0.18;   /* very faint — a whisper */
+    }
+    .ov-corner svg { width: 100%; height: 100%; }
+
+    /* ── Page counter pill ─────────────────────────────── */
+    .ov-counter {
+      position: absolute;
+      top: 18px; right: 24px;
+      display: flex; gap: 6px;
+      align-items: center;
+    }
+    .ov-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background .3s, transform .3s;
+    }
+    .ov-dot.done  { background: var(--accent); opacity: 0.5; }
+    .ov-dot.current {
+      background: var(--accent);
+      transform: scale(1.4);
+      box-shadow: 0 0 6px var(--accent-glow);
+    }
+
+    /* ── Pixel title (drawn by canvas — keep above overlay) */
+
+    /* ── Content card — retro pixel-art panel style ─── */
+    .ov-card {
+      background: rgba(255,255,248,0.9);
+      /* Pixel border: outer dark, inner highlight — classic 16-bit panel */
+      border: 2px solid rgba(100,50,100,0.25);
+      border-radius: 0;          /* square corners — intentional */
+      box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.8),    /* top-left highlight */
+        inset -2px -2px 0 rgba(100,50,100,0.15),  /* bottom-right shadow */
+        4px 4px 0 rgba(100,50,100,0.10);           /* drop shadow */
+      padding: 22px 30px;
+      width: 100%;
+      margin-top: 14px;
+      position: relative;
+    }
+    .ov-card + .ov-card { margin-top: 10px; }
+
+    /* Tiny corner pip — a single pixel-art accent dot in top-left */
+    .ov-card::before {
+      content: "";
+      position: absolute;
+      top: 6px; left: 6px;
+      width: 4px; height: 4px;
+      background: rgba(150,61,151,0.3);
+      box-shadow: 8px 0 0 rgba(150,61,151,0.2), 0 8px 0 rgba(150,61,151,0.2);
+    }
+
+    /* ── Typography ────────────────────────────────────── */
+    .ov-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: center;
+      margin-top: 86px;   /* clears the pixel art title (sz=6, 10 rows = 72px + padding) */
+      margin-bottom: 6px;
+      letter-spacing: .01em;
+    }
+    .ov-subtitle {
+      font-family: var(--font-display);
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-align: center;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .ov-body {
+      font-size: .9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      text-align: center;
+    }
+    .ov-body + .ov-body { margin-top: .5rem; }
+    .ov-body strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .ov-body .p1  { color: var(--p1); font-weight: 600; }
+    .ov-body .p2  { color: var(--p2); font-weight: 600; }
+    .ov-body .col { color: var(--accent); font-weight: 600; }
+    .ov-spacer { height: 10px; }
+
+    /* ── 8-bit pixel button keyframes ─────────────────── */
+    @keyframes px-pulse {
+      0%, 100% { box-shadow: 4px 4px 0 #4a1a4a, inset 0 0 0 transparent; opacity: 1; }
+      50%       { box-shadow: 4px 4px 0 #6b2a6b, inset 0 0 0 transparent; opacity: .85; }
+    }
+    @keyframes px-blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    @keyframes px-caret { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ── Nav bar (back + continue) ──────────────────── */
+    .ov-nav {
+      position: absolute;
+      bottom: 20px; left: 0; right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      transition: opacity .35s;
+      pointer-events: none;
+      z-index: 10;   /* above scanline pseudo-element */
+    }
+    .ov-nav.visible { opacity: 1; pointer-events: auto; }
+
+    /* Pixel button base */
+    .px-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: var(--bg);
+      border: 2px solid var(--accent);
+      border-radius: 0;               /* deliberately square — pixel art */
+      box-shadow: 4px 4px 0 #4a1a4a;
+      font-family: 'Space Grotesk', monospace;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      cursor: pointer;
+      image-rendering: pixelated;
+      transition: transform .08s, box-shadow .08s;
+      user-select: none;
+    }
+    .px-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 #4a1a4a;
+    }
+    .px-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 #4a1a4a;
+    }
+    .px-btn.primary {
+      background: var(--accent);
+      color: #fff;
+      animation: px-pulse 1.6s ease-in-out infinite;
+    }
+    .px-btn.primary:hover { animation: none; background: #b054b0; }
+    .px-btn.secondary {
+      border-color: var(--text-muted);
+      color: var(--text-muted);
+      box-shadow: 4px 4px 0 rgba(0,0,0,.15);
+    }
+    .px-btn.secondary:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+
+    /* ── Fill timer button state ─────────────────────────────
+       While filling: a left-to-right colour sweep driven by --fill CSS var.
+       The button is disabled and shows a "loading bar" appearance.
+       On complete: brief flash, then normal pulse animation.          */
+    .px-btn.filling {
+      animation: none !important;
+      cursor: not-allowed;
+      /* Two-layer gradient: filled portion = accent, unfilled = muted bg */
+      background: linear-gradient(
+        to right,
+        var(--accent) var(--fill, 0%),
+        rgba(150,61,151,0.15) var(--fill, 0%)
+      );
+      color: rgba(255,255,255,0.9);
+      border-color: var(--accent);
+      /* Transition the gradient — CSS can't animate gradients directly,
+         so we animate via JS (rAF) updating the --fill custom property.
+         The transition below smooths out small jank between frames.     */
+      transition: none;
+    }
+    .px-btn.filling:disabled { opacity: 1; }  /* don't dim it */
+
+    @keyframes px-flash {
+      0%   { background: #fff; color: var(--accent); transform: scale(1.05); }
+      50%  { background: var(--accent); color: #fff; }
+      100% { background: var(--accent); color: #fff; }
+    }
+    .px-btn.filled {
+      animation: px-flash 0.5s ease-out forwards, px-pulse 1.6s ease-in-out 0.5s infinite;
+    }
+
+    /* Pixel caret animation inside button */
+    .px-caret { animation: px-caret 0.8s step-end infinite; }
+
+    /* Pixel key chip (replaces <kbd>) */
+    .px-key {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 22px; height: 22px;
+      background: rgba(150,61,151,.15);
+      border: 1px solid var(--accent);
+      border-bottom-width: 3px;
+      font-size: .72rem;
+      font-weight: 700;
+      border-radius: 2px;
+      image-rendering: pixelated;
+    }
+
+    /* Legacy .ov-continue — kept for any canvas fallbacks */
+    .ov-continue {
+      position: absolute;
+      bottom: 28px; left: 0; right: 0;
+      text-align: center;
+      font-size: .8rem;
+      color: var(--text-muted);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .ov-continue.visible { opacity: 1; }
+
+    /* ── Block instruction badge ───────────────────────── */
+    .ov-block-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      border-radius: 99px;
+      font-family: var(--font-display);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin: 10px auto 0;
+    }
+    .ov-block-badge.nonCol {
+      background: rgba(192,57,43,.15);
+      border: 1px solid rgba(192,57,43,.4);
+      color: #E8715E;
+    }
+    .ov-block-badge.col {
+      background: rgba(150,61,151,.15);
+      border: 1px solid var(--border-accent);
+      color: #C57FD4;
+    }
+    .ov-block-badge.com {
+      background: rgba(36,113,163,.15);
+      border: 1px solid rgba(36,113,163,.4);
+      color: #6EB3E8;
+    }
+
+    /* ── Waiting room ──────────────────────────────────── */
+    .ov-waiting-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 18px auto 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Retro arcade score panel ─────────────────────────*/
+    .ov-score-panel {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 0;
+      width: 100%;
+    }
+
+    .ov-score-cell {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 14px 12px;
+      background: rgba(255,255,248,0.9);
+      border: 2px solid rgba(100,50,100,0.2);
+      border-right-width: 0;
+      box-shadow: inset 2px 2px 0 rgba(255,255,255,.8), inset -2px -2px 0 rgba(100,50,100,.1);
+      position: relative;
+    }
+    .ov-score-cell:first-child { border-radius: 0; }
+    .ov-score-cell:last-child  { border-right-width: 2px; }
+
+    /* Pixel-art corner pip on each cell */
+    .ov-score-cell::before {
+      content: "";
+      position: absolute; top: 5px; left: 5px;
+      width: 3px; height: 3px;
+      background: rgba(150,61,151,0.25);
+    }
+
+    .ov-score-label {
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-family: var(--font-display);
+    }
+    .ov-score-value {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text-primary);
+    }
+    .ov-score-sub {
+      font-size: .68rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      letter-spacing: .04em;
+    }
+
+    /* Legacy stat row kept for any remaining references */
+    .ov-stat-row { display: flex; justify-content: center; gap: 32px; margin-top: 14px; }
+    .ov-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .ov-stat-value { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--text-primary); line-height: 1; }
+    .ov-stat-label { font-size: .72rem; color: var(--text-muted); letter-spacing: .06em; text-transform: uppercase; }
+    .ov-divider { width: 1px; background: var(--border); align-self: stretch; margin: 4px 0; }
+
+    /* ── Key display ───────────────────────────────────── */
+    .ov-keys {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 14px;
+    }
+    .ov-key-group {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+    }
+    .ov-key-label {
+      font-size: .7rem;
+      color: var(--text-muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .ov-key-pair { display: flex; gap: 8px; }
+    .ov-key {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(150,61,151,0.3);
+      border-bottom-width: 3px;
+      border-radius: 7px;
+      background: rgba(150,61,151,0.06);
+      font-family: var(--font-display);
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ── Data consent form overlay ─────────────────────── */
+    #datacheck {
+      position: absolute;
+      top: 0; left: 0;
+      width: 800px; height: 600px;
+      z-index: 4;
+      display: none;
+      background: rgba(255,255,240,0.98);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      padding: 40px 60px;
+    }
+    #datacheck.visible { display: flex; }
+    #datacheck h1 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: center;
+    }
+    #datacheck p {
+      font-size: .88rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      text-align: center;
+      max-width: 560px;
+    }
+    #data-retention {
+      display: flex; flex-direction: column;
+      gap: 12px; align-items: center;
+    }
+    #data-retention label {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .9rem; color: var(--text-secondary);
+      cursor: pointer;
+    }
+    #data-retention input[type="radio"] { accent-color: var(--accent); }
+    #submitData {
+      margin-top: 8px;
+      padding: 10px 32px;
+      background: var(--accent);
+      color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: .9rem; font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    #submitData:hover { opacity: .85; }
+    #empty_response_msg { color: var(--negative); font-size: .82rem; }
+
+    /* ── Exit button ───────────────────────────────────── */
+    #exitForm {
+      position: absolute;
+      top: 12px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: none;
+    }
+    #exitForm.visible { display: block; }
+    #exitButton {
+      padding: 8px 24px;
+      background: #5fb49c;
+      color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: .85rem; font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    #exitButton:hover { background: #247c7f; }
+  </style>
+</head>
+  <body>
+
+    <!-- Letterbox background (fills window behind the stage) -->
+    <div id="letterbox"></div>
+
+    <!-- Accent stripe -->
+    <div id="accent-stripe"></div>
+
+    <!-- Screen-size warning -->
+    <div id="size-warning">
+      <h2>Screen too small</h2>
+      <p>This experiment requires a browser window at least <strong>820px wide</strong> and <strong>620px tall</strong>. Please maximise your browser window or use a larger screen.</p>
+    </div>
+
+    <!-- ── Stage: fixed 800×600, scaled by JS ───────────── -->
+    <div id="stage">
+
+      <!-- Game canvases -->
+      <canvas id="canvas"    width="800" height="600"></canvas>
+      <canvas id="fireworks" width="800" height="600"></canvas>
+
+      <!-- Overlay: instruction screens (HTML-rendered, shown during non-trial phases) -->
+      <div id="overlay">
+
+        <!-- Shared nav bar — shown/hidden by InstructionManager -->
+        <div class="ov-nav" id="ov-nav">
+          <button class="px-btn secondary" id="ov-back-btn" onclick="INST.back()" aria-label="Previous page">
+            <span class="px-caret">◀</span> BACK
+          </button>
+          <button class="px-btn primary" id="ov-continue-btn" onclick="INST.next()" aria-label="Continue">
+            CONTINUE <span class="px-caret">▶</span>
+          </button>
+        </div>
+
+        <!-- Page: waiting room -->
+        <div class="ov-page" id="ov-waiting">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <!-- canvas draws the pixel-art title and waiter above this -->
+          <div class="ov-title" style="margin-top:200px">Waiting for Player 2</div>
+          <div class="ov-waiting-spinner"></div>
+          <div class="ov-card" style="margin-top:18px">
+            <p class="ov-body">During this experiment you will play an online multiplayer arcade-style game.</p>
+            <p class="ov-body" style="margin-top:6px">The instructions will begin automatically once Player 2 connects.</p>
+            <p class="ov-body" style="margin-top:6px; color:var(--text-muted); font-size:.82rem">You may close this window if you do not wish to wait.</p>
+          </div>
+          <div class="ov-continue" id="ov-waiting-continue"></div>
+        </div>
+
+        <!-- Page 1: Welcome -->
+        <div class="ov-page" id="ov-inst1">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <div class="ov-counter" id="ov-counter-1"></div>
+          <div class="ov-title">Welcome</div>
+          <div class="ov-subtitle">Team Spirit</div>
+          <div class="ov-card">
+            <p class="ov-body">This experiment examines your performance during a <strong>multiplayer arcade-style game</strong>.</p>
+            <p class="ov-body">The game involves balls flying around the screen and two paddles — one for you, one for Player 2.</p>
+            <p class="ov-body">Your task is to move your paddle to hit as many balls as you can, whilst <strong>collaborating</strong>, <strong>competing</strong>, or playing <strong>separately</strong>.</p>
+          </div>
+          <div class="ov-card">
+            <p class="ov-body">The game runs over <strong>3 blocks of 12 trials</strong>, each trial lasting <strong>45 seconds</strong>.</p>
+            <p class="ov-body">There is a short break between blocks. The experiment takes approximately <strong>35–40 minutes</strong>.</p>
+            <p class="ov-body" style="color:var(--text-muted);font-size:.82rem;margin-top:6px">Please ensure your browser window is maximised before continuing.</p>
+          </div>
+          <div class="ov-continue" id="ov-continue-1"><kbd>space</kbd> to continue</div>
+        </div>
+
+        <!-- Page 2: Online / partner info -->
+        <div class="ov-page" id="ov-inst2">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <div class="ov-counter" id="ov-counter-2"></div>
+          <div class="ov-title">Your Partner</div>
+          <div class="ov-card">
+            <p class="ov-body" id="ov-partner-text">
+              During this experiment you will be collaborating and competing with another player.
+            </p>
+            <div class="ov-spacer"></div>
+            <p class="ov-body">When the experiment begins, you will be asked to indicate that you are <strong>ready</strong> before each trial starts.</p>
+            <p class="ov-body" style="margin-top:6px">As a courtesy to your partner, please remain engaged and progress through the breaks promptly.</p>
+          </div>
+          <div class="ov-continue" id="ov-continue-2"><kbd>space</kbd> to continue</div>
+        </div>
+
+        <!-- Page 3: Controls — hand selection via HTML buttons -->
+        <div class="ov-page" id="ov-inst3">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <div class="ov-counter" id="ov-counter-3"></div>
+          <div class="ov-title">Controls</div>
+          <div class="ov-card">
+            <p class="ov-body"><span class="p1">Your paddle is red.</span> <span class="p2">Player 2's paddle is blue.</span></p>
+            <p class="ov-body">Score points by moving your paddle to intercept the balls.</p>
+            <div class="ov-spacer"></div>
+            <p class="ov-body" style="font-weight:600;color:var(--text-primary)">Which is your dominant hand?</p>
+            <div style="display:flex;gap:12px;justify-content:center;margin-top:14px">
+              <button class="px-btn secondary" id="hand-btn-left" onclick="selectHand('Left')" style="font-size:.82rem">
+                🤚 Left-handed
+              </button>
+              <button class="px-btn secondary" id="hand-btn-right" onclick="selectHand('Right')" style="font-size:.82rem">
+                ✋ Right-handed
+              </button>
+            </div>
+          </div>
+          <div class="ov-card" id="ov-controls-display" style="display:none">
+            <p class="ov-body" id="ov-controls-text"></p>
+            <div class="ov-keys" style="margin-top:12px" id="ov-controls-keys"></div>
+          </div>
+          <p class="ov-body" style="color:var(--text-muted);font-size:.78rem;margin-top:10px">A short practice trial follows this screen.</p>
+          <div class="ov-continue" id="ov-continue-3" style="display:none"></div>
+        </div>
+
+        <!-- Page 4: DRT -->
+        <div class="ov-page" id="ov-inst4">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <div class="ov-counter" id="ov-counter-4"></div>
+          <div class="ov-title">The Light</div>
+          <div class="ov-card">
+            <p class="ov-body">Along with controlling your paddle, you will also need to respond to a <strong style="color:#1bff00">flashing green light</strong> using your <strong>non-dominant hand</strong>.</p>
+            <p class="ov-body">The light appears in the side panels. Respond quickly — you have a short window after it disappears.</p>
+            <p class="ov-body" style="margin-top:6px">Fast, accurate responses earn <strong>score bonuses</strong>.</p>
+          </div>
+          <div class="ov-card" id="ov-drt-key-display">
+            <p class="ov-body">Your light response key:</p>
+            <div class="ov-keys" style="margin-top:10px" id="ov-drt-keys"></div>
+          </div>
+          <p class="ov-body" style="color:var(--text-muted);font-size:.78rem;margin-top:10px">A practice trial with only the light follows.</p>
+          <div class="ov-continue" id="ov-continue-4"><kbd>space</kbd> to continue</div>
+        </div>
+
+        <!-- Page 5: Combined practice intro -->
+        <div class="ov-page" id="ov-inst5">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <div class="ov-counter" id="ov-counter-5"></div>
+          <div class="ov-title">Full Practice</div>
+          <div class="ov-card">
+            <p class="ov-body" style="color:var(--accent);font-family:var(--font-display);font-weight:600">Great job!</p>
+            <p class="ov-body" id="ov-inst5-text">Now let's practice a full-length trial with more balls and the light together.</p>
+            <p class="ov-body" style="margin-top:6px">Remember to respond quickly and accurately to the light for score bonuses!</p>
+          </div>
+          <div class="ov-continue" id="ov-continue-5"><kbd>space</kbd> to continue</div>
+        </div>
+
+        <!-- Page 6: Practice complete -->
+        <div class="ov-page" id="ov-inst6">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <div class="ov-counter" id="ov-counter-6"></div>
+          <div class="ov-title">Ready!</div>
+          <div class="ov-card">
+            <p class="ov-body" style="color:var(--accent);font-family:var(--font-display);font-weight:600;font-size:1rem">Well done — practice complete.</p>
+            <p class="ov-body" style="margin-top:6px">You can now join Player 2 for the main game. The first set of block instructions will appear shortly.</p>
+          </div>
+          <div class="ov-continue" id="ov-continue-6"><kbd>space</kbd> to continue</div>
+        </div>
+
+        <!-- Page: Block instructions -->
+        <div class="ov-page" id="ov-block">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+          <div class="ov-title" id="ov-block-title" style="margin-top:80px">Block 1 of 3</div>
+          <div class="ov-block-badge" id="ov-block-badge">—</div>
+          <div class="ov-card" style="margin-top:16px">
+            <p class="ov-body" id="ov-block-instruction"></p>
+          </div>
+          <div class="ov-card" id="ov-block-drt-reminder" style="display:none">
+            <p class="ov-body">Don't forget to respond quickly and accurately to the <strong style="color:#1bff00">flashing light</strong>.</p>
+          </div>
+          <div class="ov-keys" style="margin-top:16px" id="ov-block-keys"></div>
+          <div class="ov-nav" id="ov-block-nav">
+            <button class="px-btn primary" id="ov-block-continue-btn" onclick="blockReadyContinue()">
+              READY <span class="px-caret">▶</span>
+            </button>
+          </div>
+          <div class="ov-continue" id="ov-block-continue" style="display:none"></div>
+        </div>
+
+        <!-- Page: Inter-trial break -->
+        <div class="ov-page" id="ov-intertrial">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism)"/>
+            </svg>
+          </div>
+
+          <!-- Trial number + quote (drawn by JS) -->
+          <div class="ov-title" id="ov-trial-header" style="margin-top:72px">Trial Complete</div>
+          <div id="ov-trial-quote" style="font-family:var(--font-display);font-size:.9rem;font-weight:600;color:var(--accent);text-align:center;margin-top:4px;min-height:1.2em"></div>
+
+          <!-- Score panel — retro arcade style -->
+          <div class="ov-score-panel" id="ov-stat-row" style="margin-top:14px"></div>
+
+          <!-- Trial score history sparkline -->
+          <div style="margin-top:12px;width:100%">
+            <div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+                        color:var(--text-muted);font-family:var(--font-display);margin-bottom:4px">
+              Score history
+            </div>
+            <canvas id="score-history-canvas" width="680" height="60"
+                    style="width:100%;height:60px;image-rendering:pixelated;
+                           border:1px solid var(--border);border-radius:0;
+                           background:rgba(0,0,0,0.04)">
+            </canvas>
+          </div>
+
+          <!-- Fill-timer NEXT TRIAL button — appears when timer completes -->
+          <div class="ov-nav" id="ov-intertrial-nav">
+            <button class="px-btn primary" id="ov-intertrial-continue-btn" onclick="trialBreakContinue()">
+              NEXT TRIAL <span class="px-caret">▶</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Page: Waiting for player 2 (inter-trial) -->
+        <div class="ov-page" id="ov-waiting-intertrial">
+          <div class="ov-title" style="margin-top:200px">Waiting for Player 2</div>
+          <div class="ov-waiting-spinner"></div>
+          <p class="ov-body" style="margin-top:16px;color:var(--text-muted)">The next trial will begin once both players are ready.</p>
+        </div>
+
+        <!-- ── End of experiment overlay ── -->
+        <div class="ov-page" id="ov-end">
+          <div class="ov-corner" aria-hidden="true">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="prism-end" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%"   stop-color="#55CDFC"/>
+                  <stop offset="50%"  stop-color="#F7A8B8"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="0,0 60,0 0,60" fill="url(#prism-end)"/>
+            </svg>
+          </div>
+          <div class="ov-title" id="ov-end-title" style="margin-top:80px">The experiment is complete!</div>
+          <div class="ov-body" id="ov-end-body" style="margin-top:12px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6"></div>
+          <div id="ov-end-action" style="margin-top:24px"></div>
+          <div class="ov-body" id="ov-end-contact" style="margin-top:28px;font-size:.78rem;color:var(--text-muted);max-width:420px;margin-left:auto;margin-right:auto"></div>
+        </div>
+
+        <!-- ── Game closed overlay ── -->
+        <div class="ov-page" id="ov-closed">
+          <div class="ov-title" style="margin-top:200px">This game has closed</div>
+          <p class="ov-body" id="ov-closed-contact" style="margin-top:12px;color:var(--text-muted)"></p>
+          <p class="ov-body" style="margin-top:16px;color:var(--text-muted)">You may close this browser window at any time.</p>
+        </div>
+
+      </div><!-- #overlay -->
+
+      <!-- Data consent (its own layer above overlay) -->
+      <div id="datacheck">
+        <h1>Data Consent</h1>
+        <div id="username_msg">
+          <p>Before commencing the final trial, we wish to confirm your consent to use the data collected.</p>
+          <p style="margin-top:8px">Please make a selection below. You will still be reimbursed regardless of your decision.</p>
+        </div>
+        <div id="p2_type" style="display:none">
+          <p>Our experiment examines behaviour when working with artificially intelligent machines. Player 2 in this experiment was a bot designed to maximise hits.</p>
+          <p style="margin-top:8px">Some participants were aware of this from the start; others were not. We are seeking your consent to include your data in this analysis.</p>
+        </div>
+        <form id="data-retention">
+          <label><input type="radio" id="removeData" name="rmData"> I would like my data <strong>removed</strong> from analysis</label>
+          <label><input type="radio" id="retainData" name="rmData"> I would like my data <strong>included</strong> in analysis</label>
+        </form>
+        <button type="button" id="submitData">Confirm</button>
+        <p id="empty_response_msg"></p>
+      </div>
+
+      <!-- Exit button — text and action set by expEnd() based on platform -->
+      <div id="exitForm">
+        <button type="button" id="exitButton">Return</button>
+      </div>
+
+    </div><!-- #stage -->
+
+    <!-- Game scripts — v=1782587881 (bump version to force cache refresh) -->
+    <script src="js/setup.js?v=1782684162"></script>
+    <script src="js/classes.js?v=1782684162"></script>
+    <script src="js/input.js?v=1782684162"></script>
+    <script src="js/rendering.js?v=1782684162"></script>
+    <script src="js/gameflow.js?v=1782684162"></script>
+    <script src="js/endgame.js?v=1782684162"></script>
+  </body>
+</html>

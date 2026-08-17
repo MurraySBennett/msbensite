@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paddle task — demo</title>
+<style>
+  :root {
+    --bg:#14111f; --surface:#1e1a2c; --raised:#262138; --edge:#382f52;
+    --ink:#e4e0f0; --mid:#b0a8c8; --dim:#8b83a8;
+    --pink:#f5a9b8; --cyan:#5bcefa; --mint:#7fe0c0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:3rem 1.25rem 5rem;
+        display:flex;flex-direction:column;gap:2rem}
+  .kicker{font-family:ui-monospace,Menlo,monospace;font-size:.6875rem;
+          letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin:0}
+  h1{font-family:ui-monospace,Menlo,monospace;font-size:2rem;line-height:1.1;
+     letter-spacing:-.02em;margin:0}
+  p{margin:0;color:var(--mid)}
+  p strong{color:var(--ink)}
+
+  .task{background:var(--surface);border:1px solid var(--edge);border-radius:8px;
+        padding:1.25rem;display:flex;flex-direction:column;gap:.75rem}
+  .task h2{font-family:ui-monospace,Menlo,monospace;font-size:.6875rem;
+           text-transform:uppercase;letter-spacing:.16em;color:var(--dim);margin:0}
+  .keys{display:flex;gap:.5rem;align-items:center;font-size:.9375rem;color:var(--mid)}
+  kbd{font-family:ui-monospace,Menlo,monospace;font-size:.8125rem;
+      background:var(--raised);border:1px solid var(--edge);border-bottom-width:2px;
+      border-radius:4px;padding:.15em .5em;color:var(--ink)}
+
+  fieldset{border:1px solid var(--edge);border-radius:8px;padding:1.1rem 1.25rem;
+           margin:0;background:var(--surface);display:flex;flex-direction:column;gap:1rem}
+  legend{font-family:ui-monospace,Menlo,monospace;font-size:.6875rem;
+         text-transform:uppercase;letter-spacing:.16em;color:var(--dim);padding:0 .4rem}
+  .row{display:flex;flex-direction:column;gap:.35rem}
+  .row label{font-size:.875rem;font-weight:600}
+  .row .hint{font-size:.8125rem;color:var(--dim)}
+  select,input[type=range]{width:100%}
+  select{background:var(--raised);color:var(--ink);border:1px solid var(--edge);
+         border-radius:5px;padding:.5rem .6rem;font:inherit;font-size:.9375rem}
+  select:focus,input:focus{outline:2px solid var(--cyan);outline-offset:1px}
+  .inline{display:flex;align-items:center;gap:.6rem}
+  .val{font-family:ui-monospace,Menlo,monospace;color:var(--cyan);
+       font-size:.875rem;min-width:2.5rem;text-align:right}
+
+  .play{display:block;width:100%;padding:.9rem;border:0;border-radius:8px;
+        background:var(--pink);color:#1a1626;font:inherit;font-weight:700;
+        font-size:1rem;cursor:pointer;transition:opacity .15s}
+  .play:hover{opacity:.9}
+  .play:active{opacity:1}
+
+  .note{border-left:3px solid var(--cyan);padding:.5rem 0 .5rem .9rem;
+        font-size:.875rem;color:var(--dim)}
+  a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="kicker">Human–machine teaming</p>
+    <h1>The paddle task</h1>
+  </header>
+
+  <p>
+    This is the <strong>actual experiment client</strong> — the same physics,
+    timing and rendering participants saw, running in your browser with no
+    server behind it. Pick a condition and play a short trial.
+  </p>
+
+  <div class="task">
+    <h2>What you're doing</h2>
+    <p>
+      Balls fall from the top of the screen. Move your paddle to hit as many as
+      you can before the trial ends.
+    </p>
+    <div class="keys">
+      <kbd>&larr;</kbd><kbd>&rarr;</kbd>
+      <span>move the paddle</span>
+    </div>
+  </div>
+
+  <form onsubmit="play(event)">
+    <fieldset>
+      <legend>Condition</legend>
+
+      <div class="row">
+        <label for="blockType">Court</label>
+        <select id="blockType">
+          <option value="nonCol">Divided — you cover your own half</option>
+          <option value="col">Shared — the whole court is yours</option>
+        </select>
+        <span class="hint">
+          In the experiment this is the collaboration manipulation: whether two
+          players each defend a half, or share the full width.
+        </span>
+      </div>
+
+      <div class="row">
+        <label for="nBalls">Balls</label>
+        <div class="inline">
+          <input type="range" id="nBalls" min="1" max="9" step="2" value="3"
+                 oninput="document.getElementById('nBallsVal').textContent=this.value">
+          <span class="val" id="nBallsVal">3</span>
+        </div>
+        <span class="hint">The workload manipulation. More balls, more load.</span>
+      </div>
+
+      <div class="row">
+        <label for="trialDur">Trial length</label>
+        <div class="inline">
+          <input type="range" id="trialDur" min="10" max="45" step="5" value="20"
+                 oninput="document.getElementById('durVal').textContent=this.value+'s'">
+          <span class="val" id="durVal">20s</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="drt">Secondary task</label>
+        <select id="drt">
+          <option value="0">Off</option>
+          <option value="1">On — respond to the light</option>
+        </select>
+        <span class="hint">
+          A detection-response task, used to measure spare attentional capacity
+          while the main task runs.
+        </span>
+      </div>
+    </fieldset>
+
+    <p style="margin-top:1.25rem">
+      <button class="play" type="submit">Play a trial</button>
+    </p>
+  </form>
+
+  <p class="note">
+    Solo only. The paired and bot conditions need a server — the bots are
+    Python, running alongside the real experiment. Nothing you do here is
+    recorded or leaves your browser.
+  </p>
+
+</div>
+
+<script>
+function play(e) {
+  e.preventDefault();
+  const p = new URLSearchParams({
+    block_type: document.getElementById('blockType').value,
+    n_balls: document.getElementById('nBalls').value,
+    trial_duration: document.getElementById('trialDur').value,
+    d: document.getElementById('drt').value,
+    skipIntro: '1',
+    offline: '1'
+  });
+  window.location.href = 'game.html?' + p.toString();
+}
+</script>
+</body>
+</html>

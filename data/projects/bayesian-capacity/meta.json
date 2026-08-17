@@ -1,0 +1,25 @@
+{
+  "id": "bayesian-capacity",
+  "title": "Bayesian Workload Capacity",
+  "category": "Cognitive Modeling & Decision Science",
+  "status": "in-progress",
+  "thumbnail": "/assets/images/project-icons/bayesian-capacity.png",
+  "thumbnail_alt": "Capacity coefficient with a credible interval spanning the UCIP benchmark",
+  "summary": "How many trials does a capacity estimate actually need? A Bayesian treatment of the workload capacity coefficient that reports uncertainty rather than a point estimate, with a two-stage online/offline design that stops collecting once the answer is settled.",
+  "tags": [
+    "Systems Factorial Technology",
+    "workload capacity",
+    "UCIP benchmark",
+    "Bayesian inference",
+    "sequential design",
+    "early stopping",
+    "sample size"
+  ],
+  "links": {
+    "osf": "",
+    "experiment_demo": "",
+    "interactive_demo": "",
+    "publication": ""
+  },
+  "publications": []
+}
