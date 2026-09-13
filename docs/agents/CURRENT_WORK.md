@@ -1,5 +1,11 @@
 # Current work handoff
 
+> **UNUSED TEMPLATE — not the live state.** This has never been filled in (note
+> the `YYYY-MM-DD` placeholder below). The live work state for this repo is
+> `WORK.md`, and `AGENTS.md` routes there. Keep this only if you intend to adopt
+> the PM/worker split; if you do, fill in the Control block first so a cold
+> session can tell it is live.
+
 <!--
 THE ONE LIVE HANDOFF. Read in full before editing.
 

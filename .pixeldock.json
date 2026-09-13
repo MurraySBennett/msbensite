@@ -1,0 +1,8 @@
+{
+  "name": "msbensite",
+  "icon": "generic",
+  "start": "python3 -m http.server 8301",
+  "url": "http://127.0.0.1:8301/",
+  "port": 8301,
+  "description": "personal site (absolute paths, so served from the repo root)"
+}
