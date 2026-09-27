@@ -4,8 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Page Not Found - Murray S. Bennett</title>
-    <!-- Favicon (optional, add your own if you have one) -->
-    <link rel="icon" href="path/to/your/favicon.ico" type="image/x-icon" />
     <!-- Google Fonts: Inter for body, Press Start 2P for headings -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Press+Start+2P&display=swap"
@@ -35,13 +33,14 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         max-width: 500px;
         width: 90%; /* Responsive width */
+        box-sizing: border-box;
       }
 
       /* Heading Style */
       h1 {
         font-family: "Press Start 2P", cursive;
         color: #6a5acd; /* SlateBlue from your theme */
-        font-size: 2.5em;
+        font-size: clamp(1.25rem, 5vw, 2.5rem);
         margin-bottom: 15px;
         text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
       }
@@ -84,7 +83,7 @@
       /* Image Style */
       .error-image {
         /* New class for the image */
-        max-width: 400px; /* Control image size */
+        max-width: min(400px, 100%); /* Fit narrow screens */
         height: auto;
         margin-bottom: 20px;
         border-radius: 8px; /* Slightly rounded corners for the image */

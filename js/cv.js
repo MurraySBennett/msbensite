@@ -63,19 +63,6 @@ function renderSection(entries, type) {
   return `<ul class="pub-list">${entries.map((p) => renderPubEntry(p, type)).join("")}</ul>`;
 }
 
-// ── ORCID-only notice ────────────────────────────────────────────────────────
-
-function renderOrcidOnlyNotice(orcidOnly) {
-  if (!orcidOnly || orcidOnly.length === 0) return "";
-  return `
-    <div class="orcid-only-notice">
-      <p><i class="fab fa-orcid"></i> <strong>${orcidOnly.length} work(s) found in your ORCID record</strong> that aren't in <code>publications.json</code> yet:</p>
-      <ul>${orcidOnly.map((w) => `<li>${w.title} (${w.year || "n.d."})</li>`).join("")}</ul>
-      <p>Add them to <code>/data/publications.json</code> to include them on this page.</p>
-    </div>
-  `;
-}
-
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -83,7 +70,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const underReviewEl = document.getElementById("cv-under-review-pubs");
   const conferenceEl = document.getElementById("cv-conference-pubs");
   const pubsLoadingEl = document.getElementById("pubs-loading");
-  const orcidNoticeEl = document.getElementById("orcid-only-notice");
 
   // Show loading state
   if (pubsLoadingEl) pubsLoadingEl.style.display = "block";
@@ -109,9 +95,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.warn("CV: ORCID sync failed, showing local publications only.");
   }
 
-  // ORCID-only notice (only shown to you — hidden from visitors via CSS, visible in dev)
-  if (orcidNoticeEl) {
-    orcidNoticeEl.innerHTML = renderOrcidOnlyNotice(pubs._orcid_only);
-    if (pubs._orcid_only?.length > 0) orcidNoticeEl.style.display = "block";
-  }
 });

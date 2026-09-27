@@ -70,6 +70,7 @@ h1,
 h2,
 h3 {
   font-family: "Press Start 2P", cursive;
+  line-height: 1.6;
 }
 
 p {
@@ -1101,7 +1102,7 @@ body.konami-mode::before {
 
 .tile-header h3 {
   margin: 0;
-  flex: 1;
+  flex: 1 1 100%;
   min-width: 0;
 }
 

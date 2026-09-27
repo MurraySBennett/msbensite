@@ -7,17 +7,7 @@
   {
     "id": "confidnet",
     "category": "Human-AI Collaboration",
-    "status": "in-progress"
-  },
-  {
-    "id": "cdnn-knn",
-    "category": "Human-AI Collaboration",
-    "status": "in-progress"
-  },
-  {
-    "id": "melnet-training",
-    "category": "Human-AI Collaboration",
-    "status": "in-progress"
+    "status": "under-review"
   },
   {
     "id": "discrete-choice-rating",
@@ -30,38 +20,18 @@
     "status": "published"
   },
   {
-    "id": "censoring-accumulator-models",
-    "category": "Cognitive Modeling & Decision Science",
-    "status": "in-progress"
-  },
-  {
-    "id": "noisy-grt",
-    "category": "Cognitive Modeling & Decision Science",
-    "status": "in-progress"
-  },
-  {
     "id": "grin",
-    "category": "Cognitive Modeling & Decision Science",
-    "status": "in-progress"
-  },
-  {
-    "id": "implicit-attitudes",
     "category": "Cognitive Modeling & Decision Science",
     "status": "in-progress"
   },
   {
     "id": "melanoma-features",
     "category": "Perception & Applied Vision",
-    "status": "published"
+    "status": "under-review"
   },
   {
     "id": "wheel-of-fortune",
     "category": "Perception & Applied Vision",
     "status": "published"
-  },
-  {
-    "id": "abc-feature-interactions",
-    "category": "Perception & Applied Vision",
-    "status": "in-progress"
   }
 ]

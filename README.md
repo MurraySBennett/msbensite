@@ -130,3 +130,16 @@ Or with VS Code, install the **Live Server** extension and click "Go Live".
   "publications": ["publication-id-from-publications.json"]
 }
 ```
+
+## Core-page regression checks
+
+With the local server running, use Node's test runner with Playwright available:
+
+```sh
+BASE_URL=http://127.0.0.1:8000 node --test tests/core-pages.cjs
+```
+
+If Playwright is installed outside this checkout, set `NODE_PATH` to its parent
+`node_modules` directory. Set `CHROMIUM_PATH` to a compatible browser executable
+when the Playwright-managed browser is unavailable. The tests intercept optional
+external services so their availability does not determine the results.

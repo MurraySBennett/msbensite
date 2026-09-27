@@ -1,16 +1,18 @@
 {
-  "_note": "This file is the source of truth for publications on the CV page and project detail pages. Add new entries here and they will appear automatically everywhere. For ORCID auto-sync, see /js/orcid-sync.js — it merges live ORCID data with any entries marked orcid_override:true here.",
+  "_note": "Curated publication data aligned with the application bibliography. Linked preprints use their registered metadata; journal-review status is author-maintained. ORCID may enrich missing links.",
   "journal": [
     {
-      "id": "hedley2025benchmarking",
+      "id": "hedley2026novelBench",
       "authors": "Hedley, L. G., Russel, L., Bennett, M. S., & Eidels, A.",
-      "year": 2025,
+      "year": null,
       "title": "Benchmarking the benchmark: A novel simulation benchmark for team performance",
       "journal": "Chinese Journal of Psychology",
       "status": "in-press",
       "doi": "",
       "osf": "",
-      "related_projects": ["team-spirit-hh"]
+      "related_projects": [
+        "team-spirit-hh"
+      ]
     },
     {
       "id": "kerr2025flutracking",
@@ -25,7 +27,7 @@
       "related_projects": []
     },
     {
-      "id": "gronau2023choice",
+      "id": "gronau2023dcrse",
       "authors": "Gronau, Q. F., Bennett, M. S., Brown, S. D., Hawkins, G. E., & Eidels, A.",
       "year": 2023,
       "title": "Do choice tasks and rating scales elicit the same judgments?",
@@ -33,23 +35,30 @@
       "volume": "49",
       "pages": "100437",
       "status": "published",
-      "doi": "",
+      "doi": "10.1016/j.jocm.2023.100437",
       "osf": "",
-      "related_projects": ["discrete-choice-rating"]
+      "related_projects": [
+        "discrete-choice-rating"
+      ]
     },
     {
-      "id": "bennett2022teams",
+      "id": "bennett2025human",
       "authors": "Bennett, M. S., Hedley, L. G., Love, J., Houpt, J. W., Brown, S. D., & Eidels, A.",
-      "year": 2022,
+      "year": 2025,
       "title": "Human performance in competitive and collaborative human–machine teams",
       "journal": "Topics in Cognitive Science",
       "status": "published",
-      "doi": "",
+      "doi": "10.1111/tops.12683",
       "osf": "",
-      "related_projects": ["team-spirit-hh"]
+      "related_projects": [
+        "team-spirit-hh"
+      ],
+      "volume": "17",
+      "issue": "2",
+      "pages": "324–348"
     },
     {
-      "id": "john2022physiological",
+      "id": "john2022unraveling",
       "authors": "John, A. R., Singh, A. K., Do, T.-T. N., Eidels, A., Nalivaiko, E., Gavgani, A. M., Brown, S. D., Bennett, M. S., Lal, S., Simpson, A. M., et al.",
       "year": 2022,
       "title": "Unraveling the physiological correlates of mental workload variations in tracking and collision prediction tasks",
@@ -63,7 +72,7 @@
     },
     {
       "id": "garrett2022wheel",
-      "authors": "Garrett, P. M., Bennett, M. S., Hsieh, Y.-T., Howard, Z. L., Yang, C.-T., R., D., & Eidels, A.",
+      "authors": "Garrett, P. M., Bennett, M. S., Hsieh, Y.-T., Howard, Z. L., Yang, C.-T., Little, D. R., & Eidels, A.",
       "year": 2022,
       "title": "Wheel of fortune: A cross-cultural examination of how expertise shapes the mental representations of familiar and unfamiliar numerals",
       "journal": "Computational Brain & Behavior",
@@ -71,57 +80,80 @@
       "issue": "1",
       "pages": "45–59",
       "status": "published",
-      "doi": "",
+      "doi": "10.1007/s42113-021-00122-1",
       "osf": "",
-      "related_projects": ["wheel-of-fortune"]
+      "related_projects": [
+        "wheel-of-fortune"
+      ]
     },
     {
-      "id": "bennett2020dutch",
+      "id": "bennett2020going",
       "authors": "Bennett, M. S., Mullard, R., Adam, M. T., Steyvers, M., Brown, S. D., & Eidels, A.",
       "year": 2020,
       "title": "Going, going, gone: Competitive decision-making in Dutch auctions",
       "journal": "Cognitive Research: Principles and Implications",
       "volume": "5",
       "issue": "1",
-      "pages": "1–22",
+      "pages": "62",
       "status": "published",
-      "doi": "",
+      "doi": "10.1186/s41235-020-00259-w",
       "osf": "",
-      "related_projects": ["dutch-auction"]
+      "related_projects": [
+        "dutch-auction"
+      ]
     }
   ],
   "under_review": [
     {
-      "id": "bennett-metacognition",
-      "authors": "Bennett, M. S., & Kvam, P.",
+      "id": "bennett2026metacog",
+      "authors": "Bennett, M. S., & Kvam, P. D.",
       "year": 2026,
       "title": "Machine metacognition improves classification performance and uncertainty quantification",
       "status": "under-review",
       "osf": "https://osf.io/f34rm",
-      "related_projects": ["confidnet"]
+      "related_projects": [
+        "confidnet"
+      ],
+      "doi": "10.31234/osf.io/jp83f_v1"
     },
     {
-      "id": "bennett-iat",
-      "authors": "Bennett, M. S., Alaukik, A., Smith, C. T., & Kvam, P. D.",
+      "id": "alaukik2026iat",
+      "authors": "Alaukik, A., Bennett, M. S., Smith, C. T., & Kvam, P. D.",
       "year": 2026,
       "title": "A road map for assessing process independence in behavioral measures of attitudes: An SFT and GRT modeling analysis",
       "status": "under-review",
       "osf": "",
-      "related_projects": ["implicit-attitudes"]
+      "related_projects": [
+        "implicit-attitudes"
+      ],
+      "doi": "10.31234/osf.io/jqasm_v1"
     },
     {
-      "id": "bennett-melanoma",
-      "authors": "Bennett, M. S., Houpt, J. W., Wenger, M. J., Townsend, J. T., & Mark, L.",
+      "id": "bennett2025btl",
+      "authors": "Bennett, M. S., Houpt, J. W., Townsend, J. T., Wenger, M. J., & Mark, L.",
       "year": 2026,
       "title": "Scalable estimation of continuous perceptual representations from human judgements and computer vision: An application to melanoma identification",
       "status": "under-review",
       "osf": "https://osf.io/ctg9s",
-      "related_projects": ["melanoma-features"]
+      "related_projects": [
+        "melanoma-features"
+      ],
+      "doi": "10.31234/osf.io/kgeyt_v1",
+      "citation_version": "Public preprint"
+    },
+    {
+      "id": "fitch2026realtime",
+      "authors": "Fitch, A. K., Hedley, L. G., Bennett, M. S., & Kvam, P. D.",
+      "year": 2026,
+      "title": "Real-Time Cognitive Modeling Using Simulation-Inversion Networks",
+      "status": "under-review",
+      "doi": "10.31234/osf.io/vbjd3_v1",
+      "related_projects": []
     }
   ],
   "conference": [
     {
-      "id": "hedley2023teaming",
+      "id": "hedley2023relationship",
       "authors": "Hedley, L. G., Bennett, M. S., Love, J., Houpt, J. W., Brown, S. D., & Eidels, A.",
       "year": 2023,
       "title": "The relationship between teaming behaviours and joint capacity of hybrid human-machine teams",
@@ -129,7 +161,9 @@
       "volume": "45",
       "status": "published",
       "doi": "",
-      "related_projects": ["team-spirit-hh"]
+      "related_projects": [
+        "team-spirit-hh"
+      ]
     }
   ]
 }

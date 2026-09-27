@@ -1,11 +1,11 @@
 {
   "id": "melanoma-features",
-  "title": "Quantitative Perceptual Measures of Melanoma ABC Features",
+  "title": "Measuring Perceived Features of Melanoma Images",
   "category": "Perception & Applied Vision",
   "status": "under-review",
   "thumbnail": "/assets/images/project-icons/melanoma-features-demo.png",
   "thumbnail_alt": "Melanoma ABC feature rating experiment screenshot",
-  "summary": "Continuous, ratio-scale perceptual measures of melanoma asymmetry, border irregularity, and colour variance \u2014 derived from 40,000+ pairwise human judgements using the Bradley-Terry-Luce model \u2014 complement rather than duplicate computer vision estimates. Combining both sources improves melanoma classifier performance beyond either alone, demonstrating that human perceptual science has a concrete role in medical AI development.",
+  "summary": "Pairwise judgments and a perceptual model provide human feature estimates that can be compared and combined with computer-vision measurements.",
   "tags": [
     "melanoma",
     "perception",
@@ -15,12 +15,12 @@
     "human-AI"
   ],
   "links": {
-    "osf": "",
+    "osf": "https://osf.io/ctg9s",
     "experiment_demo": "",
-    "interactive_demo": "/experiment-demo-viewer.html?demo=mel-features",
-    "publication": ""
+    "interactive_demo": "",
+    "publication": "https://doi.org/10.31234/osf.io/kgeyt_v1"
   },
   "publications": [
-    "bennett2025abc"
+    "bennett2025btl"
   ]
 }

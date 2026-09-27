@@ -5,7 +5,7 @@
   "status": "published",
   "thumbnail": "/assets/images/project-icons/dutch-auction-demo.png",
   "thumbnail_alt": "Dutch auction experiment interface screenshot",
-  "summary": "A computerised Dutch auction platform and two group experiments establish that price change pattern and stock volatility have little effect on bidding \u2014 but starting price is a powerful and robust driver of winning bids. A novel extension of Prospect Theory to the time domain accounts for multi-player bidding behaviour and correctly predicts the starting price effect.",
+  "summary": "Group experiments test how a falling price shapes bidding; a preliminary prospect-theory model describes the decision to bid now or keep waiting.",
   "tags": [
     "Dutch auction",
     "decision making",
@@ -15,9 +15,11 @@
   ],
   "links": {
     "osf": "",
-    "experiment_demo": "/experiment-demo-viewer.html?demo=dutch-auction",
+    "experiment_demo": "",
     "interactive_demo": "",
-    "publication": ""
+    "publication": "https://doi.org/10.1186/s41235-020-00259-w"
   },
-  "publications": []
+  "publications": [
+    "bennett2020going"
+  ]
 }

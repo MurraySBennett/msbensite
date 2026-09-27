@@ -52,15 +52,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // --- Load meta and content in parallel ---
   try {
+    const indexRes = await fetch("/data/projects-index.json");
+    if (!indexRes.ok) throw new Error("Could not load projects index");
+    const index = await indexRes.json();
+    if (!index.some(({ id }) => id === projectId)) {
+      showError("This project is not currently available. Explore the projects on the Research page.");
+      return;
+    }
     const [metaRes, contentRes] = await Promise.all([
       fetch(`/data/projects/${projectId}/meta.json`),
       fetch(`/data/projects/${projectId}/content.md`),
     ]);
 
     if (!metaRes.ok) throw new Error(`Project "${projectId}" not found (meta ${metaRes.status})`);
+    if (!contentRes.ok) throw new Error(`Project content unavailable (${contentRes.status})`);
 
     const meta = await metaRes.json();
-    const markdownText = contentRes.ok ? await contentRes.text() : "_Content coming soon._";
+    const markdownText = await contentRes.text();
 
     // --- Page title ---
     document.title = `${meta.title} — Murray S. Bennett`;
@@ -151,6 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           const allPubs = await pubRes.json();
           const allEntries = [
             ...(allPubs.journal || []),
+            ...(allPubs.under_review || []),
             ...(allPubs.conference || []),
             ...(allPubs.in_preparation || []),
           ];
@@ -175,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ? `<em>${p.status}</em>`
                     : "";
                   return `<li class="pub-entry">
-                    ${p.authors} (<strong>${p.year}</strong>). ${p.title}. ${venue}.${doiLink}
+                    ${p.authors} (<strong>${p.status === "in-press" ? "In Press" : p.year || "n.d."}</strong>). ${p.title}. ${venue}.${doiLink}
                   </li>`;
                 })
                 .join("");

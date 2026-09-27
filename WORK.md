@@ -6,23 +6,24 @@ project: msbensite
 
 ## Now
 
-Murray selected core research, CV, teaching and tools first on 2026-09-27;
-demos come later. Plan: `../job-applications/docs/plans/professional-foundation.md`.
-Application foundations precede website edits; planning is complete, execution
-and a persistent goal have not launched. Seven substantive project pages are in
-scope; six placeholders and demo reconstruction are deferred. Review stays local:
-pushes to `main` deploy, and publication is not authorized. Social outreach follows.
+Plan: `../job-applications/docs/plans/professional-foundation.md`; goal active.
+Core pages and seven substantive projects are ready for author review locally.
+Six-page canonical CV installed; six browser regressions and 26 desktop/mobile route checks pass.
+Pending: author review and manuscript citation-version confirmation; see the application repo's verification report.
+Preview: http://localhost:8765. No deployment; demos and social outreach remain deferred.
 
 ## Streams
 
 ### build
 - [x] 2026-09-27 — Launch scope chosen: core research, CV, teaching and tools; demos later.
-- [ ] now — Execute the foundation plan after launch; finish core routes and verified content, remove placeholder/demo promises from the included visitor journey, verify desktop/mobile and links, and obtain author review. No deployment.
+- [x] 2026-09-27 — Core routes, seven evidence-based projects, teaching/tools/contact and canonical CV download aligned; excluded project URLs fail honestly. Desktop/mobile, keyboard, links and optional ORCID failure checked.
+- [ ] now — Obtain author review under the foundation goal; reconcile melanoma submitted author order and IAT manuscript/preprint title with canonical bib. Keep local; no deployment.
 - [ ] later (L) Make the five demos faithful: current dc-rs, dutch-auction, mel-features, team-spirit-hh and wheel-of-fortune implementations have uncertain fidelity. Start with the real `team-spirit/bot/murrayserver/www/paddleGame.html` client and its socket boundary; single-player was a real condition.
-- [ ] next — Keep `tools.html` focused on verified GRIN capability; unfinished tools remain excluded.
+- [x] 2026-09-27 — Tools and GRIN copy describe implemented count-only inference; RT extension explicitly remains in development.
 
 ### writing
-- [ ] next (M) review and rewrite the site text — project descriptions and the research/experience narrative — accurate and not overclaiming, and readable by visitors from any background rather than specialists only
+- [x] 2026-09-27 — Research/experience/project copy revised against scoped evidence; clinical benefit and completed human-intervention claims removed.
+- [ ] now (M) Review concrete site copy and CV; author approval is still outstanding.
 
 ### comms
 - [ ] now (M) decide what a deliberate academic social presence is *for* before touching any platform — finding collaborators, circulating preprints, being findable by search committees and conference backchannel point at different platforms and very different posting habits, so "which platforms" is the wrong first question. Run `superpowers:brainstorming`; do not start from a posting schedule
