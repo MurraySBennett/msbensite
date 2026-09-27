@@ -6,32 +6,20 @@ project: msbensite
 
 ## Now
 
-Personal academic site (murraysbennett.com) on S3 + CloudFront with a GitHub
-Actions deploy; the deploy was fixed on 2026-08-26 so it can no longer wipe
-the bucket. The live build question is demo fidelity: the five existing demos
-(dc-rs, dutch-auction, mel-features, team-spirit-hh, wheel-of-fortune) are
-2025 re-implementations of uncertain fidelity, while the real clients still
-exist — `team-spirit/bot/murrayserver/www/paddleGame.html` is 118KB of the
-actual canvas game needing only a stubbed `WebSocket`. Single-player was a
-real experimental condition, so nothing has to fake a partner.
-
-**2026-09-24 — `~/.agents/handoffs/HANDOFF-academic-social-presence.md` was
-consumed into this file and can be deleted.** It is a brainstorm with an open
-decision at the centre of it, not built work: no hub decision has ever been
-made, no Bluesky account exists, and there is no social markup anywhere in this
-repo. It landed here because the first question — is murraysbennett.com the hub
-the profiles point at — is a question about this site.
-
-Nothing is blocked externally. Two decisions in `comms` gate everything else
-there, the X and LinkedIn 2FA work under it is worth doing whatever those
-decisions turn out to be, and `docs/agents/CURRENT_WORK.md` is still the
-unfilled scaffold template and should go.
+Murray selected core research, CV, teaching and tools first on 2026-09-27;
+demos come later. Plan: `../job-applications/docs/plans/professional-foundation.md`.
+Application foundations precede website edits; planning is complete, execution
+and a persistent goal have not launched. Seven substantive project pages are in
+scope; six placeholders and demo reconstruction are deferred. Review stays local:
+pushes to `main` deploy, and publication is not authorized. Social outreach follows.
 
 ## Streams
 
 ### build
-- [ ] next (L) make the demos faithful: stub the socket in the real clients so each demo *is* the task rather than an approximation of it, starting with the paddle game
-- [ ] later leave `tools.html` thin — padding it with unfinished work would be worse than the gap. Wait until something is genuinely done
+- [x] 2026-09-27 — Launch scope chosen: core research, CV, teaching and tools; demos later.
+- [ ] now — Execute the foundation plan after launch; finish core routes and verified content, remove placeholder/demo promises from the included visitor journey, verify desktop/mobile and links, and obtain author review. No deployment.
+- [ ] later (L) Make the five demos faithful: current dc-rs, dutch-auction, mel-features, team-spirit-hh and wheel-of-fortune implementations have uncertain fidelity. Start with the real `team-spirit/bot/murrayserver/www/paddleGame.html` client and its socket boundary; single-player was a real condition.
+- [ ] next — Keep `tools.html` focused on verified GRIN capability; unfinished tools remain excluded.
 
 ### writing
 - [ ] next (M) review and rewrite the site text — project descriptions and the research/experience narrative — accurate and not overclaiming, and readable by visitors from any background rather than specialists only
