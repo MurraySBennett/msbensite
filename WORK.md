@@ -6,7 +6,7 @@ project: msbensite
 
 ## Now
 
-Plan: `../job-applications/docs/plans/professional-foundation.md`; goal active.
+Plan: `../job-applications/docs/plans/professional-foundation.md`; goal blocked pending author decisions/review.
 Core pages and seven substantive projects are ready for author review locally.
 Six-page canonical CV installed; six browser regressions and 26 desktop/mobile route checks pass.
 Pending: author review and manuscript citation-version confirmation; see the application repo's verification report.
