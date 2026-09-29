@@ -20,14 +20,13 @@ async function pageFor(t) {
   return page;
 }
 async function loadedProject(page, id) {
-  await page.goto(`${base}/project-detail.html?id=${id}`);
-  await page.waitForFunction(() => !document.querySelector('#project-title').textContent.toLowerCase().includes('loading'));
+  await page.goto(`${base}/projects/${id}.html`);
 }
 test('deferred project URLs do not expose a coming-soon page', async t => {
   const page = await pageFor(t);
-  await loadedProject(page, 'noisy-grt');
-  assert.match(await page.locator('#project-title').innerText(), /not found|unavailable/i);
-  assert.doesNotMatch(await page.locator('#project-content').innerText(), /coming soon/i);
+  await page.goto(`${base}/project-detail.html?id=noisy-grt`);
+  assert.match(await page.locator('#legacy-message').innerText(), /not currently available/i);
+  assert.equal((await page.request.get(`${base}/projects/noisy-grt.html`)).status(), 404);
 });
 test('an under-review project displays its related preprint', async t => {
   const page = await pageFor(t);
@@ -36,12 +35,74 @@ test('an under-review project displays its related preprint', async t => {
   assert.match(await page.locator('#project-publications').innerText(), /Machine metacognition improves classification/);
   assert.equal(await page.locator('#project-publications a.doi-link').getAttribute('href'), 'https://doi.org/10.31234/osf.io/jp83f_v1');
 });
-test('missing project content fails visibly instead of displaying a placeholder', async t => {
+test('project narrative is present without a Markdown request', async t => {
   const page = await pageFor(t);
-  await page.route('**/data/projects/grin/content.md', route => route.fulfill({ status: 404, body: 'missing' }));
+  let markdownRequests = 0;
+  page.on('request', request => { if (request.url().endsWith('.md')) markdownRequests++; });
   await loadedProject(page, 'grin');
-  assert.match(await page.locator('#project-title').innerText(), /not found|unavailable/i);
-  assert.doesNotMatch(await page.locator('#project-content').innerText(), /coming soon/i);
+  assert.match(await page.locator('#project-content').innerText(), /Fitting a theory of perception/);
+  assert.equal(markdownRequests, 0);
+});
+test('Research cards and project narratives remain readable without JavaScript', async t => {
+  const page = await browser.newPage({ javaScriptEnabled: false });
+  t.after(() => page.close());
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${base}/research.html`);
+  assert.equal(await page.locator('.research-tile').count(), 7);
+  assert.equal(await page.locator('nav a').count(), 5);
+  assert.equal(await page.getByRole('link', { name: 'CV', exact: true }).isVisible(), true);
+  await page.goto(`${base}/projects/grin.html`);
+  assert.match(await page.locator('#project-content').innerText(), /Fitting a theory of perception/);
+});
+test('all published project routes fit desktop and mobile screens', async t => {
+  const page = await pageFor(t);
+  const ids = ['team-spirit-hh', 'confidnet', 'discrete-choice-rating', 'dutch-auction', 'grin', 'melanoma-features', 'wheel-of-fortune'];
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const id of ids) {
+      const response = await page.goto(`${base}/projects/${id}.html`);
+      assert.equal(response.status(), 200, id);
+      assert.equal(await page.locator('h1').count(), 1, id);
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${id} at ${width}px`);
+    }
+  }
+  assert.deepEqual(errors, []);
+});
+test('legacy project link reaches the static page', async t => {
+  const page = await pageFor(t);
+  await page.goto(`${base}/project-detail.html?id=grin`);
+  await page.waitForURL('**/projects/grin.html');
+  assert.match(await page.locator('h1').innerText(), /GRIN/);
+});
+test('core and project pages expose navigation, headings and sharing metadata', async t => {
+  const page = await pageFor(t);
+  for (const path of ['/', '/research.html', '/cv.html', '/teaching.html', '/tools.html', '/projects/confidnet.html']) {
+    await page.goto(base + path);
+    assert.equal(await page.locator('main').count(), 1, path);
+    assert.equal(await page.locator('h1').count(), 1, path);
+    assert.equal(await page.locator('link[rel=canonical]').count(), 1, path);
+    assert.equal(await page.locator('meta[name=description]').count(), 1, path);
+    assert.equal(await page.locator('.skip-link').count(), 1, path);
+  }
+  await page.goto(`${base}/index.html`);
+  assert.equal(await page.getByRole('link', { name: 'Download CV' }).getAttribute('href'), '/assets/documents/MurrayBennettCV.pdf');
+  await page.locator('nav a[data-nav=home][aria-current=page]').waitFor();
+  assert.equal(await page.locator('nav a[data-nav=home]').getAttribute('aria-current'), 'page');
+});
+test('mobile menu has a usable target and keyboard activation', async t => {
+  const page = await pageFor(t);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${base}/research.html`);
+  const button = page.getByRole('button', { name: 'Toggle navigation' });
+  await button.waitFor();
+  const box = await button.boundingBox();
+  assert.ok(box.width >= 44 && box.height >= 44);
+  await button.focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await button.getAttribute('aria-expanded'), 'true');
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
 });
 test('curated CV publications remain visible when ORCID is unavailable', async t => {
   const page = await pageFor(t);

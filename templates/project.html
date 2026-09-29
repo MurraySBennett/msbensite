@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{TITLE}} — Murray S. Bennett</title>
+    <!-- site-metadata -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="/js/components.js" defer></script>
+  </head>
+  <body data-page="research">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div id="nav-placeholder"></div>
+    <main id="main-content" class="container">
+      <article id="project-detail-content">
+        <div class="project-header">
+          <h1 id="project-title">{{TITLE}}</h1>
+          <div id="project-status"><span class="status-badge {{STATUS_CLASS}}">{{STATUS}}</span></div>
+          <div id="project-tags" class="tag-list">{{TAGS}}</div>
+        </div>
+        {{IMAGE}}
+        <div class="project-summary-block"><p id="project-summary">{{SUMMARY}}</p></div>
+        <div id="project-links-container"><div class="project-links">{{LINKS}}</div></div>
+        <div id="project-content" class="project-content markdown-body">{{CONTENT}}</div>
+        <div id="project-publications">{{PUBLICATIONS}}</div>
+        <hr />
+        <p><a href="/research.html">Back to Research</a></p>
+      </article>
+    </main>
+    <div id="footer-placeholder"></div>
+  </body>
+</html>

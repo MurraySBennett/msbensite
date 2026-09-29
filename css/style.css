@@ -161,16 +161,42 @@ nav ul li a.active {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
   z-index: 10;
   position: absolute;
-  right: 1.5rem;
-  top: 1rem;
+  right: 1rem;
+  top: 0.4rem;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -5rem;
+  z-index: 1000;
+  padding: 0.7rem 1rem;
+  background: #fff;
+  color: #14354a;
+  border: 2px solid currentColor;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+a:focus-visible, button:focus-visible {
+  outline: 3px solid #d46b25;
+  outline-offset: 3px;
 }
 
 .hamburger .bar {
@@ -1139,8 +1165,11 @@ body.konami-mode::before {
   margin-bottom: 1.5rem;
 }
 
-.project-header h2 {
+.project-header h1 {
   margin-bottom: 0.5rem;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.4;
+  color: #6a5acd;
 }
 
 .project-thumbnail {
@@ -1496,6 +1525,10 @@ summary:hover {
 
 /* Responsive: stack cv-entry-header on narrow screens */
 @media (max-width: 480px) {
+  .profile-info h1 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
   .cv-entry-header {
     flex-direction: column;
     align-items: flex-start;

@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "python3 -m scripts.build_site",
+    "test": "python3 -m unittest discover -s tests -p 'test_build_site.py' -v && python3 scripts/check_site.py"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

@@ -6,18 +6,21 @@ project: msbensite
 
 ## Now
 
-Plan: `../job-applications/docs/plans/professional-foundation.md`; goal blocked pending author decisions/review.
-Core pages and seven substantive projects are ready for author review locally.
-Six-page canonical CV installed; six browser regressions and 26 desktop/mobile route checks pass.
-Pending: author review and manuscript citation-version confirmation; see the application repo's verification report.
-Preview: http://localhost:8765. No deployment; demos and social outreach remain deferred.
+Plan: `docs/plans/job-search-site-release.md`; implementation is on `foundation-core` for local review.
+Static build produces seven project pages and a narrow `dist/` artifact; CI checks that artifact before S3 deploy.
+Core navigation, accessibility, metadata and first-screen CV/contact access updated; 5 build checks and 11 browser checks pass, with desktop/mobile screenshots inspected.
+Pending: author review of site/CV and confirmation of melanoma author order and IAT title with canonical bibliography.
+Preview: http://localhost:8877. No push to `main` or public deployment before review; demos and social outreach remain deferred.
 
 ## Streams
 
 ### build
+- [ ] now — Obtain author review of the locally verified job-search release artifact before pushing to `main`.
+- [x] 2026-09-29 — Build artifact passed five Python checks and eleven browser checks; reviewed desktop/mobile Home, Research and project screenshots.
+- [x] 2026-09-29 — Add static seven-project build, allowlisted publish artifact, predeploy CI checks, core navigation and accessibility polish.
 - [x] 2026-09-27 — Launch scope chosen: core research, CV, teaching and tools; demos later.
 - [x] 2026-09-27 — Core routes, seven evidence-based projects, teaching/tools/contact and canonical CV download aligned; excluded project URLs fail honestly. Desktop/mobile, keyboard, links and optional ORCID failure checked.
-- [ ] now — Obtain author review under the foundation goal; reconcile melanoma submitted author order and IAT manuscript/preprint title with canonical bib. Keep local; no deployment.
+- [ ] now — Obtain author review under the foundation goal; reconcile melanoma submitted author order and IAT manuscript/preprint title with canonical bib. Keep local until review.
 - [ ] later (L) Make the five demos faithful: current dc-rs, dutch-auction, mel-features, team-spirit-hh and wheel-of-fortune implementations have uncertain fidelity. Start with the real `team-spirit/bot/murrayserver/www/paddleGame.html` client and its socket boundary; single-player was a real condition.
 - [x] 2026-09-27 — Tools and GRIN copy describe implemented count-only inference; RT extension explicitly remains in development.
 

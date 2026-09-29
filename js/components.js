@@ -1,8 +1,8 @@
 /**
  * components.js
- * Fetches and injects the shared nav and footer HTML components into every page.
- * Also sets the active nav link based on the current page, fills in the year,
- * and initialises the dark mode toggle.
+ * Fills shared nav/footer placeholders for source previews. The production build
+ * inlines those components, so this script only wires their behavior there.
+ * It also sets the active nav link, year, and dark mode toggle.
  *
  * Usage: include this script in the <head> of every HTML page:
  *   <script src="/js/components.js" defer></script>
@@ -49,6 +49,7 @@
     links.forEach((link) => {
       if (link.dataset.nav === page) {
         link.classList.add("active");
+        link.setAttribute("aria-current", "page");
       }
     });
   }

@@ -1,145 +1,38 @@
 # murraysbennett.com
 
-Personal academic website for Murray S. Bennett — hosted on AWS S3 + CloudFront, deployed via GitHub Actions.
+Murray S. Bennett's academic website. Plain HTML, CSS, JSON, and Markdown are the editable source; `scripts/build_site.py` creates the reviewed static artifact in `dist/`. GitHub Actions deploys that artifact to S3 and invalidates CloudFront after checks pass. No server or CMS runs in production.
 
-## Structure
+## Edit and preview
 
-```
-/                          ← HTML pages (S3 requires these at root)
-  index.html
-  research.html
-  project-detail.html
-  experiments.html
-  experiment-demo-viewer.html
-  teaching.html
-  cv.html
-  404.html
+Use Python 3.13 and Node 22. The pinned Markdown renderer and browser test dependency are installed with:
 
-/.github/workflows/
-  deploy.yml               ← Auto-deploys to S3 on push to main
-
-/css/
-  style.css                ← All styles
-
-/js/
-  components.js            ← Injects shared nav + footer into every page
-  research-grid.js         ← Dynamically renders project tiles on research.html
-  project-detail.js        ← Loads project meta + content on project-detail.html
-  experiment-demo-loader.js
-  nav-burger.js            ← (legacy, now handled by components.js)
-  dpad.js
-  activate-pixel-chaser.js
-  activate-konami.js
-  activate-snake.js
-  activate-pong.js
-  steal-the-doi.js
-
-/js/demos/
-  team-spirit-hh.js
-  dutch-auction.js
-  wheel-of-fortune.js
-  mel-features.js
-  dc-rs.js
-
-/components/
-  nav.html                 ← Shared navigation HTML fragment
-  footer.html              ← Shared footer HTML fragment
-
-/data/
-  projects-index.json      ← Lightweight list of all projects (id + category)
-  publications.json        ← All publications in structured format
-  projects/
-    {project-id}/
-      meta.json            ← Tile metadata (title, summary, thumbnail, links, etc.)
-      content.md           ← Full project narrative in Markdown
-
-/assets/
-  images/
-    murray_small.png
-    project-icons/         ← Tile thumbnail images
-    team-spirit-hh/        ← Project-specific images
-    sprites/               ← Easter egg GIFs
-    button-icons/          ← Gamepad button images
-  documents/
-    MurrayBennettCV.pdf
-  audio/
-    steal.mp3
+```sh
+python3 -m pip install -r requirements-build.txt
+npm ci
+npx playwright install chromium
 ```
 
-## Adding a new project
+Build and preview the exact files that will be published:
 
-1. Create `/data/projects/your-project-id/`
-2. Add `meta.json` (copy from an existing project and update fields)
-3. Add `content.md` (write your project narrative in Markdown)
-4. Add one line to `/data/projects-index.json`:
-   ```json
-   { "id": "your-project-id", "category": "Cognitive Modeling & Decision Science", "status": "in-progress" }
-   ```
-5. (Optional) Add a thumbnail image to `/assets/images/project-icons/` and update `meta.json`
+```sh
+npm run build
+python3 -m http.server 8000 --directory dist
+```
 
-The project tile on `research.html` and the detail page on `project-detail.html?id=your-project-id` will both work automatically.
+Open <http://localhost:8000>. Run `npm test` after building; it starts its own local server on a free port for browser checks. The build also checks local file references, included publication IDs, and the seven-project source index. `dist/` is generated and ignored by Git.
 
-## Adding a new experiment demo
+## Update content
 
-1. Create `/js/demos/your-demo-id.js`
-2. Add an entry to the `demoMap` in `/js/experiment-demo-loader.js`
-3. Add a tile to `experiments.html`
-4. Update the relevant project's `meta.json` to include the demo link
+- Core copy and layout: edit `index.html`, `research.html`, `cv.html`, `teaching.html`, `tools.html`, and `css/style.css`.
+- A project: edit its `data/projects/<id>/meta.json` and `content.md`. Add or remove an approved project in `data/projects-index.json`; only indexed projects publish. The build renders `/projects/<id>.html` and Research cards from these files.
+- Publication listings: edit `data/publications.json` after checking the canonical bibliography in `../job-applications`.
+- CV download: replace `assets/documents/MurrayBennettCV.pdf` with the reviewed canonical PDF from `../job-applications`.
+- Shared navigation and footer: edit `components/nav.html` and `components/footer.html`.
+
+The old `/project-detail.html?id=<id>` route redirects included projects to their static pages. Excluded project IDs show an unavailable message. Experiment demos and draft project files remain in the repository for later work and are absent from `dist/`.
 
 ## Deployment
 
-Push to `main` — GitHub Actions handles the rest.
+Pull requests build and test without AWS credentials. A push to `main` builds, tests, uploads the artifact, syncs only `dist/` to S3, and invalidates CloudFront. The two sync passes give HTML immediate revalidation and other assets a one-hour cache. Do not push until the final copy, CV, and citation versions have author approval.
 
-**First-time setup:** Add these secrets under Settings → Secrets and variables → Actions:
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_REGION` (e.g. `us-east-1`)
-- `S3_BUCKET_NAME`
-- `CLOUDFRONT_DISTRIBUTION_ID`
-
-## Local development
-
-Since the site uses absolute paths (`/css/style.css`, `/data/projects/...`), you need a local server rather than opening HTML files directly. The simplest option:
-
-```bash
-# Python (built-in, works on all platforms)
-python -m http.server 8000
-# then open http://localhost:8000
-```
-
-Or with VS Code, install the **Live Server** extension and click "Go Live".
-
-## meta.json schema
-
-```json
-{
-  "id": "project-id",
-  "title": "Full Project Title",
-  "category": "One of: Human-AI Collaboration | Cognitive Modeling & Decision Science | Perception & Applied Vision",
-  "status": "One of: published | under-review | in-progress",
-  "thumbnail": "/assets/images/project-icons/filename.png",
-  "thumbnail_alt": "Alt text for the thumbnail",
-  "summary": "One or two sentence summary shown on the tile and detail page.",
-  "tags": ["tag1", "tag2"],
-  "links": {
-    "osf": "https://osf.io/...",
-    "experiment_demo": "/experiment-demo-viewer.html?demo=demo-id",
-    "interactive_demo": "",
-    "publication": "https://doi.org/..."
-  },
-  "publications": ["publication-id-from-publications.json"]
-}
-```
-
-## Core-page regression checks
-
-With the local server running, use Node's test runner with Playwright available:
-
-```sh
-BASE_URL=http://127.0.0.1:8000 node --test tests/core-pages.cjs
-```
-
-If Playwright is installed outside this checkout, set `NODE_PATH` to its parent
-`node_modules` directory. Set `CHROMIUM_PATH` to a compatible browser executable
-when the Playwright-managed browser is unavailable. The tests intercept optional
-external services so their availability does not determine the results.
+GitHub Actions needs `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET_NAME`, and `CLOUDFRONT_DISTRIBUTION_ID` as repository secrets.
