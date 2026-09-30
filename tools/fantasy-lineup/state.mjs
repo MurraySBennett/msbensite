@@ -124,6 +124,12 @@ function validateEnvelope(value) {
       validateLineup(record.advice.lineup, record);
       validateModelComparisons(record.advice.comparisons, record,
         record.advice.calibrated === true);
+      if (record.advice.player_means !== undefined &&
+          (!object(record.advice.player_means) || Object.entries(record.advice.player_means).some(
+            ([id, value]) => !record.roster.some((player) => player.player_id === id) ||
+              !Number.isFinite(value)))) {
+        throw new Error('invalid frozen player means');
+      }
       if (record.initial && !samePairs(record.initial.comparisons,
         record.advice.comparisons)) {
         throw new Error('model advice must use the same comparison as the unaided choice');
@@ -270,6 +276,12 @@ export function freezeAdvice(record, forecast, nowUtc) {
   validateLineup(forecast?.lineup, record);
   const comparisons = forecast.comparisons || (forecast.comparison ? [forecast.comparison] : []);
   validateModelComparisons(comparisons, record, forecast.calibrated === true);
+  if (forecast.player_means !== undefined &&
+      (!object(forecast.player_means) || Object.entries(forecast.player_means).some(
+        ([id, value]) => !record.roster.some((player) => player.player_id === id) ||
+          !Number.isFinite(value)))) {
+    throw new Error('invalid frozen player means');
+  }
   if (record.initial && !samePairs(record.initial.comparisons, comparisons)) {
     throw new Error('model advice must use the same comparison as the unaided choice');
   }
@@ -279,6 +291,7 @@ export function freezeAdvice(record, forecast, nowUtc) {
     comparison: comparisons[0] ? copy(comparisons[0]) : null,
     comparisons: copy(comparisons),
     calibrated: forecast.calibrated === true,
+    ...(forecast.player_means === undefined ? {} : {player_means: copy(forecast.player_means)}),
     frozen_at: nowUtc, data_cutoff_utc: record.data_cutoff_utc,
     model_version: record.model_version, snapshot_sha256: record.snapshot_sha256};
   return updated;

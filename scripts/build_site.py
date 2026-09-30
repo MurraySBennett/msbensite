@@ -2,6 +2,7 @@
 
 import argparse
 from datetime import datetime, timezone
+from hashlib import sha256
 import html
 import json
 import re
@@ -19,7 +20,7 @@ SCRIPTS = ('components.js', 'dark-mode-toggle.js', 'cv.js', 'orcid-sync.js',
            'dpad.js', 'activate-pixel-chaser.js', 'activate-konami.js',
            'activate-snake.js', 'activate-pong.js', 'steal-the-doi.js')
 FANTASY_FILES = ('index.html', 'methods.html', 'app.mjs', 'style.css',
-                 'decision.mjs', 'scenarios.mjs', 'state.mjs')
+                 'decision.mjs', 'scenarios.mjs', 'state.mjs', 'evaluation.mjs')
 BASE_IMAGES = (
     'assets/images/murray_small.png',
     'assets/images/sprites/seeing-eye.gif',
@@ -52,6 +53,90 @@ def copy_file(source, output, relative):
     dst = output / relative
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
+
+
+def copy_reviewed_outcomes(source, output):
+    """Only explicitly reviewed, hashed outcome files enter the site artifact."""
+    selection = read_json(source / 'data/fantasy-outcomes-publish.json')
+    if selection.get('schema_version') != 1 or not isinstance(selection.get('files'), list):
+        raise ValueError('invalid outcome publish allowlist')
+    files = selection['files']
+    if not files:
+        return
+    if not selection.get('reviewed_at') or not selection.get('reviewer'):
+        raise ValueError('outcome publish allowlist needs review attribution')
+    forecasts = {}
+    forecast_paths = selection.get('forecast_manifests')
+    if not isinstance(forecast_paths, list) or not forecast_paths:
+        raise ValueError('outcome publish allowlist needs approved forecast manifests')
+    for entry in forecast_paths:
+        path, digest = entry.get('path'), entry.get('sha256')
+        if not isinstance(path, str) or not re.fullmatch(
+                r'tools/fantasy-lineup/versions/[a-f0-9]{20}/manifest\.json', path) or\
+                not isinstance(digest, str) or not re.fullmatch(r'[a-f0-9]{64}', digest) or\
+                digest in forecasts:
+            raise ValueError('invalid approved forecast manifest')
+        content = (source / path).read_bytes()
+        if sha256(content).hexdigest() != digest:
+            raise ValueError('approved forecast manifest checksum mismatch')
+        forecast = json.loads(content)
+        if forecast.get('schema_version') != 1 or not isinstance(forecast.get('games'), dict):
+            raise ValueError('invalid approved forecast manifest')
+        forecasts[digest] = forecast
+    allowed = re.compile(r'tools/fantasy-lineup/outcomes/(?:current\.json|versions/[a-f0-9]{20}/(?:manifest|week-\d{4}-(?:[1-9]|1[0-8]))\.json)\Z')
+    hashes = {}
+    for entry in files:
+        path, digest = entry.get('path'), entry.get('sha256')
+        if not isinstance(path, str) or not allowed.fullmatch(path) or path in hashes or\
+                not isinstance(digest, str) or not re.fullmatch(r'[a-f0-9]{64}', digest):
+            raise ValueError(f'invalid or duplicate reviewed outcome path: {path}')
+        content = (source / path).read_bytes()
+        if sha256(content).hexdigest() != digest:
+            raise ValueError(f'reviewed outcome checksum mismatch: {path}')
+        hashes[path] = digest
+    prefix = 'tools/fantasy-lineup/outcomes/'
+    pointer_path = prefix + 'current.json'
+    if pointer_path not in hashes:
+        raise ValueError('reviewed outcomes omit current pointer')
+    pointer = read_json(source / pointer_path)
+    manifest_path = prefix + pointer['manifest']
+    if (pointer.get('schema_version') != 1 or manifest_path not in hashes or
+            hashes[manifest_path] != pointer.get('manifest_sha256')):
+        raise ValueError('reviewed outcomes omit or mismatch current manifest')
+    manifest = read_json(source / manifest_path)
+    if manifest.get('schema_version') != 1 or not isinstance(manifest.get('weeks'), dict):
+        raise ValueError('invalid reviewed outcome manifest')
+    for key, descriptor in manifest['weeks'].items():
+        path = prefix + descriptor['path']
+        if path not in hashes or hashes[path] != descriptor.get('sha256'):
+            raise ValueError(f'reviewed outcomes omit or mismatch week: {path}')
+        week = read_json(source / path)
+        forecast_hash = week.get('forecast_manifest_sha256', '')
+        public_source = week.get('source')
+        source_fields = {'name', 'url', 'retrieved_at', 'licence', 'raw_sha256', 'status'}
+        if (not isinstance(public_source, dict) or set(public_source) != source_fields or
+                public_source['status'] != 'final' or
+                not public_source['url'].startswith('https://') or
+                not re.fullmatch(r'[a-f0-9]{64}', public_source['raw_sha256'])):
+            raise ValueError(f'outcome week lacks public final-source evidence: {path}')
+        if not re.fullmatch(
+                r'[a-f0-9]{64}', forecast_hash):
+            raise ValueError(f'unfinalized or unlinked outcome week: {path}')
+        forecast = forecasts.get(forecast_hash)
+        if not forecast:
+            raise ValueError(f'outcome week has no approved forecast: {path}')
+        observed_ids = set(week.get('players', {}))
+        missing_ids = week.get('missing_player_ids', [])
+        if not isinstance(missing_ids, list) or len(missing_ids) != len(set(missing_ids)) or\
+                observed_ids & set(missing_ids):
+            raise ValueError(f'contradictory missing outcome players: {path}')
+        if (key != f'{week.get("season")}-{week.get("week")}:{forecast_hash}' or
+                (forecast.get('season'), forecast.get('week')) !=
+                (week.get('season'), week.get('week')) or
+                set(forecast['games']) != observed_ids | set(missing_ids)):
+            raise ValueError(f'outcome week differs from approved forecast pool: {path}')
+    for path in hashes:
+        copy_file(source, output, path)
 
 
 def metadata(title, description, path):
@@ -228,6 +313,7 @@ def build(source: Path, output: Path):
         copy_file(source, output, f'js/{name}')
     for name in FANTASY_FILES:
         copy_file(source, output, f'tools/fantasy-lineup/{name}')
+    copy_reviewed_outcomes(source, output)
     for name in ('css/style.css', 'data/publications.json', 'assets/documents/MurrayBennettCV.pdf',
                  'assets/audio/steal.mp3'):
         copy_file(source, output, name)

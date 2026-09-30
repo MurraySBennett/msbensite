@@ -85,7 +85,7 @@ test('fixture roster saves unaided, official and final choices with readable adv
   assert.match(await page.locator('#scenario-result').innerText(), /Conditional legal lineup.*WR-1.*flip threshold/s);
   await page.getByRole('button', {name: 'Save final pick in this browser'}).click();
   await page.getByRole('heading', {name: 'Results'}).waitFor();
-  assert.match(await page.locator('#saved-weeks').innerText(), /Unaided pick: saved.*Final pick: saved.*Realized result: pending/s);
+  assert.match(await page.locator('#saved-weeks').innerText(), /Unaided pick: saved.*Final pick: saved.*Pending outcome data/s);
   assert.deepEqual(errors, []);
 });
 test('skip path, form error preserving values, and 390px layout', async t => {
@@ -119,8 +119,10 @@ test('keyboard controls have visible focus; failed refresh retains saved records
   await page.getByRole('button', {name: 'Save final pick in this browser'}).click();
   await page.route('**/tools/fantasy-lineup/current.json', route => route.fulfill({status: 503, body: 'unavailable'}));
   await page.reload();
+  await page.locator('#notice:not(:empty)').waitFor();
   assert.match(await page.locator('#notice').innerText(), /last good dated snapshot/);
   await page.getByRole('button', {name: 'Results'}).click();
+  await page.getByRole('heading', {name: 'Results'}).waitFor();
   assert.match(await page.locator('#saved-weeks').innerText(), /Final pick: saved/);
 });
 test('keyboard-only setup and skip reaches advice; unsupported rule stays visible', async t => {
@@ -171,6 +173,7 @@ test('a frozen starter remains visible for a late final record', async t => {
   await page.getByRole('heading', {name: 'Compare and save'}).waitFor();
   assert.equal(await page.locator('#final-WR-1').inputValue(), selected);
   await page.getByRole('button', {name: 'Save final pick in this browser'}).click();
+  await page.getByRole('heading', {name: 'Results'}).waitFor();
   assert.match(await page.locator('#saved-weeks').innerText(), /Final pick: saved/);
   const late = await page.evaluate(() => JSON.parse(localStorage.getItem('fantasy-lineup:v1')).weeks['2099-4'].final.excluded_from_prospective);
   assert.equal(late, true);
@@ -206,4 +209,74 @@ test('a verified but old snapshot warns about stale inputs', async t => {
   await page.goto(`${base}/tools/fantasy-lineup/`);
   await page.getByText(/Season 2099, week 4/).waitFor();
   assert.match(await page.locator('#notice').innerText(), /more than 24 hours old/);
+});
+function outcomeFixture(aYards = 80, bYards = 40, forecastHash = fixture().pointer.manifest_sha256) {
+  const observed_at = '2099-09-29T12:00:00Z';
+  const week = {schema_version: 1, season: 2099, week: 4,
+    forecast_manifest_sha256: forecastHash, missing_player_ids: [],
+    source: {name: 'fixture results', url: 'https://example.invalid/final',
+      retrieved_at: '2099-09-29T13:00:00Z', licence: 'fixture only',
+      raw_sha256: 'f'.repeat(64), status: 'final'},
+    players: {
+      a: {player_id: 'a', observed_at, stats: {receptions: 8, receiving_yards: aYards}},
+      b: {player_id: 'b', observed_at, stats: {receptions: 4, receiving_yards: bYards}},
+    }};
+  const weekText = JSON.stringify(week);
+  const manifest = {schema_version: 1, generated_at: '2099-09-29T13:00:00Z',
+    weeks: {['2099-4:' + forecastHash]: {path: 'versions/results/week-2099-4.json', sha256: hash(weekText)}}};
+  const manifestText = JSON.stringify(manifest);
+  return {pointer: {schema_version: 1, manifest: 'versions/results/manifest.json',
+    manifest_sha256: hash(manifestText)}, manifestText, weekText};
+}
+async function routeOutcomes(page, data) {
+  await page.route('**/tools/fantasy-lineup/outcomes/current.json', route => route.fulfill({json: data.pointer}));
+  await page.route('**/tools/fantasy-lineup/outcomes/versions/results/manifest.json', route =>
+    route.fulfill({body: data.manifestText, contentType: 'application/json'}));
+  await page.route('**/tools/fantasy-lineup/outcomes/versions/results/week-2099-4.json', route =>
+    route.fulfill({body: data.weekText, contentType: 'application/json'}));
+}
+test('Results keeps completed and pending weeks distinct, and correction leaves pick frozen', async t => {
+  const page = await pageFor(t);
+  await setup(page);
+  await page.getByRole('button', {name: 'Skip unaided pick'}).click();
+  await page.getByRole('button', {name: 'Save final pick in this browser'}).click();
+  const frozen = await page.evaluate(() => localStorage.getItem('fantasy-lineup:v1'));
+  await page.evaluate(() => {
+    const store = JSON.parse(localStorage.getItem('fantasy-lineup:v1'));
+    const previous = structuredClone(store.weeks['2099-4']); previous.week = 3;
+    store.weeks['2099-3'] = previous;
+    localStorage.setItem('fantasy-lineup:v1', JSON.stringify(store));
+  });
+  const savedBeforeCorrection = await page.evaluate(() => localStorage.getItem('fantasy-lineup:v1'));
+  await routeOutcomes(page, outcomeFixture());
+  await page.reload();
+  await page.getByRole('button', {name: 'Results'}).click();
+  await page.getByText(/Season 2099, week 4.*Realized points/s).waitFor({timeout: 3000});
+  assert.match(await page.locator('#saved-weeks').innerText(), /week 4.*Realized points.*week 3.*Pending outcome data/s);
+  assert.match(await page.locator('#saved-weeks').innerText(), /Forecast quality.*Research inference/s);
+  assert.match(await page.locator('#saved-weeks').innerText(), /model: 16\.0/);
+  await page.setViewportSize({width: 390, height: 844});
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  if (process.env.FANTASY_SCREENSHOT_DIR) await page.screenshot({path: `${process.env.FANTASY_SCREENSHOT_DIR}/fantasy-results-mobile.png`, fullPage: true});
+  const corrected = outcomeFixture(100, 40);
+  await routeOutcomes(page, corrected);
+  await page.reload();
+  await page.getByRole('button', {name: 'Results'}).click();
+  await page.getByText(/Season 2099, week 4.*Realized points/s).waitFor({timeout: 3000});
+  assert.match(await page.locator('#saved-weeks').innerText(), /corrected outcome version|Source fixture results/i);
+  assert.match(await page.locator('#saved-weeks').innerText(), /model: 18\.0/);
+  assert.equal(await page.evaluate(() => localStorage.getItem('fantasy-lineup:v1')), savedBeforeCorrection);
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('fantasy-lineup:v1')).weeks['2099-4']);
+  assert.equal(saved.advice.lineup['WR-1'], JSON.parse(frozen).weeks['2099-4'].advice.lineup['WR-1']);
+});
+test('outcomes from a different forecast player pool remain pending', async t => {
+  const page = await pageFor(t);
+  await setup(page);
+  await page.getByRole('button', {name: 'Skip unaided pick'}).click();
+  await page.getByRole('button', {name: 'Save final pick in this browser'}).click();
+  await routeOutcomes(page, outcomeFixture(80, 40, '0'.repeat(64)));
+  await page.getByRole('button', {name: 'Results'}).click();
+  await page.getByText(/different forecast snapshot/).waitFor();
+  assert.match(await page.locator('#saved-weeks').innerText(), /different forecast|could not be verified/i);
+  assert.doesNotMatch(await page.locator('#saved-weeks').innerText(), /Realized points/);
 });

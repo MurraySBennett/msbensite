@@ -1,10 +1,13 @@
 import json
+import hashlib
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
 from scripts.build_site import build, validate
+from fantasy.evaluate_decisions import write_outcome_snapshot
+from fantasy.decision import StatLine
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,13 +43,54 @@ class BuildSiteTests(unittest.TestCase):
             self.assertTrue((out / 'assets/documents/MurrayBennettCV.pdf').exists())
             pilot = out / 'tools/fantasy-lineup'
             for name in ('index.html', 'methods.html', 'app.mjs', 'style.css',
-                         'decision.mjs', 'scenarios.mjs', 'state.mjs'):
+                         'decision.mjs', 'scenarios.mjs', 'state.mjs', 'evaluation.mjs'):
                 self.assertTrue((pilot / name).is_file(), name)
             self.assertIn('<nav', (pilot / 'index.html').read_text())
             self.assertIn('name="robots" content="noindex,nofollow"',
                           (pilot / 'index.html').read_text())
             self.assertNotIn('/tools/fantasy-lineup/', (out / 'tools.html').read_text())
             self.assertNotIn('/tools/fantasy-lineup/', (out / 'sitemap.xml').read_text())
+            self.assertFalse((pilot / 'outcomes').exists())
+
+    def test_reviewed_outcome_snapshot_is_in_built_artifact_only_when_allowlisted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / 'source'
+            shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns(
+                '.git', '.venv', 'node_modules', 'dist', '__pycache__'))
+            folder = source / 'tools/fantasy-lineup/outcomes'
+            manifest = {'schema_version': 1, 'season': 2099, 'week': 4,
+                        'games': {'a': {'kickoff_utc': '2099-09-28T17:00:00Z'}}}
+            forecast_bytes = (json.dumps(manifest, sort_keys=True,
+                                         separators=(',', ':')) + '\n').encode()
+            forecast_hash = hashlib.sha256(forecast_bytes).hexdigest()
+            forecast_file = source / f'tools/fantasy-lineup/versions/{forecast_hash[:20]}/manifest.json'
+            forecast_file.parent.mkdir(parents=True)
+            forecast_file.write_bytes(forecast_bytes)
+            row = StatLine('a', '2099-09-29T12:00:00Z',
+                           {'receptions': 8, 'receiving_yards': 80})
+            write_outcome_snapshot(manifest, {'a': row}, folder,
+                                   {'name': 'fixture', 'url': 'https://example.invalid/final',
+                                    'retrieved_at': '2099-09-29T13:00:00Z',
+                                    'licence': 'fixture only', 'raw_sha256': 'a' * 64,
+                                    'status': 'final'})
+            (folder / 'unreviewed.json').write_text('{}')
+            files = [{'path': str(path.relative_to(source)),
+                      'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+                     for path in sorted(folder.rglob('*.json')) if path.name != 'unreviewed.json']
+            allowlist = source / 'data/fantasy-outcomes-publish.json'
+            allowlist.write_text(json.dumps({'schema_version': 1, 'reviewed_at': '2099-09-29T13:00:00Z',
+                                             'reviewer': 'fixture', 'files': files,
+                                             'forecast_manifests': [{'path': str(forecast_file.relative_to(source)),
+                                                                     'sha256': forecast_hash}]}))
+            out = Path(temp) / 'site'
+            build(source, out)
+            self.assertTrue((out / 'tools/fantasy-lineup/outcomes/current.json').is_file())
+            self.assertFalse((out / 'tools/fantasy-lineup/outcomes/unreviewed.json').exists())
+            selection = json.loads(allowlist.read_text())
+            selection['forecast_manifests'] = []
+            allowlist.write_text(json.dumps(selection))
+            with self.assertRaisesRegex(ValueError, 'approved forecast'):
+                build(source, Path(temp) / 'other-site')
 
     def test_missing_project_content_fails_build(self):
         with tempfile.TemporaryDirectory() as temp:

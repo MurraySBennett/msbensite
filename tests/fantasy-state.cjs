@@ -107,6 +107,19 @@ test('week records freeze initial, model and final choices with provenance', asy
   assert.deepEqual(beginWeek(config(), {...manifest(), model_version: 'new'}, storage), record);
 });
 
+test('frozen advice retains per-player expected points for later forecast checking', async () => {
+  const {beginWeek, freezeAdvice, saveWeek, readWeek} = await state;
+  const storage = new MemoryStorage();
+  let record = beginWeek(config(), manifest(), storage);
+  record = freezeAdvice(record, {lineup: lineupB, calibrated: false,
+    player_means: {a: 10.5, b: 12, k: 6}}, prelock);
+  saveWeek(record, storage);
+  assert.equal(readWeek(2026, 5, storage).advice.player_means.a, 10.5);
+  const changed = structuredClone(record);
+  changed.advice.player_means.a = 100;
+  assert.throws(() => saveWeek(changed, storage), /frozen advice/);
+});
+
 test('late revision is retained while earlier prelock final remains frozen', async () => {
   const {beginWeek, freezeAdvice, saveFinal} = await state;
   const storage = new MemoryStorage();

@@ -1,5 +1,6 @@
 import {SUPPORTED_STATS, scoreDraws, optimize, compare} from './decision.mjs';
 import {explore} from './scenarios.mjs';
+import {evaluateWeek, aggregateResults} from './evaluation.mjs';
 import {validateConfig, beginWeek, saveInitial, freezeAdvice, saveFinal, saveWeek,
   readWeek, exportRecords, importRecords} from './state.mjs';
 
@@ -92,9 +93,9 @@ function cacheSnapshot(value, key = 'last-good') {
     };
   });
 }
-async function verifiedJson(path, expectedHash) {
+async function verifiedJson(path, expectedHash, base = ROOT) {
   if (!safePath(path)) throw new Error('invalid snapshot path');
-  const response = await fetch(ROOT + path, {cache: 'no-store'});
+  const response = await fetch(base + path, {cache: 'no-store'});
   if (!response.ok) throw new Error(`snapshot request failed: ${response.status}`);
   const bytes = await response.arrayBuffer();
   const digest = await crypto.subtle.digest('SHA-256', bytes);
@@ -303,7 +304,8 @@ function makeAdvice() {
   const lineup = optimize(roster, record.slots, model.means, locks);
   if (!record.initial) pair = choosePair(lineup);
   const comparisons = pair ? [{...pair, probabilityA: null}] : [];
-  record = freezeAdvice(record, {lineup, comparisons, calibrated: false, model_version: record.model_version}, new Date().toISOString());
+  record = freezeAdvice(record, {lineup, comparisons, calibrated: false,
+    model_version: record.model_version, player_means: model.means}, new Date().toISOString());
   saveWeek(record, localStorage);
 }
 function renderCompare() {
@@ -351,24 +353,102 @@ function updateOverrideFields() {
     wrap.append(label, input); return wrap;
   }));
 }
-function renderResults() {
+async function loadOutcomes(weeks) {
+  const base = ROOT + 'outcomes/';
+  const response = await fetch(base + 'current.json', {cache: 'no-store'});
+  if (!response.ok) throw new Error(`outcome pointer unavailable: ${response.status}`);
+  const pointer = await response.json();
+  if (pointer.schema_version !== 1 || !/^[a-f0-9]{64}$/.test(pointer.manifest_sha256)) throw new Error('invalid outcome pointer');
+  const manifest = await verifiedJson(pointer.manifest, pointer.manifest_sha256, base);
+  if (manifest.schema_version !== 1 || !manifest.weeks || typeof manifest.weeks !== 'object') throw new Error('invalid outcome manifest');
+  const loaded = new Map();
+  for (const week of weeks) {
+    const key = `${week.season}-${week.week}`;
+    const manifestKey = `${key}:${week.snapshot_sha256}`;
+    const descriptor = manifest.weeks[manifestKey];
+    if (!descriptor) {
+      if (Object.keys(manifest.weeks).some(candidate => candidate.startsWith(`${key}:`)))
+        loaded.set(key, {error: 'different forecast snapshot'});
+      continue;
+    }
+    try {
+      const outcome = await verifiedJson(descriptor.path, descriptor.sha256, base);
+      if (outcome.schema_version !== 1 || outcome.season !== week.season || outcome.week !== week.week) throw new Error('outcome week mismatch');
+      loaded.set(key, {outcome, sha256: descriptor.sha256});
+    } catch (error) { loaded.set(key, {error: error.message}); }
+  }
+  return loaded;
+}
+function resultsCard(item, observed) {
+  const block = node('article', '', {class: 'advice-card'});
+  block.append(node('h3', `Season ${item.season}, week ${item.week}`),
+    node('p', `Cutoff ${iso(item.data_cutoff_utc)}. Unaided pick: ${item.unaided_skipped ? 'skipped' : item.initial ? 'saved' : 'pending'}. Model advice: ${item.advice ? 'frozen' : 'pending'}. Final pick: ${item.final ? 'saved' : 'pending'}.`));
+  if (!observed || observed.error) {
+    block.append(node('p', `Pending outcome data.${observed?.error ? ` Outcome file could not be verified: ${observed.error}.` : ''}`));
+    return {block, result: null};
+  }
+  if (!item.snapshot_sha256 || observed.outcome.forecast_manifest_sha256 !== item.snapshot_sha256 ||
+      observed.outcome.source?.status !== 'final') {
+    block.append(node('p', 'Pending outcome data. Outcome file could not be verified against this frozen forecast or as final results.'));
+    return {block, result: null};
+  }
+  let result;
+  try { result = evaluateWeek(item, observed.outcome); }
+  catch (error) {
+    block.append(node('p', `Pending outcome data. Evaluation failed: ${error.message}.`));
+    return {block, result: null};
+  }
+  if (result.status === 'pending') {
+    block.append(node('p', `Pending outcome data for player IDs: ${result.missing_player_ids.join(', ')}. No missing score was treated as zero.`));
+    return {block, result};
+  }
+  const points = result.realized_points;
+  block.append(node('h4', 'Realized points'),
+    node('p', `Unaided: ${points.initial == null ? 'not measured' : fmt(points.initial)}; model: ${points.model == null ? 'unavailable' : fmt(points.model)}; prelock final: ${points.final == null ? 'unavailable' : fmt(points.final)}.`),
+    node('p', `Best legal modeled-slot lineup from this frozen roster: ${fmt(result.oracle_points)} points. Oracle regret — unaided ${result.regret.initial == null ? 'unavailable' : fmt(result.regret.initial)}, model ${result.regret.model == null ? 'unavailable' : fmt(result.regret.model)}, prelock final ${result.regret.final == null ? 'unavailable' : fmt(result.regret.final)}.`),
+    node('p', result.fixed_slots_excluded.length ? `User-fixed slots excluded from these totals: ${result.fixed_slots_excluded.join(', ')}.` : 'All configured slots are modeled.'),
+    node('p', result.override_direction ? `Final override ${result.override_direction}: ${result.override_points > 0 ? '+' : ''}${fmt(result.override_points)} realized points versus model.` : 'No prospective final versus model difference available.'));
+  if (item.final?.excluded_from_prospective)
+    block.append(node('p', `Latest saved final: ${fmt(result.latest_saved_final_points)} points, recorded late; the prelock final above remains the prospective choice.`));
+  block.append(node('h4', 'Forecast quality'),
+    node('p', result.forecast_quality ?
+      `Roster mean absolute point error: ${fmt(result.forecast_quality.roster_mae)}. Model lineup predicted minus realized: ${fmt(result.forecast_quality.model_lineup_error)} points.` :
+      'Unavailable for this record: no frozen player point estimates were saved.'));
+  block.append(node('h4', 'Research inference'), node('p', result.prospective_eligible ?
+    'Eligible for the personal-pilot paired comparison. One week cannot establish a general effect.' :
+    `Excluded from unaided versus model inference: ${result.exclusion_reasons.join('; ')}.`));
+  block.append(node('p', `Source ${observed.outcome.source?.name} (${observed.outcome.source?.licence}); version ${observed.sha256.slice(0, 12)}; retrieved ${iso(observed.outcome.source?.retrieved_at)}. A corrected outcome version can update these realized values without changing frozen picks.`));
+  return {block, result};
+}
+async function renderResults() {
   $('saved-weeks').replaceChildren();
   let store;
   try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }
   catch { $('saved-weeks').textContent = 'Stored records cannot be read.'; return; }
   const weeks = Object.values(store.weeks || {}).sort((a, b) => b.season - a.season || b.week - a.week);
   if (!weeks.length) { $('saved-weeks').textContent = 'No saved weeks yet.'; return; }
+  let observed = new Map();
+  try { observed = await loadOutcomes(weeks); }
+  catch (error) { $('saved-weeks').append(node('p', `Outcome snapshot unavailable (${error.message}). Saved choices remain available below.`)); }
+  const results = [];
   for (const item of weeks) {
-    const block = node('article', '', {class: 'advice-card'});
-    block.append(node('h3', `Season ${item.season}, week ${item.week}`),
-      node('p', `Cutoff ${iso(item.data_cutoff_utc)}. Unaided pick: ${item.unaided_skipped ? 'skipped' : item.initial ? 'saved' : 'pending'}. Model advice: ${item.advice ? 'frozen' : 'pending'}. Final pick: ${item.final ? 'saved' : 'pending'}. Realized result: pending outcome data.`));
+    const {block, result} = resultsCard(item, observed.get(`${item.season}-${item.week}`));
     $('saved-weeks').append(block);
+    if (result) results.push(result);
   }
+  const report = aggregateResults(results);
+  const summary = node('section', '', {class: 'pilot-summary'});
+  summary.append(node('h3', 'Personal-pilot summary'),
+    node('p', `Eligible paired weeks: ${report.paired_weeks}. ${report.inference_note}`));
+  if (report.paired_final_minus_model_ci95)
+    summary.append(node('p', `Final minus model mean: ${fmt(report.paired_final_minus_model_mean)} points; 95% descriptive bootstrap interval ${fmt(report.paired_final_minus_model_ci95[0])} to ${fmt(report.paired_final_minus_model_ci95[1])}.`));
+  if (report.calibration_bins) summary.append(node('p', `Final comparison probability calibration bins: ${report.calibration_bins.map(bin => `${Math.round(bin.range[0] * 100)}–${Math.round(bin.range[1] * 100)}%: ${bin.n} predictions, ${Math.round(bin.observed_rate * 100)}% observed`).join('; ')}.`));
+  $('saved-weeks').append(summary);
 }
 function wireEvents() {
-  for (const button of document.querySelectorAll('[data-view]')) button.addEventListener('click', () => {
+  for (const button of document.querySelectorAll('[data-view]')) button.addEventListener('click', async () => {
     const view = button.dataset.view;
-    if (view === 'results') renderResults();
+    if (view === 'results') await renderResults();
     if (view === 'pick' && record) renderPick();
     if (view === 'compare' && record?.advice) renderCompare();
     if (view === 'setup' || view === 'results' || view === 'pick' && record || view === 'compare' && record?.advice) show(view);
@@ -406,13 +486,13 @@ function wireEvents() {
   });
   $('initial-slots').addEventListener('change', updatePairChoices);
   $('final-slots').addEventListener('change', updateOverrideFields);
-  $('final-form').addEventListener('submit', event => {
+  $('final-form').addEventListener('submit', async event => {
     event.preventDefault(); $('final-errors').textContent = '';
     try {
       const lineup = readLineup('final'); validateLineupHere(lineup);
       const reasons = Object.fromEntries([...$('override-fields').querySelectorAll('input')].map(input => [input.dataset.slot, input.value]));
       record = saveFinal(record, {lineup, comparisons: comparisonChoice('final-probability'), override_reasons: reasons}, new Date().toISOString());
-      saveWeek(record, localStorage); notice('Final pick saved in this browser.'); renderResults(); show('results');
+      saveWeek(record, localStorage); notice('Final pick saved in this browser.'); await renderResults(); show('results');
     } catch (error) { errorAt('final-errors', error); }
   });
   $('scenario-form').addEventListener('submit', event => {
@@ -444,7 +524,7 @@ function wireEvents() {
   });
   $('import-records').addEventListener('change', async event => {
     const file = event.target.files?.[0]; if (!file) return;
-    try { const result = importRecords(await file.text(), localStorage); notice(`Imported ${result.imported_weeks} weeks.`); renderResults(); }
+    try { const result = importRecords(await file.text(), localStorage); notice(`Imported ${result.imported_weeks} weeks.`); await renderResults(); }
     catch (error) { notice(`Import failed: ${error.message}. Existing records were kept.`); }
   });
 }

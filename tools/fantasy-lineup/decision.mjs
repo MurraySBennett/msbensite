@@ -28,7 +28,9 @@ export function scoreDraws(playerDraws, rules) {
     if (draw.available === false) return 0;
     return Object.entries(coefficients).reduce((total, [field, coefficient]) => {
       const value = draw.stats[field] ?? 0;
-      if (!Number.isFinite(value) || value < 0) throw new Error(`invalid stat: ${field}`);
+      if (!Number.isFinite(value) ||
+          (value < 0 && !['passing_yards', 'rushing_yards', 'receiving_yards'].includes(field)))
+        throw new Error(`invalid stat: ${field}`);
       return total + coefficient * value;
     }, 0);
   });
