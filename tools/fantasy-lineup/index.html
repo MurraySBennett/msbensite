@@ -30,6 +30,14 @@
       <p id="snapshot-meta">Loading dated data…</p>
       <form id="setup-form" novalidate>
         <fieldset><legend>Your roster</legend><p>Choose players by name, team and stable ID. A player can be selected once.</p>
+          <div class="roster-filters">
+            <div><label for="roster-search">Search by name, team or player ID</label>
+              <input id="roster-search" type="search" autocomplete="off" aria-controls="roster-options" placeholder="Type a player name or ID" /></div>
+            <div><label for="roster-position">Filter by position</label><select id="roster-position" aria-controls="roster-options"><option value="">All positions</option></select></div>
+            <div><label for="roster-team">Filter by team</label><select id="roster-team" aria-controls="roster-options"><option value="">All teams</option></select></div>
+          </div>
+          <p id="roster-count" role="status" aria-live="polite"></p>
+          <p id="roster-empty" hidden>No players match these filters.</p>
           <div id="roster-options" class="roster-grid"></div></fieldset>
         <fieldset><legend>Starting slots</legend><p>Enter the number of each slot. FLEX accepts RB, WR or TE; SUPERFLEX also accepts QB.</p>
           <div class="slot-grid" id="slot-counts"></div>

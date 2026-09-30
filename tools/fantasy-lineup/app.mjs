@@ -138,13 +138,42 @@ function renderSetup() {
   try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}').config; }
   catch { notice('Stored records are damaged. Results and Import remain available for recovery.'); }
   const selected = new Set(saved?.roster?.map(p => p.player_id) || []);
-  $('roster-options').replaceChildren(...allPlayers().sort((a, b) => displayName(a).localeCompare(displayName(b))).map(player => {
+  const players = allPlayers().sort((a, b) => displayName(a).localeCompare(displayName(b)));
+  $('roster-options').replaceChildren(...players.map(player => {
     const label = node('label', '', {class: 'check-row'});
     const input = node('input', '', {type: 'checkbox', name: 'roster', value: player.player_id});
     input.checked = selected.has(player.player_id);
     label.append(input, document.createTextNode(`${displayName(player)} · injury ${player.injury_status || 'Unknown'} (issued ${iso(player.injury_issued_at)})`));
     return label;
   }));
+  const positions = [...new Set(players.map(player => player.position))].sort();
+  const teams = [...new Set(players.map(player => player.team))].sort();
+  $('roster-position').append(...positions.map(position => node('option', position, {value: position})));
+  $('roster-team').append(...teams.map(team => node('option', team, {value: team})));
+  const playerById = new Map(players.map(player => [player.player_id, player]));
+  const filterRoster = () => {
+    const query = $('roster-search').value.trim().toLowerCase();
+    const position = $('roster-position').value;
+    const team = $('roster-team').value;
+    let visible = 0;
+    let selectedCount = 0;
+    for (const label of $('roster-options').querySelectorAll('.check-row')) {
+      const input = label.querySelector('input[name="roster"]');
+      const player = playerById.get(input.value);
+      const matches = (!query || `${player.name} ${player.team} ${player.player_id}`.toLowerCase().includes(query)) &&
+        (!position || player.position === position) && (!team || player.team === team);
+      label.hidden = !matches;
+      if (matches) visible++;
+      if (input.checked) selectedCount++;
+    }
+    $('roster-count').textContent = `Showing ${visible} of ${players.length} players; ${selectedCount} selected.`;
+    $('roster-empty').hidden = visible !== 0;
+  };
+  $('roster-search').addEventListener('input', filterRoster);
+  $('roster-position').addEventListener('change', filterRoster);
+  $('roster-team').addEventListener('change', filterRoster);
+  $('roster-options').addEventListener('change', filterRoster);
+  filterRoster();
   $('slot-counts').replaceChildren(...slotKinds.map(([kind, , initial]) => {
     const wrap = node('div');
     const label = node('label', `${kind} slots`, {for: `slot-${kind}`});
