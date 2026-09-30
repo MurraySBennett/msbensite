@@ -56,6 +56,8 @@
     <section id="pick" class="pilot-view" aria-labelledby="pick-title" hidden>
       <h2 id="pick-title" tabindex="-1">Make your first lineup</h2>
       <p>This saves your lineup before showing the model's recommendation. Choose starters below, then press <strong>Save my first lineup and show the model lineup</strong>. The A/B question records your own estimate; it does not run the model. You can skip your first lineup and show advice immediately.</p>
+      <div class="model-shortcut"><button id="skip-pick" type="button">Skip my first lineup and show the model lineup now</button>
+        <p>This skips measuring your unaided lineup for this week.</p></div>
       <div id="pick-context"></div>
       <form id="pick-form" novalidate><div id="initial-slots"></div>
         <fieldset><legend>Close-call confidence check</legend>
@@ -66,7 +68,6 @@
           <label class="check-row"><input id="external-forecast" type="checkbox" /> I have already seen another forecast.</label>
         </fieldset><div id="pick-errors" class="form-errors" role="alert"></div>
         <button type="submit">Save my first lineup and show the model lineup</button>
-        <button id="skip-pick" type="button" class="secondary">Skip my first lineup and show the model lineup</button>
       </form>
     </section>
     <section id="compare" class="pilot-view" aria-labelledby="compare-title" hidden>
