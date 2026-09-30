@@ -9,7 +9,7 @@ project: msbensite
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked.
 Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
 New direction: practical public tools from simulation-based inference and Bayesian decision models for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
-Fantasy NFL human–model lineup work follows `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md` on `feature/fantasy-decision-tool`. Task 1 source gate and fixtures are complete; live week-5 source smoke found only week-4 roster rows, which the adapter now labels for downstream stale-data warnings. Task 2 scoring and legal-lineup logic is next. All 13 Python tests pass in the repo venv; browser tests cannot launch here until host Chromium libraries are available. Hay-window feasibility is later. Demos and social outreach remain deferred.
+Fantasy NFL human–model lineup work follows `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md` on `feature/fantasy-decision-tool`. Tasks 1–2 are complete: source capture and roster age, plus scoring, legal lineups and a rolling benchmark. Task 3 generative forecast and frozen snapshot is next. All 22 Python tests pass in the repo venv; browser tests cannot launch here until host Chromium libraries are available. Hay-window feasibility is later. Demos and social outreach remain deferred.
 Canonical-bibliography confirmation of melanoma author order and IAT title remains open; the public site cites registered preprints.
 
 ## Streams
@@ -17,8 +17,9 @@ Canonical-bibliography confirmation of melanoma author order and IAT title remai
 ### build
 - [ ] now — Explore a practical public tool for nonresearch users, grounding candidates in available methods and examples rather than claiming unpublished outcomes.
 - [x] 2026-09-30 — Review and approve `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md` for a weekly real-roster recommendation and prospective unaided/model/final comparison.
-- [ ] now — Execute `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md`; Task 2 scoring and legal-lineup logic is next, with tests and releases gated by the plan.
+- [ ] now — Execute `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md`; Task 3 generative forecast and frozen snapshot is next, with tests and releases gated by the plan.
 - [x] 2026-09-30 — Complete Task 1 source gate and pre-game fixtures; retain capture hashes and cutoff, reject wrong assets, select only captured roster IDs, and label the latest available roster week.
+- [x] 2026-09-30 — Complete Task 2 league-rule scoring, legal-lineup selection, deterministic full-roster optimizer and cutoff-safe rolling baseline.
 - [ ] next — Design a NSW lucerne cut-today-vs-wait weather-window comparison; test issue-time Open-Meteo forecasts against SILO observed rain, and do not equate rain-free weather with safe baling. A grower with moisture and operation records is needed for a later personalized model. Check forecast API licence before public integration or monetization.
 - [x] 2026-09-29 — Author accepted the site presentation; main deployment passed and public Home, GRIN, Research and CV routes were checked.
 - [x] 2026-09-29 — Build artifact passed five Python checks and eleven browser checks; reviewed desktop/mobile Home, Research and project screenshots.
