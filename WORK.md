@@ -6,27 +6,28 @@ project: msbensite
 
 ## Now
 
-Plan: `docs/plans/job-search-site-release.md`; implementation is on `foundation-core` for local review.
-Static build produces seven project pages and a narrow `dist/` artifact; CI checks that artifact before S3 deploy.
-Core navigation, accessibility, metadata and first-screen CV/contact access updated; 5 build checks and 11 browser checks pass, with desktop/mobile screenshots inspected.
-Pending: author review of site/CV and confirmation of melanoma author order and IAT title with canonical bibliography.
-Preview: http://localhost:8877. No push to `main` or public deployment before review; demos and social outreach remain deferred.
+The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked.
+Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
+New direction: practical public tools from research methods for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
+Next: identify the strongest small tool and its evidence/privacy boundary before building. Demos and social outreach remain deferred.
+Canonical-bibliography confirmation of melanoma author order and IAT title remains open; the public site cites registered preprints.
 
 ## Streams
 
 ### build
-- [ ] now — Obtain author review of the locally verified job-search release artifact before pushing to `main`.
+- [ ] now — Explore a practical public tool for nonresearch users, grounding candidates in available methods and examples rather than claiming unpublished outcomes.
+- [x] 2026-09-29 — Author accepted the site presentation; main deployment passed and public Home, GRIN, Research and CV routes were checked.
 - [x] 2026-09-29 — Build artifact passed five Python checks and eleven browser checks; reviewed desktop/mobile Home, Research and project screenshots.
 - [x] 2026-09-29 — Add static seven-project build, allowlisted publish artifact, predeploy CI checks, core navigation and accessibility polish.
 - [x] 2026-09-27 — Launch scope chosen: core research, CV, teaching and tools; demos later.
 - [x] 2026-09-27 — Core routes, seven evidence-based projects, teaching/tools/contact and canonical CV download aligned; excluded project URLs fail honestly. Desktop/mobile, keyboard, links and optional ORCID failure checked.
-- [ ] now — Obtain author review under the foundation goal; reconcile melanoma submitted author order and IAT manuscript/preprint title with canonical bib. Keep local until review.
+- [ ] next — Reconcile melanoma submitted author order and IAT manuscript/preprint title with canonical bibliography; public site currently cites registered preprints.
 - [ ] later (L) Make the five demos faithful: current dc-rs, dutch-auction, mel-features, team-spirit-hh and wheel-of-fortune implementations have uncertain fidelity. Start with the real `team-spirit/bot/murrayserver/www/paddleGame.html` client and its socket boundary; single-player was a real condition.
 - [x] 2026-09-27 — Tools and GRIN copy describe implemented count-only inference; RT extension explicitly remains in development.
 
 ### writing
 - [x] 2026-09-27 — Research/experience/project copy revised against scoped evidence; clinical benefit and completed human-intervention claims removed.
-- [ ] now (M) Review concrete site copy and CV; author approval is still outstanding.
+- [x] 2026-09-29 — Author accepted the site presentation for publication; preserve later style refinements as separate work.
 
 ### comms
 - [ ] now (M) decide what a deliberate academic social presence is *for* before touching any platform — finding collaborators, circulating preprints, being findable by search committees and conference backchannel point at different platforms and very different posting habits, so "which platforms" is the wrong first question. Run `superpowers:brainstorming`; do not start from a posting schedule
