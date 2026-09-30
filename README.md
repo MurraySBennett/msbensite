@@ -29,7 +29,13 @@ Open <http://localhost:8000>. Run `npm test` after building; it starts its own l
 - CV download: replace `assets/documents/MurrayBennettCV.pdf` with the reviewed canonical PDF from `../job-applications`.
 - Shared navigation and footer: edit `components/nav.html` and `components/footer.html`.
 
-The old `/project-detail.html?id=<id>` route redirects included projects to their static pages. Excluded project IDs show an unavailable message. Experiment demos and draft project files remain in the repository for later work and are absent from `dist/`.
+The old `/project-detail.html?id=<id>` route redirects included projects to their static pages. Excluded project IDs show an unavailable message. The earlier experiment demos and draft project files remain in the repository for later work and are absent from `dist/`.
+
+## Fantasy lineup experiment
+
+The unlisted, noindex `/tools/fantasy-lineup/` route is a fixture-tested preview. `fantasy/sources.md` records the approved public inputs and their capture rules; `fantasy/model.md` describes the generative forecast; `fantasy/evidence.md` gives the current backtest counts and release decision. A weekly update uses `python3 -m fantasy.update --season YEAR --week WEEK --cutoff UTC --output PATH --cache PATH`; it requires the four checksum-backed source captures to have been retrieved before the cutoff. Build output includes outcome snapshots only when the hashed files and matching approved forecast manifest are listed in `data/fantasy-outcomes-publish.json` after review.
+
+Run `python3 -m fantasy.backtest --seasons 2023 2024 2025 --seed 7026` for the current evidence report, then `python3 -m unittest tests.test_fantasy_backtest -v` for controlled fixture checks. There are no admissible historical issue-time cases or reviewed real outcomes yet, so this reports zero real weeks and does not support promotion. A future JSON case catalog can be passed with `--cases PATH`; each historical case needs its own `capture_dir`, cutoff, final `outcomes`, approved `outcome_source`, raw and normalized result files with hashes, and review attribution. Fixture scenario checks additionally need a hashed pregame forecast snapshot; real scenario checks await a reviewed participation source adapter. Do not assign a past retrieval time to a current download.
 
 ## Deployment
 
