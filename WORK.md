@@ -8,14 +8,16 @@ project: msbensite
 
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked.
 Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
-New direction: practical public tools from research methods for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
-Next: identify the strongest small tool and its evidence/privacy boundary before building. Demos and social outreach remain deferred.
+New direction: practical public tools from simulation-based inference and Bayesian decision models for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
+Fantasy NFL human–model lineup design was confirmed and its reviewable spec is at `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md`. League is Sleeper, PPR, superflex and kicker; author prefers manual roster entry over league import. Next: author reviews the spec, then write an implementation plan before code. Hay-window feasibility is documented below for later. Demos and social outreach remain deferred.
 Canonical-bibliography confirmation of melanoma author order and IAT title remains open; the public site cites registered preprints.
 
 ## Streams
 
 ### build
 - [ ] now — Explore a practical public tool for nonresearch users, grounding candidates in available methods and examples rather than claiming unpublished outcomes.
+- [ ] now — Review `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md`, the confirmed design for a weekly real-roster recommendation and prospective unaided/model/final comparison; then write the implementation plan.
+- [ ] next — Design a NSW lucerne cut-today-vs-wait weather-window comparison; test issue-time Open-Meteo forecasts against SILO observed rain, and do not equate rain-free weather with safe baling. A grower with moisture and operation records is needed for a later personalized model. Check forecast API licence before public integration or monetization.
 - [x] 2026-09-29 — Author accepted the site presentation; main deployment passed and public Home, GRIN, Research and CV routes were checked.
 - [x] 2026-09-29 — Build artifact passed five Python checks and eleven browser checks; reviewed desktop/mobile Home, Research and project screenshots.
 - [x] 2026-09-29 — Add static seven-project build, allowlisted publish artifact, predeploy CI checks, core navigation and accessibility polish.
