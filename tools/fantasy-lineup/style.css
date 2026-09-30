@@ -1,0 +1,35 @@
+.pilot { max-width: 68rem; color: #241d37; }
+.pilot-head { position: static; background: #f4f0ff; color: #241d37; text-align: left; box-shadow: none; border-radius: 1rem; padding: 1.5rem; }
+.pilot-head h1 { font-size: clamp(1.15rem, 3vw, 1.7rem); overflow-wrap: anywhere; }
+.eyebrow { text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
+.pilot-tabs { position: static; margin: 1.5rem 0; display: flex; gap: .5rem; flex-wrap: wrap; }
+.pilot button, .pilot input, .pilot select { font: inherit; }
+.pilot button { cursor: pointer; border: 2px solid #493a8b; border-radius: .5rem; padding: .7rem 1rem; color: white; background: #493a8b; min-height: 44px; }
+.pilot button.secondary, .pilot-tabs button { color: #493a8b; background: white; }
+.pilot-tabs button[aria-current] { background: #493a8b; color: white; }
+.pilot button:focus, .pilot input:focus, .pilot select:focus, .pilot a:focus, .pilot summary:focus { outline: 3px solid #d14625; outline-offset: 3px; }
+.pilot-view { background: #fff; border: 1px solid #d8d0ee; border-radius: 1rem; padding: clamp(1rem, 3vw, 2rem); margin-bottom: 2rem; }
+.pilot-view[hidden] { display: none; }
+.pilot h2 { font-size: clamp(1.05rem, 2vw, 1.35rem); overflow-wrap: anywhere; }
+.pilot h3 { font-size: 1rem; }
+.pilot fieldset { margin: 1rem 0; padding: 1rem; border: 1px solid #a99dc9; border-radius: .6rem; min-width: 0; }
+.pilot legend { font-weight: 700; padding: .2rem; }
+.pilot label { display: block; font-weight: 600; margin: .75rem 0 .3rem; }
+.pilot input:not([type=checkbox]):not([type=file]), .pilot select { border: 1px solid #635c75; border-radius: .4rem; padding: .55rem; max-width: 100%; width: 100%; background: #fff; color: #241d37; min-height: 44px; }
+.pilot input[type=checkbox] { inline-size: 1.25rem; block-size: 1.25rem; accent-color: #493a8b; }
+.pilot .check-row { display: flex; gap: .7rem; align-items: center; font-weight: 500; }
+.roster-grid, .score-grid, .slot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .5rem 1rem; }
+.roster-grid .check-row { border: 1px solid #ddd5ed; border-radius: .5rem; padding: .5rem; margin: 0; }
+.pilot .form-errors { color: #8b2719; font-weight: 700; margin: .8rem 0; }
+.advice-card { border-left: .35rem solid #493a8b; background: #f7f4ff; border-radius: .5rem; padding: 1rem; }
+.advice-card dl { display: grid; grid-template-columns: minmax(7rem, 12rem) 1fr; gap: .5rem; }
+.advice-card dt { font-weight: 700; }
+.advice-card dd { margin: 0; overflow-wrap: anywhere; }
+.pilot details { padding: 1rem; border: 1px solid #a99dc9; border-radius: .5rem; margin: 1rem 0; }
+.pilot summary { cursor: pointer; font-weight: 700; }
+.pilot .lineup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 0 1rem; }
+.pilot .context-list { padding-left: 1.4rem; }
+.pilot .context-list li { margin: .4rem 0; }
+.pilot .record-actions { margin-top: 1rem; display: grid; gap: .5rem; }
+.pilot #notice:not(:empty) { margin: 1rem 0; padding: .8rem; background: #fff1d6; border-left: .3rem solid #9a6213; }
+@media (max-width: 500px) { .pilot-tabs button { flex: 1 1 45%; } .advice-card dl { display: block; } .advice-card dt { margin-top: .65rem; } }

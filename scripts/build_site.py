@@ -18,6 +18,8 @@ CORE_PAGES = ('index.html', 'research.html', 'cv.html', 'teaching.html',
 SCRIPTS = ('components.js', 'dark-mode-toggle.js', 'cv.js', 'orcid-sync.js',
            'dpad.js', 'activate-pixel-chaser.js', 'activate-konami.js',
            'activate-snake.js', 'activate-pong.js', 'steal-the-doi.js')
+FANTASY_FILES = ('index.html', 'methods.html', 'app.mjs', 'style.css',
+                 'decision.mjs', 'scenarios.mjs', 'state.mjs')
 BASE_IMAGES = (
     'assets/images/murray_small.png',
     'assets/images/sprites/seeing-eye.gif',
@@ -170,6 +172,7 @@ def inline_components(output, source):
                             f'<span class="current-year">{datetime.now(timezone.utc).year}</span>')
     pages = [output / name for name in CORE_PAGES if name not in ('404.html', 'project-detail.html')]
     pages += sorted((output / 'projects').glob('*.html'))
+    pages += [output / 'tools/fantasy-lineup' / name for name in ('index.html', 'methods.html')]
     for path in pages:
         page = path.read_text(encoding='utf-8')
         match = re.search(r'<body data-page="([a-z-]+)"', page)
@@ -223,6 +226,8 @@ def build(source: Path, output: Path):
         copy_file(source, output, name)
     for name in SCRIPTS:
         copy_file(source, output, f'js/{name}')
+    for name in FANTASY_FILES:
+        copy_file(source, output, f'tools/fantasy-lineup/{name}')
     for name in ('css/style.css', 'data/publications.json', 'assets/documents/MurrayBennettCV.pdf',
                  'assets/audio/steal.mp3'):
         copy_file(source, output, name)
@@ -243,6 +248,13 @@ def build(source: Path, output: Path):
         page_path = output / name
         page_path.write_text(insert_metadata(page_path.read_text(encoding='utf-8'), title, description,
                                              '/' if name == 'index.html' else '/' + name), encoding='utf-8')
+    for name, title, description in (
+        ('index.html', 'Fantasy lineup pilot — Murray S. Bennett', 'Private preview of a dated NFL fantasy lineup decision tool.'),
+        ('methods.html', 'Fantasy lineup methods and evidence — Murray S. Bennett', 'Methods, evidence status, privacy and limitations for the fantasy lineup pilot.'),
+    ):
+        path = output / 'tools/fantasy-lineup' / name
+        canonical = '/tools/fantasy-lineup/' if name == 'index.html' else '/tools/fantasy-lineup/methods.html'
+        path.write_text(insert_metadata(path.read_text(encoding='utf-8'), title, description, canonical), encoding='utf-8')
 
     legacy = output / 'project-detail.html'
     legacy_script = ('<script>const publishedProjects = new Set(' + json.dumps([item['id'] for item in index]) + ');'

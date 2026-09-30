@@ -38,6 +38,15 @@ class BuildSiteTests(unittest.TestCase):
             self.assertFalse((out / 'js/demos').exists())
             self.assertFalse((out / 'assets/images/_aseprite-sources').exists())
             self.assertTrue((out / 'assets/documents/MurrayBennettCV.pdf').exists())
+            pilot = out / 'tools/fantasy-lineup'
+            for name in ('index.html', 'methods.html', 'app.mjs', 'style.css',
+                         'decision.mjs', 'scenarios.mjs', 'state.mjs'):
+                self.assertTrue((pilot / name).is_file(), name)
+            self.assertIn('<nav', (pilot / 'index.html').read_text())
+            self.assertIn('name="robots" content="noindex,nofollow"',
+                          (pilot / 'index.html').read_text())
+            self.assertNotIn('/tools/fantasy-lineup/', (out / 'tools.html').read_text())
+            self.assertNotIn('/tools/fantasy-lineup/', (out / 'sitemap.xml').read_text())
 
     def test_missing_project_content_fails_build(self):
         with tempfile.TemporaryDirectory() as temp:

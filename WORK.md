@@ -9,7 +9,7 @@ project: msbensite
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked.
 Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
 New direction: practical public tools from simulation-based inference and Bayesian decision models for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
-Fantasy NFL human–model lineup work follows `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md` on `feature/fantasy-decision-tool`. Tasks 1–5 are complete: source gate, legal scoring/lineups, seeded forecast and frozen snapshots, browser decision/scenario engine, and local weekly records. Task 6 accessible preview interface is next. Browser tests cannot launch here until host Chromium libraries are available. Hay-window feasibility is later. Demos and social outreach remain deferred.
+Fantasy NFL human–model lineup work follows `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md` on `feature/fantasy-decision-tool`. Tasks 1–6 are complete through the unlisted accessible preview route; Task 7 outcome evaluation and Results view is next. Browser tests run with the installed Nix Chromium via `CHROMIUM_PATH`. No current snapshot is in the publish allowlist, so the preview shows an unavailable-data message until a reviewed snapshot is supplied. Hay-window feasibility is later. Demos and social outreach remain deferred.
 Canonical-bibliography confirmation of melanoma author order and IAT title remains open; the public site cites registered preprints.
 
 ## Streams
@@ -17,7 +17,8 @@ Canonical-bibliography confirmation of melanoma author order and IAT title remai
 ### build
 - [ ] now — Explore a practical public tool for nonresearch users, grounding candidates in available methods and examples rather than claiming unpublished outcomes.
 - [x] 2026-09-30 — Review and approve `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md` for a weekly real-roster recommendation and prospective unaided/model/final comparison.
-- [ ] now — Execute `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md`; Task 6 accessible preview interface is next, with tests and releases gated by the plan.
+- [ ] now — Execute `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md`; Task 7 outcome evaluation and Results view is next, with release gated by Task 8 evidence.
+- [x] 2026-09-30 — Complete Task 6 unlisted accessible preview flow, checksum-verified snapshot loading with IndexedDB fallback, local records, conditional scenario display, Methods page and browser fixture checks.
 - [x] 2026-09-30 — Complete Task 5 versioned browser-only configuration and weekly records, frozen choices, late-revision exclusions, private export disclosure and atomic import validation.
 - [x] 2026-09-30 — Complete Task 4 browser scoring, legal optimizer, paired comparisons and conditional scenarios with conserved team opportunities, explicit uncalibrated probability suppression and focused Node tests.
 - [x] 2026-09-30 — Complete Task 3 seeded generative forecast, pre-lock validation, versioned atomic snapshots, fixture operator update, model assumptions and tests.

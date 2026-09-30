@@ -24,6 +24,7 @@ with ThreadingHTTPServer(('127.0.0.1', 0), handler) as server:
     thread.start()
     environment = dict(os.environ, BASE_URL=f'http://127.0.0.1:{server.server_port}')
     try:
-        raise SystemExit(subprocess.call(['node', '--test', 'tests/core-pages.cjs'], cwd=root, env=environment))
+        raise SystemExit(subprocess.call(['node', '--test', 'tests/core-pages.cjs',
+                                          'tests/fantasy-browser.cjs'], cwd=root, env=environment))
     finally:
         server.shutdown()

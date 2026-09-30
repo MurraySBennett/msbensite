@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fantasy lineup pilot — Murray S. Bennett</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <!-- site-metadata -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/tools/fantasy-lineup/style.css" />
+  <script src="/js/components.js" defer></script>
+  <script type="module" src="/tools/fantasy-lineup/app.mjs"></script>
+</head>
+<body data-page="tools">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div id="nav-placeholder"></div>
+  <main id="main-content" class="container pilot">
+    <header class="pilot-head"><p class="eyebrow">Private preview · NFL</p><h1>Fantasy lineup pilot</h1>
+      <p>A dated, conditional lineup suggestion. Your roster, scoring and picks stay in this browser.</p>
+      <p><a href="methods.html">Methods and evidence</a></p></header>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <nav class="pilot-tabs" aria-label="Pilot sections">
+      <button type="button" data-view="setup" aria-current="step">1 Set up</button>
+      <button type="button" data-view="pick">2 Make your pick</button>
+      <button type="button" data-view="compare">3 Compare and save</button>
+      <button type="button" data-view="results">Results</button>
+    </nav>
+    <section id="setup" class="pilot-view" aria-labelledby="setup-title">
+      <h2 id="setup-title" tabindex="-1">Set up your league</h2>
+      <p id="snapshot-meta">Loading dated data…</p>
+      <form id="setup-form" novalidate>
+        <fieldset><legend>Your roster</legend><p>Choose players by name, team and stable ID. A player can be selected once.</p>
+          <div id="roster-options" class="roster-grid"></div></fieldset>
+        <fieldset><legend>Starting slots</legend><p>Enter the number of each slot. FLEX accepts RB, WR or TE; SUPERFLEX also accepts QB.</p>
+          <div class="slot-grid" id="slot-counts"></div>
+          <label for="fixed-dst">Fixed D/ST (optional; excluded from forecast points)</label>
+          <input id="fixed-dst" name="fixed-dst" autocomplete="off" placeholder="Team name" /></fieldset>
+        <fieldset><legend>Scoring</legend><p>Confirm your league's points per reception and other coefficients. Blank advanced fields score zero.</p>
+          <div id="scoring-fields" class="score-grid"></div>
+          <label for="other-scoring">Other scoring component in your league (leave blank if none)</label>
+          <input id="other-scoring" autocomplete="off" placeholder="For example, return yards" />
+          <label class="check-row"><input id="scoring-confirmed" type="checkbox" /> I checked these against my league rules.</label>
+        </fieldset>
+        <div id="setup-errors" class="form-errors" role="alert"></div>
+        <button type="submit">Continue to my pick</button>
+      </form>
+    </section>
+    <section id="pick" class="pilot-view" aria-labelledby="pick-title" hidden>
+      <h2 id="pick-title" tabindex="-1">Make your pick</h2><p>Choose before seeing model points. You can skip this measurement and still get advice.</p>
+      <div id="pick-context"></div>
+      <form id="pick-form" novalidate><div id="initial-slots"></div>
+        <fieldset><legend>One close call</legend><div id="initial-pair"></div>
+          <label for="initial-probability">Your chance that A scores more than B (0–100%)</label>
+          <input id="initial-probability" type="number" min="0" max="100" step="1" value="50" />
+          <label class="check-row"><input id="external-forecast" type="checkbox" /> I have already seen another forecast.</label>
+        </fieldset><div id="pick-errors" class="form-errors" role="alert"></div>
+        <button type="submit">Freeze my pick and show advice</button>
+        <button id="skip-pick" type="button" class="secondary">Skip unaided pick</button>
+      </form>
+    </section>
+    <section id="compare" class="pilot-view" aria-labelledby="compare-title" hidden>
+      <h2 id="compare-title" tabindex="-1">Compare and save</h2>
+      <p>Advice is conditional on the dated inputs below. A scenario does not change the official pick.</p>
+      <div id="advice-card" class="advice-card"></div>
+      <details id="scenario-panel"><summary>What if?</summary>
+        <form id="scenario-form"><label for="scenario-player">Player</label><select id="scenario-player"></select>
+          <label for="scenario-type">Assumption</label><select id="scenario-type"><option value="out">Out</option><option value="active-normal">Active, normal workload</option><option value="active-limited">Active, limited workload</option><option value="target-share">Target share</option><option value="carry-share">Carry share</option></select>
+          <label for="scenario-value">Workload or share (0–100%)</label><input id="scenario-value" type="number" min="1" max="99" value="50" />
+          <button type="submit">Explore condition</button></form><div id="scenario-result" role="status"></div></details>
+      <form id="final-form" novalidate><h3>Your final lineup</h3><div id="final-slots"></div>
+        <div id="final-pair"></div><label for="final-probability">Your final chance that A scores more than B (0–100%)</label>
+        <input id="final-probability" type="number" min="0" max="100" step="1" value="50" />
+        <div id="override-fields"></div><div id="final-errors" class="form-errors" role="alert"></div>
+        <button type="submit">Save final pick in this browser</button></form>
+    </section>
+    <section id="results" class="pilot-view" aria-labelledby="results-title" hidden>
+      <h2 id="results-title" tabindex="-1">Results</h2><p>Saved weekly choices appear here. Realized scores arrive with the later outcome check; none are inferred from projections.</p>
+      <div id="saved-weeks"></div><div class="record-actions"><button id="export-records" type="button">Export private records</button>
+        <label for="import-records">Import private records (replaces this browser's records)</label><input id="import-records" type="file" accept="application/json,.json" /></div>
+    </section>
+  </main><div id="footer-placeholder"></div>
+</body></html>
