@@ -54,16 +54,19 @@
       </form>
     </section>
     <section id="pick" class="pilot-view" aria-labelledby="pick-title" hidden>
-      <h2 id="pick-title" tabindex="-1">Make your pick</h2><p>Choose before seeing model points. You can skip this measurement and still get advice.</p>
+      <h2 id="pick-title" tabindex="-1">Make your first lineup</h2>
+      <p>This saves your lineup before showing the model's recommendation. Choose starters below, then press <strong>Save my first lineup and show the model lineup</strong>. The A/B question records your own estimate; it does not run the model. You can skip your first lineup and show advice immediately.</p>
       <div id="pick-context"></div>
       <form id="pick-form" novalidate><div id="initial-slots"></div>
-        <fieldset><legend>One close call</legend><div id="initial-pair"></div>
-          <label for="initial-probability">Your chance that A scores more than B (0–100%)</label>
+        <fieldset><legend>Close-call confidence check</legend>
+          <p>A is the starter and B is the bench alternative. Enter your own estimate before seeing advice. The field starts at a neutral 50%; selecting A/B or seeing 50% does not produce a model answer.</p>
+          <div id="initial-pair"></div>
+          <label for="initial-probability">Your estimate: chance A scores more than B (0–100%)</label>
           <input id="initial-probability" type="number" min="0" max="100" step="1" value="50" />
           <label class="check-row"><input id="external-forecast" type="checkbox" /> I have already seen another forecast.</label>
         </fieldset><div id="pick-errors" class="form-errors" role="alert"></div>
-        <button type="submit">Freeze my pick and show advice</button>
-        <button id="skip-pick" type="button" class="secondary">Skip unaided pick</button>
+        <button type="submit">Save my first lineup and show the model lineup</button>
+        <button id="skip-pick" type="button" class="secondary">Skip my first lineup and show the model lineup</button>
       </form>
     </section>
     <section id="compare" class="pilot-view" aria-labelledby="compare-title" hidden>
