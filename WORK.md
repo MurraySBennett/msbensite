@@ -9,14 +9,15 @@ project: msbensite
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked.
 Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
 New direction: practical public tools from simulation-based inference and Bayesian decision models for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
-Fantasy NFL human–model lineup design and theoretical component were confirmed; spec: `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md`. The proposed first release now includes calibrated Bayesian uncertainty, prospective pre/post advice comparison, a model-conditional What if? view for availability and plausible RB/WR/TE usage share, and a friendly three-stage responsive UI; game-script/weather scenarios and cognitive SBI stay gated. Next: author reviews the expanded spec, then write the implementation plan. Hay-window feasibility is later. Demos and social outreach remain deferred.
+Fantasy NFL human–model lineup spec was approved on 2026-09-30; the implementation plan is `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md`. The plan covers licensed public data, calibrated forecast evaluation, the legal-lineup and What if? engines, a friendly responsive interface, and prospective human–model comparison. Next: author reviews the plan and selects execution method; implementation has not started. Hay-window feasibility is later. Demos and social outreach remain deferred.
 Canonical-bibliography confirmation of melanoma author order and IAT title remains open; the public site cites registered preprints.
 
 ## Streams
 
 ### build
 - [ ] now — Explore a practical public tool for nonresearch users, grounding candidates in available methods and examples rather than claiming unpublished outcomes.
-- [ ] now — Review `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md`, the confirmed design for a weekly real-roster recommendation and prospective unaided/model/final comparison; then write the implementation plan.
+- [x] 2026-09-30 — Review and approve `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md` for a weekly real-roster recommendation and prospective unaided/model/final comparison.
+- [ ] now — Review `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md` and choose execution method; then launch and implement within its release gates.
 - [ ] next — Design a NSW lucerne cut-today-vs-wait weather-window comparison; test issue-time Open-Meteo forecasts against SILO observed rain, and do not equate rain-free weather with safe baling. A grower with moisture and operation records is needed for a later personalized model. Check forecast API licence before public integration or monetization.
 - [x] 2026-09-29 — Author accepted the site presentation; main deployment passed and public Home, GRIN, Research and CV routes were checked.
 - [x] 2026-09-29 — Build artifact passed five Python checks and eleven browser checks; reviewed desktop/mobile Home, Research and project screenshots.
