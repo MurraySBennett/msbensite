@@ -1,0 +1,5 @@
+player_id,player_display_name,position,season,week,season_type,team,opponent_team,targets,receptions,receiving_yards,receiving_tds,carries,rushing_yards,rushing_tds,passing_yards,passing_tds,passing_interceptions,fg_made,pat_made
+00-0000001,Alex Smith,WR,2026,4,REG,NE,NYJ,8,6,72,1,0,0,0,0,0,0,0,0
+00-0000002,Alex Smith,WR,2026,4,REG,NYJ,NE,5,3,41,0,0,0,0,0,0,0,0,0
+00-0000003,Pat Kicker,K,2026,4,REG,NE,NYJ,0,0,0,0,0,0,0,0,0,0,2,3
+00-0000001,Alex Smith,WR,2026,5,REG,NE,NYJ,11,9,100,2,0,0,0,0,0,0,0,0
