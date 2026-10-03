@@ -2,7 +2,7 @@ const {test, before, after} = require('node:test');
 const assert = require('node:assert/strict');
 const {createHash} = require('node:crypto');
 const {chromium} = require('playwright');
-const base = process.env.BASE_URL || 'http://127.0.0.1:8765';
+const base = process.env.BASE_URL || 'http://127.0.0.1:8303';
 let browser;
 before(async () => { browser = await chromium.launch({headless: true,
   ...(process.env.CHROMIUM_PATH ? {executablePath: process.env.CHROMIUM_PATH} : {})}); });

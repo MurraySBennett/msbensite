@@ -16,10 +16,12 @@ Build and preview the exact files that will be published:
 
 ```sh
 npm run build
-python3 -m http.server 8000 --directory dist
+python3 -m http.server 8303 --directory dist
 ```
 
-Open <http://localhost:8000>. Run `npm test` after building; it starts its own local server on a free port for browser checks. The build also checks local file references, included publication IDs, and the seven-project source index. `dist/` is generated and ignored by Git.
+Open <http://localhost:8303>. This is also the `BASE_URL` default for the
+browser suites in `tests/`, so running them needs no extra flags. Not 8301 —
+that is the pixeldock tile, which serves the repo root rather than `dist/`. Run `npm test` after building; it starts its own local server on a free port for browser checks. The build also checks local file references, included publication IDs, and the seven-project source index. `dist/` is generated and ignored by Git.
 
 ## Update content
 

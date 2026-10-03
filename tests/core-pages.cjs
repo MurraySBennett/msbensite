@@ -1,10 +1,14 @@
 // Regression checks for visitor-visible project and publication loading.
 // Supply Playwright via NODE_PATH and optionally CHROMIUM_PATH; start a local
-// server first (BASE_URL defaults to http://127.0.0.1:8765).
+// server first, rooted at the BUILD OUTPUT -- `python3 -m http.server 8303
+// --directory dist`. These routes (projects/*.html) exist only in dist/, so a
+// server on the repo root 404s them. 8303 is this suite's port, deliberately
+// not the dock's 8301: that tile serves the repo root, and pointing the tests
+// at it would fail against a server that is up. BASE_URL overrides.
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
-const base = process.env.BASE_URL || 'http://127.0.0.1:8765';
+const base = process.env.BASE_URL || 'http://127.0.0.1:8303';
 let browser;
 before(async () => {
   browser = await chromium.launch({ headless: true,
