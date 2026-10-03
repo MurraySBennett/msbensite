@@ -59,7 +59,7 @@ async function setup(page) {
     await page.locator(`#slot-${kind}`).fill(kind === 'WR' ? '1' : '0');
   await page.locator('#scoring-confirmed').check();
   await page.getByRole('button', {name: 'Continue to my pick'}).click();
-  await page.getByRole('heading', {name: 'Make your pick'}).waitFor({timeout: 3000});
+  await page.getByRole('heading', {name: 'Make your first lineup'}).waitFor({timeout: 3000});
 }
 test('fixture roster saves unaided, official and final choices with readable advice', async t => {
   const page = await pageFor(t), errors = [];
@@ -73,7 +73,7 @@ test('fixture roster saves unaided, official and final choices with readable adv
   assert.match(await page.locator('#comparison-slot').locator('option:checked').innerText(), /Blair Example/);
   assert.match(await page.locator('#comparison-b').locator('option:checked').innerText(), /Alex Example/);
   await page.locator('#initial-probability').fill('60');
-  await page.getByRole('button', {name: 'Freeze my pick and show advice'}).click();
+  await page.getByRole('button', {name: 'Save my first lineup and show the model lineup'}).click();
   await page.getByRole('heading', {name: 'Compare and save'}).waitFor();
   if (process.env.FANTASY_SCREENSHOT_DIR) await page.screenshot({path: `${process.env.FANTASY_SCREENSHOT_DIR}/fantasy-desktop.png`, fullPage: true});
   const card = await page.locator('#advice-card').innerText();
@@ -103,7 +103,7 @@ test('skip path, form error preserving values, and 390px layout', async t => {
   for (const kind of ['QB', 'RB', 'WR', 'TE', 'FLEX', 'SUPERFLEX', 'K']) await page.locator(`#slot-${kind}`).fill(kind === 'WR' ? '1' : '0');
   await page.locator('#scoring-confirmed').check();
   await page.getByRole('button', {name: 'Continue to my pick'}).click();
-  await page.getByRole('button', {name: 'Skip unaided pick'}).click();
+  await page.getByRole('button', {name: 'Skip my first lineup and show the model lineup now'}).click();
   await page.getByRole('heading', {name: 'Compare and save'}).waitFor();
   if (process.env.FANTASY_SCREENSHOT_DIR) await page.screenshot({path: `${process.env.FANTASY_SCREENSHOT_DIR}/fantasy-mobile.png`, fullPage: true});
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -112,7 +112,7 @@ test('skip path, form error preserving values, and 390px layout', async t => {
 test('keyboard controls have visible focus; failed refresh retains saved records', async t => {
   const page = await pageFor(t);
   await setup(page);
-  await page.getByRole('button', {name: 'Skip unaided pick'}).focus();
+  await page.getByRole('button', {name: 'Skip my first lineup and show the model lineup now'}).focus();
   assert.notEqual(await page.evaluate(() => getComputedStyle(document.activeElement).outlineStyle), 'none');
   await page.keyboard.press('Enter');
   await page.getByRole('heading', {name: 'Compare and save'}).waitFor();
@@ -152,7 +152,7 @@ test('keyboard-only setup and skip reaches advice; unsupported rule stays visibl
   await page.keyboard.press('Backspace');
   await page.getByRole('button', {name: 'Continue to my pick'}).focus();
   await page.keyboard.press('Enter');
-  await page.getByRole('button', {name: 'Skip unaided pick'}).focus();
+  await page.getByRole('button', {name: 'Skip my first lineup and show the model lineup now'}).focus();
   await page.keyboard.press('Enter');
   await page.getByRole('heading', {name: 'Compare and save'}).waitFor();
   assert.match(await page.locator('#advice-card').innerText(), /Expected points/);
@@ -160,7 +160,7 @@ test('keyboard-only setup and skip reaches advice; unsupported rule stays visibl
 test('a frozen starter remains visible for a late final record', async t => {
   const page = await pageFor(t);
   await setup(page);
-  await page.getByRole('button', {name: 'Skip unaided pick'}).click();
+  await page.getByRole('button', {name: 'Skip my first lineup and show the model lineup now'}).click();
   const selected = await page.locator('#final-WR-1').inputValue();
   await page.addInitScript(() => {
     const ActualDate = Date;
@@ -181,7 +181,7 @@ test('a frozen starter remains visible for a late final record', async t => {
 test('same-week refresh cannot change a frozen advice card', async t => {
   const page = await pageFor(t);
   await setup(page);
-  await page.getByRole('button', {name: 'Skip unaided pick'}).click();
+  await page.getByRole('button', {name: 'Skip my first lineup and show the model lineup now'}).click();
   const original = await page.locator('#advice-card').innerText();
   const updated = fixture(5);
   await page.route('**/tools/fantasy-lineup/current.json', route => route.fulfill({json: updated.pointer}));
@@ -238,7 +238,7 @@ async function routeOutcomes(page, data) {
 test('Results keeps completed and pending weeks distinct, and correction leaves pick frozen', async t => {
   const page = await pageFor(t);
   await setup(page);
-  await page.getByRole('button', {name: 'Skip unaided pick'}).click();
+  await page.getByRole('button', {name: 'Skip my first lineup and show the model lineup now'}).click();
   await page.getByRole('button', {name: 'Save final pick in this browser'}).click();
   const frozen = await page.evaluate(() => localStorage.getItem('fantasy-lineup:v1'));
   await page.evaluate(() => {
@@ -272,7 +272,7 @@ test('Results keeps completed and pending weeks distinct, and correction leaves 
 test('outcomes from a different forecast player pool remain pending', async t => {
   const page = await pageFor(t);
   await setup(page);
-  await page.getByRole('button', {name: 'Skip unaided pick'}).click();
+  await page.getByRole('button', {name: 'Skip my first lineup and show the model lineup now'}).click();
   await page.getByRole('button', {name: 'Save final pick in this browser'}).click();
   await routeOutcomes(page, outcomeFixture(80, 40, '0'.repeat(64)));
   await page.getByRole('button', {name: 'Results'}).click();

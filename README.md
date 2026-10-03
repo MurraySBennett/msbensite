@@ -15,13 +15,29 @@ npx playwright install chromium
 Build and preview the exact files that will be published:
 
 ```sh
-npm run build
+.venv/bin/python -m scripts.build_site      # `npm run build` uses bare python3
 python3 -m http.server 8303 --directory dist
 ```
 
+Build with **`.venv/bin/python`**. `npm run build` calls bare `python3`, which
+on this machine is the Nix interpreter with no `markdown_it` — the build dies on
+an import, not on anything it was asked to check. The venv has the pinned
+`requirements-build.txt`.
+
 Open <http://localhost:8303>. This is also the `BASE_URL` default for the
 browser suites in `tests/`, so running them needs no extra flags. Not 8301 —
-that is the pixeldock tile, which serves the repo root rather than `dist/`. Run `npm test` after building; it starts its own local server on a free port for browser checks. The build also checks local file references, included publication IDs, and the seven-project source index. `dist/` is generated and ignored by Git.
+that is the pixeldock tile, which serves the repo root rather than `dist/`.
+
+Run `npm test` after building; it starts its own local server on a free port for
+browser checks. **It needs `CHROMIUM_PATH` exported** — Playwright resolves from
+the local `node_modules`, but its bundled browser download does not exist here,
+so without it all 21 browser checks fail on launch rather than on anything real:
+
+```sh
+CHROMIUM_PATH=$(command -v chromium || ls -d /nix/store/*chromium*/bin/chromium | tail -1) \
+  .venv/bin/python scripts/check_site.py    # 21 passed, 0 failed on 2026-10-03
+```
+ The build also checks local file references, included publication IDs, and the seven-project source index. `dist/` is generated and ignored by Git.
 
 ## Update content
 
