@@ -3,11 +3,13 @@
   "journal": [
     {
       "id": "hedley2026novelBench",
-      "authors": "Hedley, L. G., Russel, L., Bennett, M. S., & Eidels, A.",
-      "year": null,
+      "authors": "Hedley, L. G., Russell, L., Bennett, M. S., & Eidels, A.",
+      "year": 2026,
       "title": "Benchmarking the benchmark: A novel simulation benchmark for team performance",
       "journal": "Chinese Journal of Psychology",
-      "status": "in-press",
+      "volume": "68",
+      "issue": "3",
+      "status": "published",
       "doi": "",
       "osf": "",
       "related_projects": [
