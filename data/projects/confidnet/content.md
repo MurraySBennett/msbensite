@@ -14,6 +14,6 @@ The practical next question is how people interpret and act on such signals. The
 
 ## What is available
 
-KITH is a research demo built around a computer program that sorts close-up photos of skin lesions into benign (harmless) or malignant (cancerous). Give it a photo and you get two results: the program’s answer with its output probability, and a familiarity score showing how closely your photo resembles the photos it learned from. It shows early-stage (perceptual) and late-stage (decisional) familiarity, so you can compare the two.
+KITH is a research demo built around a computer model that sorts close-up photos of skin lesions into benign (harmless) or malignant (cancerous). Give it a photo and you get two results: the model’s answer with its output probability, and a familiarity score showing how closely your photo resembles the photos it learned from. It shows early-stage (perceptual) and late-stage (decisional) familiarity, so you can compare the two.
 
 [Open KITH](https://kith.murraysbennett.com) to try your own image or explore worked examples. Your photo stays on your computer; nothing is uploaded. It is a research demo, not medical advice.
