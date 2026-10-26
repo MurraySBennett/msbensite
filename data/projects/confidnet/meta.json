@@ -3,8 +3,8 @@
   "title": "Machine Metacognition: Estimating Neural-Network Uncertainty",
   "category": "Human-AI Collaboration",
   "status": "under-review",
-  "thumbnail": "",
-  "thumbnail_alt": "",
+  "thumbnail": "/assets/images/project-icons/kith-try-result.png",
+  "thumbnail_alt": "KITH result showing the model answer and how familiar the image is to the model",
   "summary": "Can the neighbourhood around an image in a network’s learned representation add useful information about the reliability of its prediction?",
   "tags": [
     "confidence estimation",
@@ -16,7 +16,7 @@
   "links": {
     "osf": "https://osf.io/f34rm",
     "experiment_demo": "",
-    "interactive_demo": "",
+    "interactive_demo": "https://kith.murraysbennett.com",
     "publication": "https://doi.org/10.31234/osf.io/jp83f_v1"
   },
   "publications": [

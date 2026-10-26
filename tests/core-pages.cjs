@@ -70,6 +70,17 @@ test('all published project routes fit desktop and mobile screens', async t => {
   }
   assert.deepEqual(errors, []);
 });
+test('KITH is linked from its project page and the tools page, like GRIN', async t => {
+  const page = await pageFor(t);
+  await loadedProject(page, 'confidnet');
+  assert.equal(await page.getByRole('link', { name: 'Open Tool' }).getAttribute('href'), 'https://kith.murraysbennett.com');
+  assert.equal(await page.getByRole('link', { name: 'Open KITH' }).getAttribute('href'), 'https://kith.murraysbennett.com');
+  await page.goto(`${base}/tools.html`);
+  const tile = page.locator('#tools-list a.research-tile[href="https://kith.murraysbennett.com"]');
+  assert.equal(await tile.count(), 1);
+  assert.match(await tile.innerText(), /KITH/);
+  assert.equal(await page.locator('#tools-list a.research-tile').count(), 2);
+});
 test('legacy project link reaches the static page', async t => {
   const page = await pageFor(t);
   await page.goto(`${base}/project-detail.html?id=grin`);
