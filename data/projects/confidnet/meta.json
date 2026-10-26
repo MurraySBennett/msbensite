@@ -1,13 +1,14 @@
 {
   "id": "confidnet",
-  "title": "Machine Metacognition: Estimating Neural-Network Uncertainty",
+  "title": "KITH: Machine Metacognition from Hidden-Layer Familiarity",
   "category": "Human-AI Collaboration",
   "status": "under-review",
   "thumbnail": "",
   "thumbnail_alt": "",
   "summary": "Can the neighbourhood around an image in a network’s learned representation add useful information about the reliability of its prediction?",
   "tags": [
-    "confidence estimation",
+    "KITH",
+    "familiarity",
     "neural networks",
     "melanoma",
     "calibration",
