@@ -237,7 +237,7 @@ def build(source: Path, output: Path):
         'research.html': ('Research — Murray S. Bennett', 'Published and ongoing research in decision science, human–AI collaboration, and perception.'),
         'cv.html': ('CV — Murray S. Bennett', 'Curriculum vitae, research experience, publications, teaching, and professional service.'),
         'teaching.html': ('Teaching — Murray S. Bennett', 'Teaching experience and approach in psychology, research methods, and quantitative modeling.'),
-        'tools.html': ('Research Tools — Murray S. Bennett', 'Available research software, including GRIN for General Recognition Theory inference.'),
+        'tools.html': ('Research Tools — Murray S. Bennett', 'Available research software, including GRIN for General Recognition Theory inference and KITH for checking whether a model has seen images like yours.'),
     }
     for name, (title, description) in page_info.items():
         page_path = output / name
