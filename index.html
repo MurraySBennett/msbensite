@@ -24,7 +24,19 @@
   </head>
 
   <script>
-    window.gameActive = false;
+    // Games set window.gameActive. Mirroring it on <html> lets CSS show the
+    // game area only while a game is running.
+    (function () {
+      let active = false;
+      Object.defineProperty(window, "gameActive", {
+        configurable: true,
+        get: () => active,
+        set: (value) => {
+          active = Boolean(value);
+          document.documentElement.classList.toggle("game-running", active);
+        },
+      });
+    })();
   </script>
   <script src="/js/components.js" defer></script>
   <script src="/js/dpad.js" defer></script>
@@ -57,13 +69,13 @@
             <p id="pixel-chaser"><strong>Postdoctoral Scholar</strong></p>
             <p id="pong"><strong>The Ohio State University</strong></p>
             <p class="intro-actions"><a class="button" href="/cv.html">View CV</a><a class="button" href="/assets/documents/MurrayBennettCV.pdf" download>Download CV</a><a class="button" href="mailto:me@murraysbennett.com">Email</a></p>
-            <p>
+            <p class="intro-text">
               I am a computational cognitive scientist. I use mathematical
               models, behavioural experiments and machine learning to study
               perception, workload capacity and decision-making in people and
               teams.
             </p>
-            <p>
+            <p class="intro-text">
               My current work looks at how AI systems can report their own
               uncertainty, and how people decide when to rely on them. I also
               build methods and software for testing cognitive theories. Two of

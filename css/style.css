@@ -88,13 +88,41 @@ p {
 header {
   background-color: #7b68ee;
   color: #e0ffff;
-  padding: 1.25rem 0;
+  padding: 0.75rem 1.25rem;
   text-align: center;
   box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
   border-radius: 0 0 0.9375rem 0.9375rem;
   position: sticky;
   top: 0;
   z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+/* Name in the header, links home from every page */
+.site-name {
+  order: 0;
+  color: #e0ffff;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-decoration: none;
+  padding: 0.5rem 0;
+  text-align: left;
+  text-shadow:
+    -0.062rem -0.062rem 0 black,
+    0.062rem -0.062rem 0 black,
+    -0.062rem 0.062rem 0 black,
+    0.062rem 0.062rem 0 black;
+}
+
+.site-name:hover,
+.site-name:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
 }
 
 header h1 {
@@ -105,7 +133,10 @@ header h1 {
 
 /* Navigation */
 nav {
-  margin-top: 0.9375rem;
+  margin: 0;
+  order: 1;
+  flex: 1 1 auto;
+  background-color: inherit;
 }
 
 nav ul {
@@ -118,7 +149,7 @@ nav ul {
 }
 
 nav ul li {
-  margin: 0 0.9375rem;
+  margin: 0.25rem 0.5rem;
 }
 
 nav ul li a {
@@ -168,9 +199,8 @@ nav ul li a.active {
   cursor: pointer;
   padding: 0;
   z-index: 10;
-  position: absolute;
-  right: 1rem;
-  top: 0.4rem;
+  position: static;
+  order: 2;
 }
 
 .skip-link {
@@ -211,6 +241,11 @@ a:focus-visible, button:focus-visible {
 /* Style for when the menu is open */
 .nav-links.open {
   display: flex;
+}
+
+/* Intro paragraphs read left-aligned at every width */
+.profile-info .intro-text {
+  text-align: left;
 }
 
 /* Section */
@@ -289,10 +324,23 @@ section h3 {
   border-color: #e8a0b8;
 }
 
+.research-card > a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.research-card > a:hover h3,
+.research-card > a:focus-visible h3 {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
 .research-card h3 {
   margin-top: 0;
   color: #4682b4;
-  font-size: 1.5em;
+  font-size: 1.15rem;
+  line-height: 1.4;
   text-shadow: 0.062rem 0.062rem 0 rgba(0, 0, 0, 0.1); /* Converted from 1px */
 }
 
@@ -341,9 +389,10 @@ section h3 {
 }
 
 /* Footer */
+/* #fff on #6a5acd is 5.3:1, which meets WCAG AA for normal text */
 footer {
-  background-color: #7b68ee;
-  color: #e0ffff;
+  background-color: #6a5acd;
+  color: #fff;
   text-align: center;
   padding: 1.25rem 0;
   margin-top: auto;
@@ -354,6 +403,11 @@ footer {
 footer p {
   margin: 0;
   font-size: 0.9em;
+}
+
+footer a {
+  color: #fff;
+  text-decoration: underline;
 }
 
 /* mobile devices */
@@ -374,6 +428,12 @@ footer p {
   .profile-info {
     width: 90%;
   }
+  .research-card h3 {
+    font-size: 0.95rem;
+  }
+  .site-name {
+    font-size: 0.75rem;
+  }
 }
 @media (min-width: 769px) {
   #virtual-gamepad {
@@ -384,6 +444,9 @@ footer p {
   }
   .nav-links {
     display: block;
+  }
+  nav ul {
+    justify-content: flex-end;
   }
 }
 
@@ -401,6 +464,31 @@ footer p {
   nav ul li a {
     font-size: 0.9em;
     padding: 0.37rem 0.75rem;
+  }
+  /* Header row on small screens: name, then moon, then menu button */
+  nav {
+    flex: 0 0 auto;
+    order: 2;
+  }
+  .nav-links.open {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 0.5rem 0 1rem;
+    background-color: inherit;
+    border-radius: 0 0 0.9375rem 0.9375rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+  }
+  header #dark-mode-row {
+    order: 1;
+    margin-left: auto;
+  }
+  .intro-actions {
+    justify-content: center;
+  }
+  html:not(.game-running) .top-row {
+    justify-content: center;
   }
   .profile-section {
     flex-direction: column;
@@ -468,6 +556,14 @@ body.konami-mode .profile-section p {
 body.konami-mode .profile-photo {
   border-color: #00ff00 !important;
   box-shadow: 0 0 0.5rem rgba(0, 255, 0, 0.3);
+}
+
+body.konami-mode footer a,
+body.konami-mode .site-name,
+body.konami-mode #dark-mode-toggle {
+  color: black !important;
+  border-color: black !important;
+  text-shadow: none !important;
 }
 
 body.konami-mode header,
@@ -601,6 +697,13 @@ body.konami-mode::before {
 
   animation: arcadeGlow 4s ease-in-out infinite;
 }
+/* The play area stays hidden until a game sets window.gameActive, which
+   adds .game-running to <html> straight away. Snake and pixel chaser read
+   the area size as soon as they start, so the reveal must not animate. */
+html:not(.game-running) #game-area {
+  display: none;
+}
+
 #game-area .score-display {
   position: absolute;
   font-family: "Press Start 2P", cursive;
@@ -1332,7 +1435,8 @@ body.konami-mode::before {
   border-radius: 0.4rem;
   text-decoration: none;
   font-family: "Press Start 2P", cursive;
-  font-size: 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
   transition:
     background-color 0.15s ease,
     transform 0.1s ease;
@@ -1561,31 +1665,28 @@ summary:hover {
 }
 
 /* --- Dark mode toggle row + button --- */
-/* A slim strip sitting below the nav links, visually subordinate to them */
+/* Sits at the end of the header row, styled like the nav buttons */
 #dark-mode-row {
+  order: 3;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.35rem 0 0.1rem;
-  opacity: 0.65;
-  transition: opacity 0.2s ease;
-}
-
-#dark-mode-row:hover {
-  opacity: 1;
 }
 
 #dark-mode-toggle {
   background: transparent;
-  border: none;
+  border: 0.12rem solid #e0ffff;
+  border-radius: 0.5rem;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0;
   display: inline-flex;
   color: #e0ffff;
+  font-size: 1.25rem;
+  line-height: 1;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   /* stepped hover matches the retro feel of the nav links */
   transition: transform 0.1s steps(2, start);
 }
