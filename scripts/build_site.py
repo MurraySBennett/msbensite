@@ -233,7 +233,7 @@ def build(source: Path, output: Path):
             copy_file(source, output, meta['thumbnail'].lstrip('/'))
 
     page_info = {
-        'index.html': ('Murray S. Bennett — Cognitive Psychologist', 'Research in cognitive psychology, computational modeling, perception, and human–AI collaboration.'),
+        'index.html': ('Murray S. Bennett — Computational Cognitive Scientist', 'Research in computational cognitive science, perception and human-AI collaboration.'),
         'research.html': ('Research — Murray S. Bennett', 'Published and ongoing research in decision science, human–AI collaboration, and perception.'),
         'cv.html': ('CV — Murray S. Bennett', 'Curriculum vitae, research experience, publications, teaching, and professional service.'),
         'teaching.html': ('Teaching — Murray S. Bennett', 'Teaching experience and approach in psychology, research methods, and quantitative modeling.'),
