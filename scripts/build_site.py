@@ -26,6 +26,10 @@ BASE_IMAGES = (
     'assets/images/sprites/raincloud.gif',
     *(f'assets/images/button-icons/button-{name}.png' for name in ('up', 'down', 'left', 'right', 'a', 'b')),
 )
+FAVICONS = ('favicon.ico', 'favicon.svg', 'apple-touch-icon.png')
+FAVICON_LINKS = ('<link rel="icon" href="/favicon.ico" sizes="any" />\n'
+                 '<link rel="icon" href="/favicon.svg" type="image/svg+xml" />\n'
+                 '<link rel="apple-touch-icon" href="/apple-touch-icon.png" />\n')
 DOMAIN = 'https://murraysbennett.com'
 STATUS_LABELS = {'published': 'Published', 'under-review': 'Under Review',
                  'in-progress': 'In Progress'}
@@ -163,6 +167,16 @@ def validate(output):
                 raise FileNotFoundError(f'{page.relative_to(output)} references missing {reference}')
 
 
+def add_favicons(output):
+    for page in output.rglob('*.html'):
+        text = page.read_text(encoding='utf-8')
+        if 'rel="icon"' in text:
+            continue
+        if text.count('</head>') != 1:
+            raise ValueError(f'cannot place favicon links: {page.relative_to(output)}')
+        page.write_text(text.replace('</head>', FAVICON_LINKS + '</head>'), encoding='utf-8')
+
+
 def inline_components(output, source):
     nav = (source / 'components/nav.html').read_text(encoding='utf-8')
     footer = (source / 'components/footer.html').read_text(encoding='utf-8')
@@ -226,7 +240,7 @@ def build(source: Path, output: Path):
     for name in ('css/style.css', 'data/publications.json', 'assets/documents/MurrayBennettCV.pdf',
                  'assets/audio/steal.mp3'):
         copy_file(source, output, name)
-    for name in BASE_IMAGES:
+    for name in BASE_IMAGES + FAVICONS:
         copy_file(source, output, name)
     for meta, _ in projects:
         if meta.get('thumbnail'):
@@ -271,6 +285,7 @@ def build(source: Path, output: Path):
                 [f'/projects/{item["id"]}.html' for item in index]) + '</urlset>\n', encoding='utf-8')
     (output / 'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: ' + DOMAIN + '/sitemap.xml\n', encoding='utf-8')
     inline_components(output, source)
+    add_favicons(output)
     validate(output)
 
 

@@ -44,6 +44,19 @@ class BuildSiteTests(unittest.TestCase):
             self.assertFalse((out / 'assets/images/_aseprite-sources').exists())
             self.assertTrue((out / 'assets/documents/MurrayBennettCV.pdf').exists())
 
+    def test_favicon_is_published_and_linked_on_every_page(self):
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp) / 'site'
+            build(ROOT, out)
+            for name in ('favicon.ico', 'favicon.svg', 'apple-touch-icon.png'):
+                self.assertTrue((out / name).is_file(), name)
+            pages = list(out.rglob('*.html'))
+            self.assertGreater(len(pages), 10)
+            for page in pages:
+                text = page.read_text()
+                self.assertIn('<link rel="icon" href="/favicon.ico" sizes="any" />', text, page.name)
+                self.assertIn('<link rel="icon" href="/favicon.svg" type="image/svg+xml" />', text, page.name)
+
     def test_missing_project_content_fails_build(self):
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp) / 'source'
