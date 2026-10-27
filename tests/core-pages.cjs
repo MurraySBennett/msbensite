@@ -120,7 +120,9 @@ test('curated CV publications remain visible when ORCID is unavailable', async t
   await page.goto(`${base}/cv.html`);
   await page.waitForSelector('#cv-under-review-pubs .pub-entry');
   assert.equal(await page.locator('#cv-under-review-pubs .pub-entry').count(), 4);
-  assert.match(await page.locator('#cv-journal-pubs').innerText(), /In Press/);
+  assert.match(await page.locator('#cv-journal-pubs').innerText(), /Russell, L\., Bennett, M\. S\., & Eidels, A\. \(2026\)\. Benchmarking the benchmark/);
+  assert.match(await page.locator('#cv-journal-pubs').innerText(), /Chinese Journal of Psychology, 68\(3\)/);
+  assert.match(await page.locator('#cv-chapter-pubs').innerText(), /Cambridge Handbook of Judgment and Decision Making/);
 });
 test('the not-found page fits a narrow mobile screen', async t => {
   const page = await pageFor(t);

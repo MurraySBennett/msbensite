@@ -13,7 +13,7 @@ import { loadPublications } from "/js/orcid-sync.js";
 
 /**
  * Format a single publication entry as an <li> string.
- * Handles journal articles, under-review, and conference proceedings.
+ * Handles journal articles, under-review, book chapters and conference proceedings.
  */
 function renderPubEntry(pub, type = "journal") {
   const yearStr = pub.status === "in-press"
@@ -32,6 +32,10 @@ function renderPubEntry(pub, type = "journal") {
   } else if (type === "conference") {
     venue = `<em>${pub.venue || ""}</em>`;
     if (pub.volume) venue += `, ${pub.volume}`;
+  } else if (type === "chapter") {
+    venue = `In <em>${pub.booktitle || ""}</em>`;
+    if (pub.publisher) venue += `. ${pub.publisher}`;
+    if (pub.note) venue += `. ${pub.note}`;
   } else if (type === "under_review") {
     venue = pub.status === "under-review"
       ? "<em>Under Review</em>"
@@ -68,6 +72,7 @@ function renderSection(entries, type) {
 document.addEventListener("DOMContentLoaded", async () => {
   const journalEl = document.getElementById("cv-journal-pubs");
   const underReviewEl = document.getElementById("cv-under-review-pubs");
+  const chapterEl = document.getElementById("cv-chapter-pubs");
   const conferenceEl = document.getElementById("cv-conference-pubs");
   const pubsLoadingEl = document.getElementById("pubs-loading");
 
@@ -85,6 +90,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   if (underReviewEl) {
     underReviewEl.innerHTML = renderSection(pubs.under_review, "under_review");
+  }
+  if (chapterEl) {
+    chapterEl.innerHTML = renderSection(pubs.chapters, "chapter");
   }
   if (conferenceEl) {
     conferenceEl.innerHTML = renderSection(pubs.conference, "conference");

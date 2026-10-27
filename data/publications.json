@@ -3,11 +3,13 @@
   "journal": [
     {
       "id": "hedley2026novelBench",
-      "authors": "Hedley, L. G., Russel, L., Bennett, M. S., & Eidels, A.",
-      "year": null,
+      "authors": "Hedley, L. G., Russell, L., Bennett, M. S., & Eidels, A.",
+      "year": 2026,
       "title": "Benchmarking the benchmark: A novel simulation benchmark for team performance",
       "journal": "Chinese Journal of Psychology",
-      "status": "in-press",
+      "volume": "68",
+      "issue": "3",
+      "status": "published",
       "doi": "",
       "osf": "",
       "related_projects": [
@@ -164,6 +166,20 @@
       "related_projects": [
         "team-spirit-hh"
       ]
+    }
+  ],
+  "chapters": [
+    {
+      "id": "bennett2026jdmchapter",
+      "authors": "Kvam, P. D., Sokratous, K., Bennett, M. S., Alaukik, A., & Wang, Y.",
+      "year": 2026,
+      "title": "Computational modeling in judgment and decision-making",
+      "booktitle": "The Cambridge Handbook of Judgment and Decision Making",
+      "publisher": "Cambridge University Press",
+      "status": "under-review",
+      "note": "Invited chapter, under review",
+      "doi": "",
+      "related_projects": []
     }
   ]
 }
