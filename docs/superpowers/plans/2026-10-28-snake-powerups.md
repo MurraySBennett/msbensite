@@ -47,7 +47,7 @@
 
 **Files:** Modify `js/activate-snake.js`, `css/style.css`; update `tests/snake-game.cjs`.
 
-- [x] Add failing browser cases for arrow-key cursor movement, A/B endpoint placement, 8-second timeout, 30-second active lifetime, countdown display, and exit during setup.
-- [x] Implement the paused placement state, endpoint validation, paired teleport movement, top-corner countdown, and cleanup on timeout/game over.
+- [x] Add failing browser cases for arrow-key cursor movement, A/B endpoint placement, 8-second timeout, persistent active portals, placement countdown, and exit during setup.
+- [x] Implement the paused placement state, endpoint validation, paired teleport movement, placement countdown, and cleanup on timeout/game over.
 - [x] Run the focused suite, then rebuild the site and run the full existing browser/build checks.
 - [x] Review the diff for source-only color values and confirm all behavior remains within this spec.

@@ -7,7 +7,7 @@ project: msbensite
 ## Now
 
 The compact random-word Burdle game is implemented locally per `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; the latest keyboard layout rebuild is live at local port 8303. No deployment was made.
-Snake is merged into main. The first CI run found stale browser assertions for the previous HUD placement and timer wording; those now target the inventory beside the profile. Next: push the test fix and confirm CI deployment.
+Snake is merged into main. CI confirms the responsive layout and found the remaining effect checks still expected old status text and a portal expiry timer; the checks now follow active fruit labels and persistent portals. Next: push and confirm deployment.
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked. Snake food placement and queued direction input are corrected locally; the cloud clicker is removed. Reflex remains a recommendation for a future Arcade link; the Arcade app is not live.
 Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
 New direction: practical public tools from research methods for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.

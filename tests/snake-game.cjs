@@ -166,7 +166,7 @@ test('portal pickup pauses for placement and exposes the two countdown phases', 
   const page = await startGame(t, portalIndex);
   await reachPowerupThreshold(page);
   await collectAvailablePowerup(page);
-  assert.match(await page.locator('.snake-inventory .powerup-status').innerText(), /Lemon|portal/i);
+  assert.match(await page.locator('.powerup-slot').nth(portalIndex).getAttribute('aria-label'), /Lemon: Place A \+ B/);
   assert.match(await page.locator('.snake-inventory .powerup-timer').innerText(), /8/);
 
   await page.keyboard.press('ArrowLeft');
@@ -179,7 +179,8 @@ test('portal pickup pauses for placement and exposes the two countdown phases', 
   await page.keyboard.press('a');
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('b');
-  assert.match(await page.locator('.snake-inventory .powerup-timer').innerText(), /30/);
+  assert.match(await page.locator('.powerup-slot').nth(portalIndex).getAttribute('aria-label'), /Lemon: Portal pair/);
+  assert.equal(await page.locator('.snake-inventory .powerup-timer').innerText(), '');
   await page.keyboard.press('ArrowUp');
   for (let move = 0; move < 3; move++) await page.evaluate(() => window.__snakeRunLoop());
   const exitTileBluePixels = await page.evaluate(() => {
@@ -192,28 +193,28 @@ test('portal pickup pauses for placement and exposes the two countdown phases', 
     return count;
   });
   assert.ok(exitTileBluePixels > 0, `portal exit tile only has ${exitTileBluePixels} snake pixels`);
-  await page.evaluate(() => window.__snakeAdvance(30000));
-  await page.evaluate(() => window.__snakeRunLoop());
-  assert.equal(await page.locator('.snake-inventory .powerup-timer').innerText(), '');
+  await page.evaluate(() => window.__snakeAdvance(60000));
+  for (let move = 0; move < 3; move++) await page.evaluate(() => window.__snakeRunLoop());
+  assert.match(await page.locator('.powerup-slot').nth(portalIndex).getAttribute('aria-label'), /Lemon: Portal pair/);
 });
 
 test('each fruit applies its named effect and the portal placement timeout resumes movement', async t => {
   const expected = [
-    /Pepper: 40 moves/,
-    /Peach: larger apple/,
-    /Grapes: 1 tail pass/,
-    /Lime: 1 wall wrap/,
-    /Tail trimmed by 3/,
-    /Starfruit: ×2 for 3 apples/,
-    /Mango: 40 moves/,
-    /Pomegranate: 3 apples/,
-    /Lemon: move, then press A and B/,
+    /Pepper: Speed boost, 40 remaining/,
+    /Peach: Big apple/,
+    /Grapes: Tail pass, 1 remaining/,
+    /Lime: Wall wrap, 1 remaining/,
+    /Pineapple: Tail trim/,
+    /Starfruit: Double points, 3 remaining/,
+    /Mango: Apple magnet, 40 remaining/,
+    /Pomegranate: Bonus apples, 3 remaining/,
+    /Lemon: Place A \+ B/,
   ];
   for (let type = 0; type < expected.length; type++) {
     const page = await startGame(t, type);
     await reachPowerupThreshold(page);
     await collectAvailablePowerup(page);
-    assert.match(await page.locator('.snake-inventory .powerup-status').innerText(), expected[type], `powerup ${type}`);
+    assert.match(await page.locator('.powerup-slot').nth(type).getAttribute('aria-label'), expected[type], `powerup ${type}`);
     const nextSpawnDelay = await page.evaluate(() => window.__snakeTimers
       .filter(timer => !timer.cleared && timer.delay >= 10000 && timer.delay <= 30000)
       .map(timer => timer.delay));
@@ -229,7 +230,7 @@ test('each fruit applies its named effect and the portal placement timeout resum
       await page.keyboard.press('ArrowUp');
       await page.evaluate(() => window.__snakeRunLoop());
       assert.doesNotMatch(await page.locator('.powerup-status').innerText(), /Game over/);
-      assert.doesNotMatch(await page.locator('.powerup-status').innerText(), /Grapes/);
+      assert.match(await page.locator('.powerup-slot').nth(type).getAttribute('aria-label'), /Grapes: Tail pass/);
     }
     if (type === 3) {
       for (let move = 0; move < 5; move++) await page.evaluate(() => window.__snakeRunLoop());
@@ -251,7 +252,7 @@ test('each fruit applies its named effect and the portal placement timeout resum
       await page.keyboard.press('ArrowRight');
       await page.evaluate(() => window.__snakeRunLoop());
       assert.equal(await page.locator('.score-display').innerText(), 'Score: 7');
-      assert.match(await page.locator('.powerup-status').innerText(), /Starfruit: ×2 for 2 apples/);
+      assert.match(await page.locator('.powerup-slot').nth(type).getAttribute('aria-label'), /Starfruit: Double points, 2 remaining/);
     }
     if (type === 6) {
       const initialMagnetCell = await page.evaluate(() => {
@@ -270,7 +271,7 @@ test('each fruit applies its named effect and the portal placement timeout resum
         await page.keyboard.press('ArrowLeft');
         await page.evaluate(() => window.__snakeRunLoop());
       }
-      assert.match(await page.locator('.powerup-status').innerText(), /Mango: 35 moves/);
+      assert.match(await page.locator('.powerup-slot').nth(type).getAttribute('aria-label'), /Mango: Apple magnet, 35 remaining/);
       const magnetCell = await page.evaluate(() => {
         const canvas = document.querySelector('#game-area canvas');
         const { width, height } = canvas;
@@ -308,7 +309,8 @@ test('portal endpoints can be placed with the mobile gamepad without overflowing
     a: document.querySelector('#a-key').getBoundingClientRect().toJSON(),
     b: document.querySelector('#b-key').getBoundingClientRect().toJSON(),
   }));
-  assert.match(state.timer, /30/);
+  assert.equal(state.timer, '');
+  assert.match(await page.locator('.powerup-slot').nth(8).getAttribute('aria-label'), /Lemon: Portal pair/);
   const width = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, view: innerWidth }));
   assert.ok(width.scroll <= width.view, `mobile page overflowed: ${width.scroll}px > ${width.view}px`);
 });
