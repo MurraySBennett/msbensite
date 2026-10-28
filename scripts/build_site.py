@@ -31,12 +31,19 @@ FAVICON_LINKS = ('<link rel="icon" href="/favicon.ico" sizes="any" />\n'
                  '<link rel="icon" href="/favicon.svg" type="image/svg+xml" />\n'
                  '<link rel="apple-touch-icon" href="/apple-touch-icon.png" />\n')
 DOMAIN = 'https://murraysbennett.com'
-STATUS_LABELS = {'published': 'Published', 'under-review': 'Under Review',
-                 'in-progress': 'In Progress'}
+STATUS_LABELS = {'published': 'Published', 'under-review': 'Under review',
+                 'in-progress': 'In progress', 'available': 'Available'}
 STATUS_CLASSES = {'published': 'status-published', 'under-review': 'status-review',
-                  'in-progress': 'status-progress'}
-LINK_LABELS = {'osf': 'OSF Project', 'interactive_demo': 'Open Tool',
-               'publication': 'Read the Paper'}
+                  'in-progress': 'status-progress', 'available': 'status-available'}
+LINK_ORDER = ('osf', 'interactive_demo', 'publication')
+
+
+def link_label(key, meta):
+    if key == 'osf':
+        return 'Data and materials (OSF)'
+    if key == 'interactive_demo':
+        return f'Open {meta["tool_name"]}' if meta.get('tool_name') else 'Open the tool'
+    return 'Read the preprint' if meta['status'] == 'under-review' else 'Read the paper'
 
 
 def esc(value):
@@ -95,7 +102,7 @@ def render_publications(meta, publications):
         year = 'In Press' if publication.get('status') == 'in-press' else publication.get('year') or 'n.d.'
         venue = publication.get('journal') or publication.get('venue') or publication.get('status') or ''
         if venue == 'under-review':
-            venue = 'Under Review'
+            venue = 'Under review'
         doi = publication.get('doi') or ''
         link = f' <a href="https://doi.org/{esc(doi)}" class="doi-link">DOI</a>' if doi else ''
         items.append(f'<li class="pub-entry">{esc(publication["authors"])} '
@@ -121,7 +128,8 @@ def render_project(template, meta, content, publications):
     image = (f'<img src="{esc(meta["thumbnail"])}" alt="{esc(meta.get("thumbnail_alt") or meta["title"])}" '
              'class="project-thumbnail" />') if meta.get('thumbnail') else ''
     links = []
-    for key, label in LINK_LABELS.items():
+    for key in LINK_ORDER:
+        label = esc(link_label(key, meta))
         href = (meta.get('links') or {}).get(key)
         if href:
             parsed = urlparse(href)

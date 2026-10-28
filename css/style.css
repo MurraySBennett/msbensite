@@ -1194,6 +1194,13 @@ html:not(.game-running) #game-area {
   border: 1px solid #d6d8db;
 }
 
+/* Released tools. #0c5460 on #d1ecf1 is 6.9:1 */
+.status-available {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
 /* --- Tags --- */
 .tag-list {
   display: flex;
@@ -1930,6 +1937,11 @@ summary:hover {
     color: #a899f0;
     border-color: #3d3470;
   }
+  body:not(.light-mode) .status-available {
+    background-color: #10303a;
+    color: #6fd3e8;
+    border-color: #1d5a6a;
+  }
   body:not(.light-mode) .tile-thumbnail-placeholder {
     background: repeating-linear-gradient(
       45deg,
@@ -2222,6 +2234,11 @@ body.dark-mode .status-progress {
   background-color: #252040;
   color: #a899f0;
   border-color: #3d3470;
+}
+body.dark-mode .status-available {
+  background-color: #10303a;
+  color: #6fd3e8;
+  border-color: #1d5a6a;
 }
 body.dark-mode .tile-thumbnail-placeholder {
   background: repeating-linear-gradient(

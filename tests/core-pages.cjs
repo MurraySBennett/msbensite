@@ -73,8 +73,8 @@ test('all published project routes fit desktop and mobile screens', async t => {
 test('KITH is linked from its project page and the tools page, like GRIN', async t => {
   const page = await pageFor(t);
   await loadedProject(page, 'confidnet');
-  assert.equal(await page.getByRole('link', { name: 'Open Tool' }).getAttribute('href'), 'https://kith.murraysbennett.com');
-  assert.equal(await page.getByRole('link', { name: 'Open KITH' }).getAttribute('href'), 'https://kith.murraysbennett.com');
+  assert.equal(await page.locator('#project-content').getByRole('link', { name: 'Open KITH' }).getAttribute('href'), 'https://kith.murraysbennett.com');
+  assert.equal(await page.locator('#project-links-container').getByRole('link', { name: 'Open KITH' }).getAttribute('href'), 'https://kith.murraysbennett.com');
   await page.goto(`${base}/tools.html`);
   const tile = page.locator('#tools-list a.research-tile[href="https://kith.murraysbennett.com"]');
   assert.equal(await tile.count(), 1);
