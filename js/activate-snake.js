@@ -27,34 +27,47 @@ function startSnakeGame() {
   const gridSize = 16;
   let snake = [{ x: 5, y: 5 }];
   let direction = { x: 1, y: 0 };
+  const directionQueue = [];
   let food = randomFood();
   let score = 0;
   let gameRunning = true;
 
   function randomFood() {
-    return {
-      x: Math.floor(Math.random() * (canvas.width / gridSize)),
-      y: Math.floor(Math.random() * (canvas.height / gridSize)),
-    };
+    const columns = Math.floor(canvas.width / gridSize);
+    const rows = Math.floor(canvas.height / gridSize);
+    const emptyCells = [];
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < columns; x++) {
+        if (!snake.some((part) => part.x === x && part.y === y)) {
+          emptyCells.push({ x, y });
+        }
+      }
+    }
+
+    return emptyCells[Math.floor(Math.random() * emptyCells.length)] ?? null;
   }
 
   // Handle arrow keys
   function changeDirection(e) {
-    if (e.key === "ArrowUp" && direction.y === 0) {
+    const turns = {
+      ArrowUp: { x: 0, y: -1 },
+      ArrowDown: { x: 0, y: 1 },
+      ArrowLeft: { x: -1, y: 0 },
+      ArrowRight: { x: 1, y: 0 },
+    };
+    const requestedDirection = turns[e.key];
+
+    if (requestedDirection) {
       e.preventDefault();
-      direction = { x: 0, y: -1 };
-    }
-    if (e.key === "ArrowDown" && direction.y === 0) {
-      e.preventDefault();
-      direction = { x: 0, y: 1 };
-    }
-    if (e.key === "ArrowLeft" && direction.x === 0) {
-      e.preventDefault();
-      direction = { x: -1, y: 0 };
-    }
-    if (e.key === "ArrowRight" && direction.x === 0) {
-      e.preventDefault();
-      direction = { x: 1, y: 0 };
+      const previousDirection = directionQueue[directionQueue.length - 1] ?? direction;
+      if (
+        directionQueue.length < 2 &&
+        requestedDirection.x !== -previousDirection.x &&
+        requestedDirection.y !== -previousDirection.y
+      ) {
+        directionQueue.push(requestedDirection);
+      }
     }
     if (e.key === "Escape") endGame();
   }
@@ -68,6 +81,8 @@ function startSnakeGame() {
       return;
     }
 
+    if (directionQueue.length) direction = directionQueue.shift();
+
     // Move snake
     const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
     snake.unshift(head);
@@ -76,6 +91,10 @@ function startSnakeGame() {
     if (head.x === food.x && head.y === food.y) {
       score++;
       food = randomFood();
+      if (!food) {
+        gameOver();
+        return;
+      }
     } else {
       snake.pop();
     }
