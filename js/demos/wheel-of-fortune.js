@@ -62,8 +62,22 @@ const WF = {
   testOffsets: [-3, -2, -1, 0, 1],
 
   maskGrid: 40, // the study's masks are a 40x40 random matrix rendered large
-  wheelOuter: 150,
-  wheelInner: 58,
+
+  /*
+   * The response wheel is a two-ring annulus divided into nine cells by radial
+   * lines, with a numeral inside each cell. The answer is logged the moment the
+   * cursor's distance from centre crosses the INNER ring; the crossing angle
+   * picks the cell. Nothing is clicked.
+   *
+   * The study ran at 1920x1080, 60 cm away: outer radius 520 px, inner 400 px,
+   * so the band is 120 px and the glyphs are 100 px. The ratio 400/520 = 0.769
+   * is preserved here at demo scale.
+   */
+  wheelSize: 400,
+  wheelOuter: 190,
+  wheelInner: 146,
+  wheelGlyphRadius: 168, // mid-band, where the numerals sit
+  homeRadius: 22, // the cursor must return inside this to arm the next trial
 };
 
 /*
@@ -159,23 +173,42 @@ const demoHtml = `
     font-size: 0.72rem; letter-spacing: 0.04em; opacity: 0.8;
   }
 
-  .wf-wheel { position: relative; width: 360px; height: 360px; }
+  .wf-wheel {
+    position: relative; width: ${WF.wheelSize}px; height: ${WF.wheelSize}px;
+    cursor: crosshair; user-select: none; touch-action: none;
+  }
+  /* The cursor rests dead centre, exactly where the stimulus appears. Leaving
+     an arrow sitting on a near-threshold noisy glyph would be a cue in its own
+     right, so it is hidden for the presentation and restored with the answer. */
+  .wf-wheel.wf-nocursor { cursor: none; }
   .wf-canvas {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     width: 110px; height: 110px; image-rendering: pixelated;
   }
-  .wf-sector {
-    position: absolute; width: 54px; height: 54px; transform: translate(-50%, -50%);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px; line-height: 1; cursor: pointer; user-select: none;
-    background: #9a9a9a; color: #111; border: 2px solid #6e6e6e; border-radius: 6px;
-    visibility: hidden; padding: 0;
+  /* The wheel is on screen for the whole session, as in the original — it is
+     not revealed per trial. Only whether a crossing counts changes. */
+  .wf-rings { position: absolute; inset: 0; }
+  .wf-ring { fill: none; stroke: #5f5f5f; stroke-width: 2; }
+  .wf-spoke { stroke: #5f5f5f; stroke-width: 2; }
+  .wf-cell { fill: #8d8d8d; }
+  .wf-cell.wf-correct { fill: #9ed3ab; }
+  .wf-cell.wf-wrong { fill: #e0aaa2; }
+
+  .wf-glyph {
+    position: absolute; transform: translate(-50%, -50%);
+    font-size: 30px; line-height: 1; color: #111;
+    pointer-events: none;
   }
-  .wf-sector.wf-shown { visibility: visible; }
-  .wf-sector:hover { background: #b4b4b4; }
-  .wf-sector.wf-correct { border-color: #1f9d3c; background: #bfe8c8; }
-  .wf-sector.wf-wrong { border-color: #c0392b; background: #f0c2bc; }
-  .wf-sector canvas { width: 40px; height: 40px; display: block; }
+  .wf-glyph canvas { width: 36px; height: 36px; display: block; }
+
+  .wf-home {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: ${WF.homeRadius * 2}px; height: ${WF.homeRadius * 2}px;
+    border-radius: 50%; border: 2px dashed #4a4a4a;
+    display: none; align-items: center; justify-content: center;
+    font-size: 22px; color: #3a3a3a; pointer-events: none;
+  }
+  .wf-home.wf-shown { display: flex; }
 
   .wf-prompt { font-size: 0.9rem; min-height: 1.3rem; text-align: center; }
 
@@ -242,7 +275,9 @@ const demoHtml = `
   <div class="wf-stage">
     <div class="wf-status"><span id="wf-phase"></span><span id="wf-counter"></span></div>
     <div class="wf-wheel" id="wf-wheel">
+      <svg class="wf-rings" id="wf-rings" viewBox="0 0 ${WF.wheelSize} ${WF.wheelSize}"></svg>
       <canvas class="wf-canvas" id="wf-canvas" width="${WF.canvas}" height="${WF.canvas}"></canvas>
+      <div class="wf-home" id="wf-home">+</div>
     </div>
     <div class="wf-prompt" id="wf-prompt"></div>
 
@@ -250,7 +285,14 @@ const demoHtml = `
       <h3>WHEEL OF FORTUNE</h3>
       <p>
         A numeral flashes for half a second, buried in noise, then a mask wipes
-        it out. You pick which one you saw from the ring of nine.
+        it out. A ring of nine appears, and you answer by
+        <strong>moving the cursor out through the numeral you saw</strong> — the
+        answer is taken the moment you cross the inner circle. Nothing is
+        clicked.
+      </p>
+      <p>
+        Between trials the cursor comes back to the cross in the middle, so
+        every trial starts from the same place.
       </p>
       <p>
         You will get plenty wrong — that is the point. <strong>Which</strong>
@@ -283,14 +325,15 @@ const demoHtml = `
     <h4>How this differs from the study</h4>
     <ul>
       <li><strong>Length.</strong> One set, tens of trials. Participants did four 90-minute sessions, one per set: 135 calibration trials then 1,170 test trials, each.</li>
-      <li><strong>Response.</strong> Click a sector. The original logged the answer the moment the cursor crossed the inner circle, recording the full mouse path.</li>
+      <li><strong>Response.</strong> Cursor-crossing, as in the original &mdash; though the original also recorded the full mouse path, which this does not.</li>
       <li><strong>Glyphs.</strong> Rendered live from fonts on your machine. The study used fixed 221&times;221 pixel images, so the exact shapes depend on what you have installed.</li>
       <li><strong>Model fit.</strong> Townsend's closed-form estimator, which is what the study used to <em>initialise</em> its fit before a differential-evolution search over 45 parameters &mdash; too much to ask of a few dozen trials.</li>
       <li><strong>Nothing is recorded.</strong> Everything is computed in your browser and discarded.</li>
     </ul>
     <p>
       The trial timing, the noise and mask construction, the 2-up-1-down
-      contrast staircase and the nine-item sets are the study's.
+      contrast staircase, the nine-item sets and the two-ring response wheel
+      with its cursor-crossing answer are the study's.
     </p>
   </div>
 </div>
@@ -378,17 +421,44 @@ function drawMask(ctx, random = Math.random) {
  * comparing each glyph's advance width against a codepoint nothing defines: if
  * they match, the font is falling back.
  */
-function glyphsRenderable(ctx, set) {
+function glyphsRenderable(set) {
   if (set.kind !== "text") return true;
-  ctx.save();
-  ctx.font = `48px ${set.font}`;
-  const missing = ctx.measureText("\u{10FFFD}").width;
-  const ok = set.glyphs.every((glyph) => {
-    const width = ctx.measureText(glyph).width;
-    return width > 0 && Math.abs(width - missing) > 0.01;
+
+  const probe = document.createElement("canvas");
+  probe.width = 64;
+  probe.height = 64;
+  const ctx = probe.getContext("2d");
+
+  /*
+   * Compare the rendered pixels, not the advance width. Width comparison looks
+   * tempting and is wrong: measured in Firefox here, .notdef is 31px wide while
+   * the Arabic digits run 19.5-29.6, and one of them collides. Tofu renders
+   * identically for every missing codepoint, so an exact pixel match against a
+   * codepoint nothing defines is the reliable test.
+   */
+  const inkFor = (text) => {
+    ctx.clearRect(0, 0, 64, 64);
+    ctx.fillStyle = "#000";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `40px ${set.font}`;
+    ctx.fillText(text, 32, 32);
+    const data = ctx.getImageData(0, 0, 64, 64).data;
+    let ink = 0;
+    let signature = "";
+    for (let i = 3; i < data.length; i += 4) {
+      const on = data[i] > 10 ? 1 : 0;
+      ink += on;
+      signature += on;
+    }
+    return { ink, signature };
+  };
+
+  const missing = inkFor("\u{10FFFD}");
+  return set.glyphs.every((glyph) => {
+    const drawn = inkFor(glyph);
+    return drawn.ink > 0 && drawn.signature !== missing.signature;
   });
-  ctx.restore();
-  return ok;
 }
 
 function drawFixation(ctx) {
@@ -594,43 +664,170 @@ function readTrials() {
 // Wheel
 // ---------------------------------------------------------------------------
 
+const SECTOR_STEP = (Math.PI * 2) / 9;
+const SECTOR_START = -Math.PI / 2; // sector 0 sits at the top
+
+/*
+ * Which cell does this angle fall in? Cells are centred on the glyph positions,
+ * so the boundaries sit half a step either side.
+ */
+function sectorForAngle(angle) {
+  const offset = angle - SECTOR_START;
+  const index = Math.round(offset / SECTOR_STEP);
+  return ((index % 9) + 9) % 9;
+}
+
+/* An annulus wedge, as an SVG path, spanning one cell. */
+function cellPath(position) {
+  const c = WF.wheelSize / 2;
+  const mid = SECTOR_START + position * SECTOR_STEP;
+  const from = mid - SECTOR_STEP / 2;
+  const to = mid + SECTOR_STEP / 2;
+  const pt = (radius, angle) =>
+    `${c + Math.cos(angle) * radius} ${c + Math.sin(angle) * radius}`;
+  return [
+    `M ${pt(WF.wheelInner, from)}`,
+    `A ${WF.wheelInner} ${WF.wheelInner} 0 0 1 ${pt(WF.wheelInner, to)}`,
+    `L ${pt(WF.wheelOuter, to)}`,
+    `A ${WF.wheelOuter} ${WF.wheelOuter} 0 0 0 ${pt(WF.wheelOuter, from)}`,
+    "Z",
+  ].join(" ");
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
 function buildWheel(setKey) {
   const set = SETS[setKey];
-  for (const old of Array.from(els.wheel.querySelectorAll(".wf-sector"))) old.remove();
+  for (const old of Array.from(els.wheel.querySelectorAll(".wf-glyph"))) old.remove();
+  els.rings.innerHTML = "";
 
-  // The study shuffled which numeral sat in which sector, per session.
+  // The study shuffled which numeral sat in which cell, per session.
   run.wheelOrder = shuffled(set.glyphs.map((_, i) => i));
 
-  const step = (Math.PI * 2) / 9;
+  const c = WF.wheelSize / 2;
+  const svg = (tag, attrs) => {
+    const node = document.createElementNS(SVG_NS, tag);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, String(value));
+    return node;
+  };
+
+  // Cells first, so the ring strokes draw over their edges.
   run.wheelOrder.forEach((stimulusIndex, position) => {
-    const angle = -Math.PI / 2 + position * step;
+    const cell = svg("path", {d: cellPath(position), class: "wf-cell"});
+    cell.dataset.stimulus = String(stimulusIndex);
+    els.rings.append(cell);
+  });
+
+  els.rings.append(svg("circle", {cx: c, cy: c, r: WF.wheelInner, class: "wf-ring"}));
+  els.rings.append(svg("circle", {cx: c, cy: c, r: WF.wheelOuter, class: "wf-ring"}));
+
+  // Radial dividers on the cell boundaries, between the two rings.
+  for (let position = 0; position < 9; position++) {
+    const angle = SECTOR_START + (position + 0.5) * SECTOR_STEP;
+    els.rings.append(
+      svg("line", {
+        x1: c + Math.cos(angle) * WF.wheelInner,
+        y1: c + Math.sin(angle) * WF.wheelInner,
+        x2: c + Math.cos(angle) * WF.wheelOuter,
+        y2: c + Math.sin(angle) * WF.wheelOuter,
+        class: "wf-spoke",
+      }),
+    );
+  }
+
+  // Numerals sit inside the band, one per cell.
+  run.wheelOrder.forEach((stimulusIndex, position) => {
+    const angle = SECTOR_START + position * SECTOR_STEP;
     const node = document.createElement("div");
-    node.className = "wf-sector";
+    node.className = "wf-glyph";
     node.dataset.stimulus = String(stimulusIndex);
-    node.style.left = `${180 + Math.cos(angle) * WF.wheelOuter}px`;
-    node.style.top = `${180 + Math.sin(angle) * WF.wheelOuter}px`;
+    node.style.left = `${c + Math.cos(angle) * WF.wheelGlyphRadius}px`;
+    node.style.top = `${c + Math.sin(angle) * WF.wheelGlyphRadius}px`;
 
     if (set.kind === "dots") {
       const mini = document.createElement("canvas");
       mini.width = WF.canvas;
       mini.height = WF.canvas;
-      const ctx = mini.getContext("2d");
-      drawGlyph(ctx, set, stimulusIndex, 20);
+      drawGlyph(mini.getContext("2d"), set, stimulusIndex, 20);
       node.append(mini);
     } else {
       node.textContent = set.glyphs[stimulusIndex];
       node.style.fontFamily = set.font;
     }
-    node.addEventListener("click", () => respond(stimulusIndex));
     els.wheel.append(node);
   });
 }
 
-function showWheel(visible) {
-  for (const node of els.wheel.querySelectorAll(".wf-sector")) {
-    node.classList.toggle("wf-shown", visible);
-    node.classList.remove("wf-correct", "wf-wrong");
+/*
+ * The wheel itself never hides — it was on screen for the whole session in the
+ * original. The only thing that changes between trials is the feedback
+ * shading, and whether a crossing is being listened for at all.
+ */
+function clearCellFeedback() {
+  for (const cell of els.rings.querySelectorAll(".wf-cell")) {
+    cell.classList.remove("wf-correct", "wf-wrong");
   }
+}
+
+function showHomeCue(visible) {
+  els.home.classList.toggle("wf-shown", visible);
+}
+
+function setCursorVisible(visible) {
+  els.wheel.classList.toggle("wf-nocursor", !visible);
+}
+
+/*
+ * The only input path. `x` and `y` are pixels relative to the wheel's centre.
+ *
+ * Two jobs: while the wheel is armed, crossing the inner ring commits an
+ * answer; while waiting between trials, returning inside the home circle starts
+ * the next one. The study worked exactly this way — the answer was taken the
+ * instant the cursor passed the centre circle, and nothing was clicked.
+ */
+function pointerAt(x, y) {
+  if (!run) return;
+  const radius = Math.hypot(x, y);
+
+  if (run.waitingForHome) {
+    if (radius <= WF.homeRadius) {
+      run.waitingForHome = false;
+      showHomeCue(false);
+      els.prompt.textContent = "";
+      nextTrial();
+    }
+    return;
+  }
+
+  const trial = run.trial;
+  if (!trial || trial.closed || trial.shownAt === null) return;
+  if (radius < WF.wheelInner) return;
+
+  // The crossing angle picks a cell; which numeral is in that cell depends on
+  // this run's shuffle.
+  respond(run.wheelOrder[sectorForAngle(Math.atan2(y, x))]);
+}
+
+function onWheelPointerMove(event) {
+  const rect = els.wheel.getBoundingClientRect();
+  const scale = rect.width ? WF.wheelSize / rect.width : 1;
+  pointerAt(
+    (event.clientX - rect.left) * scale - WF.wheelSize / 2,
+    (event.clientY - rect.top) * scale - WF.wheelSize / 2,
+  );
+}
+
+/*
+ * Park the trial until the cursor comes back to the middle. This is what keeps
+ * every trial starting from the same place, which is the point of the home
+ * circle in the original.
+ */
+function waitForHome(message) {
+  run.waitingForHome = true;
+  clearCellFeedback();
+  showHomeCue(true);
+  setCursorVisible(true); // they need to see it to bring it back
+  els.prompt.textContent = message;
 }
 
 // ---------------------------------------------------------------------------
@@ -641,7 +838,7 @@ function startRun() {
   clearTimers();
   const setKey = readSet();
 
-  if (!glyphsRenderable(els.ctx, SETS[setKey])) {
+  if (!glyphsRenderable(SETS[setKey])) {
     showMissingFont(SETS[setKey]);
     return;
   }
@@ -659,12 +856,14 @@ function startRun() {
     counts: Array.from({ length: 9 }, () => new Array(9).fill(0)),
     records: [],
     trial: null,
+    waitingForHome: false,
   };
 
   els.overlay.classList.add("wf-hidden");
   els.start.textContent = "Restart";
   buildWheel(setKey);
-  nextTrial();
+  drawBlank(els.ctx);
+  waitForHome("Move the cursor to the centre to begin");
 }
 
 function phaseTotal() {
@@ -709,12 +908,15 @@ function nextTrial() {
     run.phase === "calibration" ? "Calibration — feedback on" : "Test — no feedback";
   els.counter.textContent = `${run.index + 1} / ${phaseTotal()}`;
   els.prompt.textContent = "";
-  showWheel(false);
+  clearCellFeedback();
   runSequence();
 }
 
 function runSequence() {
   const ctx = els.ctx;
+  // Hidden from here until the wheel arms, so the pointer cannot mark the
+  // stimulus location.
+  setCursorVisible(false);
   drawBlank(ctx);
   later(() => {
     drawFixation(ctx);
@@ -728,7 +930,8 @@ function runSequence() {
           drawMask(ctx);
           later(() => {
             drawBlank(ctx);
-            showWheel(true);
+
+            setCursorVisible(true);
             els.prompt.textContent = "Which did you see?";
             trial.shownAt = performance.now();
             later(onDeadline, WF.deadlineMs);
@@ -777,10 +980,10 @@ function finishTrial() {
     run.calibrationLevels.push(run.signal);
 
     // Feedback in calibration only, as the study does.
-    for (const node of els.wheel.querySelectorAll(".wf-sector")) {
-      const index = Number(node.dataset.stimulus);
-      if (index === trial.stimulus) node.classList.add("wf-correct");
-      else if (index === trial.response) node.classList.add("wf-wrong");
+    for (const cell of els.rings.querySelectorAll(".wf-cell")) {
+      const index = Number(cell.dataset.stimulus);
+      if (index === trial.stimulus) cell.classList.add("wf-correct");
+      else if (index === trial.response) cell.classList.add("wf-wrong");
     }
     els.prompt.textContent =
       trial.endedOn === "timeout" ? "Too slow" : correct ? "Correct" : "Not that one";
@@ -791,10 +994,14 @@ function finishTrial() {
   run.records.push(trial);
   const hold = trial.phase === "calibration" ? WF.feedbackMs : WF.itiMs;
   later(() => {
-    showWheel(false);
-    els.prompt.textContent = "";
     run.index += 1;
-    nextTrial();
+    // At a phase boundary nextTrial shows the handover or the summary; there is
+    // nothing to home for.
+    if (run.index >= phaseTotal()) {
+      nextTrial();
+      return;
+    }
+    waitForHome("Back to the middle for the next one");
   }, hold);
 }
 
@@ -821,7 +1028,7 @@ function showMissingFont(set) {
 
 function showCalibrationOver() {
   clearTimers();
-  showWheel(false);
+  clearCellFeedback();
   drawBlank(els.ctx);
   els.overlay.innerHTML = `
     <h3>CALIBRATION DONE</h3>
@@ -836,7 +1043,7 @@ function showCalibrationOver() {
   els.overlay.classList.remove("wf-hidden");
   document.getElementById("wf-continue").addEventListener("click", () => {
     els.overlay.classList.add("wf-hidden");
-    nextTrial();
+    waitForHome("Move the cursor to the centre to begin");
   });
 }
 
@@ -887,7 +1094,7 @@ function renderMap(coords, set) {
 
 function showSummary() {
   clearTimers();
-  showWheel(false);
+  clearCellFeedback();
   drawBlank(els.ctx);
 
   const { counts, records, set } = run;
@@ -982,6 +1189,8 @@ function boot() {
     trials: document.getElementById("wf-trials"),
     start: document.getElementById("wf-start"),
     wheel: document.getElementById("wf-wheel"),
+    rings: document.getElementById("wf-rings"),
+    home: document.getElementById("wf-home"),
     canvas: document.getElementById("wf-canvas"),
     phase: document.getElementById("wf-phase"),
     counter: document.getElementById("wf-counter"),
@@ -995,6 +1204,9 @@ function boot() {
 
   drawBlank(els.ctx);
   els.start.addEventListener("click", startRun);
+  els.wheel.addEventListener("mousemove", onWheelPointerMove);
+  // Touch has no hover, so a drag across the ring does the same job.
+  els.wheel.addEventListener("pointermove", onWheelPointerMove);
 }
 
 boot();
