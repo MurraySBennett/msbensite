@@ -50,11 +50,11 @@ async function startGame(t, powerupIndex = 0, mobile = false) {
       const rows = Math.floor(canvas.height / 16);
       if (call <= 4 || call === 7 || (call >= 9 && call <= 13)) {
         const foodCall = call <= 4 ? call : call === 7 ? 6 : call - 3;
-        const emptyCells = columns * rows - (foodCall + 1);
-        return (5 * columns + 5.5) / emptyCells;
+        const emptyCells = (columns - 2) * (rows - 2) - (foodCall + 1);
+        return (4 * (columns - 2) + 4.5) / emptyCells;
       }
       if (call === 5) return (chosenPowerup + 0.1) / 9;
-      if (call === 6) return (5 * columns + 5.5) / (columns * rows - 6);
+      if (call === 6) return (4 * (columns - 2) + 4.5) / ((columns - 2) * (rows - 2) - 6);
       return 0.25;
     };
     window.__snakeRunLoop = () => {
@@ -167,7 +167,7 @@ test('portal pickup pauses for placement and exposes the two countdown phases', 
   await reachPowerupThreshold(page);
   await collectAvailablePowerup(page);
   assert.match(await page.locator('.powerup-slot').nth(portalIndex).getAttribute('aria-label'), /Lemon: Place A \+ B/);
-  assert.match(await page.locator('.snake-inventory .powerup-timer').innerText(), /8/);
+  assert.match(await page.locator('.snake-inventory .powerup-timer').innerText(), /16/);
 
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowLeft');
