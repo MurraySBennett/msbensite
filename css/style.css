@@ -678,12 +678,12 @@ body.konami-mode::before {
   position: relative;
   border-radius: 0.75rem;
 
-  background-color: rgba(46, 43, 95, 0.75);
-  border: 0.12rem solid rgba(90, 77, 154, 0.8);
+  background-color: rgba(16, 11, 46, 0.94);
+  border: 0.12rem solid rgba(91, 206, 250, 0.65);
 
   box-shadow:
-    0 0 0.37rem rgba(123, 104, 238, 0.5),
-    0 0 0.75rem rgba(210, 145, 255, 0.4),
+    0 0 0.37rem rgba(91, 206, 250, 0.38),
+    0 0 0.75rem rgba(245, 169, 184, 0.35),
     inset 0 0 0.37rem rgba(160, 128, 255, 0.35);
 
   animation: arcadeGlow 4s ease-in-out infinite;
@@ -695,30 +695,205 @@ html:not(.game-running) #game-area {
   display: none;
 }
 
-#game-area .score-display {
-  position: absolute;
+.score-display,
+.snake-inventory .score-display {
+  position: static;
   font-family: "Press Start 2P", cursive;
-  top: 0.12rem;
-  left: 1.25rem;
-  color: lime;
-  font-size: 1.12rem;
+  text-align: center;
+  color: #f5a9b8;
+  font-size: clamp(0.55rem, 1.8vw, 0.82rem);
+  text-shadow: 0 0 0.45rem rgba(245, 169, 184, 0.8);
   pointer-events: none;
   user-select: none;
-  z-index: 10;
+}
+.top-row.snake-game-active {
+  display: grid;
+  grid-template-columns: 10.25rem 9rem minmax(26rem, 35rem);
+  align-items: stretch;
+  justify-content: start;
+  gap: 0.85rem;
+}
+.top-row.snake-game-active #pacman-container {
+  align-self: start;
+}
+.snake-inventory {
+  box-sizing: border-box;
+  width: 9rem;
+  height: 11rem;
+  min-width: 0;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+  border: 0.12rem solid rgba(245, 169, 184, 0.65);
+  border-radius: 0.75rem;
+  background: rgba(16, 11, 46, 0.94);
+  box-shadow:
+    0 0 0.37rem rgba(91, 206, 250, 0.3),
+    0 0 0.75rem rgba(245, 169, 184, 0.28),
+    inset 0 0 0.37rem rgba(160, 128, 255, 0.28);
+}
+.snake-inventory .snake-hud-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 1.8rem;
+}
+.snake-inventory .powerup-status {
+  min-height: 1rem;
+  color: #d9d0ff;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.4rem;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  user-select: none;
+}
+.snake-inventory .powerup-inventory {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 0.15rem;
+  pointer-events: none;
+}
+.snake-inventory .powerup-slot {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  opacity: 0.28;
+  transition: opacity 120ms ease, filter 120ms ease;
+}
+.snake-inventory .powerup-slot.active {
+  opacity: 1;
+  filter: drop-shadow(0 0 0.32rem rgba(245, 169, 184, 0.8));
+}
+.snake-inventory .powerup-label {
+  width: 100%;
+  min-height: 0.55rem;
+  overflow: hidden;
+  color: #d9d0ff;
+  font: 0.3rem/1.2 "Press Start 2P", cursive;
+  text-align: center;
+  white-space: nowrap;
+}
+.snake-inventory .powerup-icon-wrap {
+  position: relative;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.snake-inventory .powerup-slot.active .powerup-icon-wrap {
+  border-radius: 0.25rem;
+  background: rgba(91, 206, 250, 0.12);
+}
+.snake-inventory .powerup-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  animation: none;
+}
+.snake-inventory .powerup-count {
+  position: absolute;
+  right: -0.35rem;
+  bottom: -0.2rem;
+  min-width: 0.7rem;
+  padding: 0.12rem;
+  border-radius: 1rem;
+  background: #f5a9b8;
+  color: #100b2e;
+  font: 0.4rem/1 "Press Start 2P", cursive;
+  text-align: center;
+}
+#game-area .snake-hud-header,
+#game-area .powerup-status,
+#game-area .powerup-timer {
+  display: none;
+}
+.snake-inventory .powerup-timer {
+  display: none;
+  text-align: center;
+  color: #d9d0ff;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.5rem;
+  pointer-events: none;
+  user-select: none;
+}
+.snake-inventory .powerup-timer.active {
+  display: block;
+}
+.top-row.snake-game-active #game-area {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 35rem;
+  min-width: 0;
+  height: 18rem;
+  margin: 0;
+  padding: 0;
+  flex: none;
+}
+#game-area .score-display {
+  display: none;
+}
+#game-area .powerup-status {
+  display: none;
+}
+#game-area .powerup-timer {
+  display: none;
+}
+@media (max-width: 1000px) {
+  .top-row.snake-game-active {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 0.65rem;
+  }
+  .top-row.snake-game-active #pacman-container {
+    justify-self: center;
+  }
+  .snake-inventory {
+    width: min(100%, 35rem);
+    height: auto;
+  }
+  .snake-inventory .powerup-inventory {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(2.2rem, auto));
+    gap: 0.2rem;
+  }
+  .top-row.snake-game-active #game-area {
+    width: min(100%, 35rem);
+    height: 18rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-row.snake-game-active #game-area {
+    height: 16rem;
+  }
 }
 
 @keyframes arcadeGlow {
   0%,
   100% {
     box-shadow:
-      0 0 0.37rem rgba(123, 104, 238, 0.5),
-      0 0 0.75rem rgba(210, 145, 255, 0.4),
+      0 0 0.37rem rgba(91, 206, 250, 0.42),
+      0 0 0.75rem rgba(245, 169, 184, 0.38),
       inset 0 0 0.37rem rgba(160, 128, 255, 0.35);
   }
   50% {
     box-shadow:
-      0 0 0.75rem rgba(123, 104, 238, 0.6),
-      0 0 1.25rem rgba(210, 145, 255, 0.5),
+      0 0 0.75rem rgba(91, 206, 250, 0.52),
+      0 0 1.25rem rgba(245, 169, 184, 0.48),
       inset 0 0 0.5rem rgba(160, 128, 255, 0.4);
   }
 }
@@ -732,24 +907,24 @@ html:not(.game-running) #game-area {
   pointer-events: none;
   background-image: repeating-linear-gradient(
     0deg,
-    rgba(255, 255, 255, 0.05) 0,
-    rgba(255, 255, 255, 0.05) 1px,
+    rgba(91, 206, 250, 0.1) 0,
+    rgba(91, 206, 250, 0.1) 1px,
     transparent 1px,
     transparent 2px
   );
   z-index: 10;
   border-radius: 0.75rem;
 }
-#game-area canvas {
+#game-area > canvas {
   display: block;
-  width: calc(100% - 0.62rem);
+  width: 100%;
   height: 100%;
-  margin-left: 0.62rem;
-  background: #1c162b;
+  margin: 0;
+  background: #100b2e;
   animation: fadeIn 0.3s ease-in forwards;
 }
 
-#game-area.game-over canvas {
+#game-area.game-over > canvas {
   animation: fadeOut 0.5s ease-out forwards;
 }
 
