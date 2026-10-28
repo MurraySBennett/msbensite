@@ -43,8 +43,8 @@
 - Consumes: `window.gameActive`, `window.stopCurrentGame`, `#game-area`, and Burdle's `window.WORDY_DICT`.
 - Produces: an accessible `#burdle-trigger`; a game panel in `#game-area`; and `window.gameUsesDpad = false` while text entry is active so the existing D-pad remains available to other games.
 
-- [ ] Add the dictionary and game script to the build allowlist and homepage, and make the profile title an accessible game trigger.
-- [ ] Implement random answer selection, Burdle scoring and guess validation, the two-column compact board, the persisted hint toggle, keyboard/mobile text input, replay, close, and shared-game cleanup.
-- [ ] Add responsive game-area styling and let `dpad.js` suppress the D-pad only when a game opts out; preserve the default for existing games.
-- [ ] Build the site with `.venv/bin/python -m scripts.build_site`; run `node --check` on the new JavaScript; inspect generated HTML/assets and confirm removed clicker references are absent.
-- [ ] Update `WORK.md` with the completed outcome and remaining next step.
+- [x] Add the dictionary and game script to the build allowlist and homepage, and make the profile title an accessible game trigger.
+- [x] Implement random answer selection, Burdle scoring and guess validation, the two-column compact board, the persisted hint toggle, keyboard/mobile text input, replay, close, and shared-game cleanup.
+- [x] Add responsive game-area styling and let `dpad.js` suppress the D-pad only when a game opts out; preserve the default for existing games.
+- [x] Build the site with `.venv/bin/python -m scripts.build_site`; run `node --check` on the new JavaScript; inspect generated HTML/assets and confirm removed clicker references are absent.
+- [x] Update `WORK.md` with the completed outcome and remaining next step.

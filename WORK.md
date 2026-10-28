@@ -6,7 +6,8 @@ project: msbensite
 
 ## Now
 
-The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked.
+The compact random-word Burdle game is implemented locally per `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; build, JavaScript syntax, and generated-artifact checks pass. No deployment was made. Next: the Burdle goal is complete; continue with the existing site work below.
+The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked. Snake food placement and queued direction input are corrected locally; the cloud clicker is removed. Reflex remains a recommendation for a future Arcade link; the Arcade app is not live.
 Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
 New direction: practical public tools from simulation-based inference and Bayesian decision models for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
 Fantasy NFL human–model lineup work follows `docs/superpowers/plans/2026-09-30-fantasy-lineup-pilot.md` on `feature/fantasy-decision-tool`. Tasks 1–8 local implementation and evidence decision are complete; public promotion failed its gate with zero admissible historical weeks and no reviewed real outcome snapshot. A private 2026 Week 4 capture and 1,000-draw forecast are saved outside the repo under `~/.local/share/msbensite/fantasy-pilot/`; loopback preview serves on port 8302 with player search/filters and a direct model-advice path. Next: enter league roster/rules, freeze unaided and final choices before lock, then add reviewed outcomes after games. The route remains unlisted and noindex. Hay-window feasibility is later.
@@ -15,6 +16,9 @@ Canonical-bibliography confirmation of melanoma author order and IAT title remai
 ## Streams
 
 ### build
+- [x] 2026-10-28 — Implement the compact random-word Burdle mini-game in `#game-area` from `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; randomize the answer per start and retain no daily/custom modes. Build, syntax, generated-artifact, and read-only review checks pass; not deployed.
+- [x] 2026-10-28 — Remove the cloud clicker and its publish/style references. Recommend Arcade's one-button Reflex game as the best short-loop candidate; don't embed it while the Arcade app is undeployed and framework-bound.
+- [x] 2026-10-28 — Fix snake food spawning on occupied cells and buffer up to two ordered non-reversing turns across movement ticks.
 - [ ] now — Explore a practical public tool for nonresearch users, grounding candidates in available methods and examples rather than claiming unpublished outcomes.
 - [x] 2026-09-30 — Review and approve `docs/superpowers/specs/2026-09-30-fantasy-lineup-human-model-design.md` for a weekly real-roster recommendation and prospective unaided/model/final comparison.
 - [x] 2026-09-30 — Add case-insensitive player name/team/ID search and position/team filters to the roster setup list; hidden selected players remain selected and the visible/selected count updates.
