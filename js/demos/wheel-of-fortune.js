@@ -1,722 +1,1000 @@
-/// --- Configuration ---
-const conf = {
-  stimulusCanvasWidth: 200, // pixels
-  stimulusCanvasHeight: 200, // pixels
-  nTrialsPerBlock: 6, // Simplified: Fewer trials per block for the demo
-  nBlocks: 1, // Number of blocks
-  stimulusDisplayTime: 1000, // Duration stimulus is shown (ms)
-  maskTime: 50, // Duration mask is shown (ms)
-  maxResponseTime: 6000, // Max time to respond (ms)
+/*
+ * Wheel of Fortune — playable demo of the task from:
+ *
+ *   Garrett, P. M., Bennett, M. S., Howard, Z. L., Yang, C.-T., Little, D. R.,
+ *   & Eidels, A. (2022). Wheel of Fortune: A Cross-cultural Examination of How
+ *   Expertise Shapes the Mental Representations of Familiar and Unfamiliar
+ *   Numerals. Computational Brain & Behavior, 5(1), 45-59.
+ *   https://doi.org/10.1007/s42113-021-00122-1
+ *
+ * Participants identify a briefly-presented, noise-degraded numeral from one of
+ * four sets. The confusions they make are turned into a map of how close those
+ * numerals sit in the mind — via Luce's similarity choice model to strip out
+ * response bias, then multidimensional scaling.
+ *
+ * This demo runs a short version and fits the same model to your own answers.
+ * Session shape, trial counts and the 4-session within-subject design are not
+ * reproduced; see docs/demos/wheel-of-fortune-fidelity.md.
+ *
+ * Deliberately linear: constants, stimulus drawing, the staircase, the trial
+ * sequence, then the model, then the summary.
+ */
 
-  // Values for the central stimulus (numbers 1-9)
-  stimulusValues: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-  // Noise levels (0.0 to 1.0, higher = more noise)
-  noiseLevels: [2.2], //[0.02, 0.04, 0.06, 0.08, 0.1], // Much smaller noise levels for a subtle effect
+// ---------------------------------------------------------------------------
+// Constants, from the original Python/Pygame experiment
+// (records/honours-wheel-of-fortune/ExperimentEnglish/)
+// ---------------------------------------------------------------------------
 
-  // Mask parameters
-  maskPixelSize: 10, // Size of each pixel in the mask grid
-  // Stimulus pixelation size
-  stimulusPixelSize: 3, // Size of each "pixel" in the noisy stimulus grid
+const WF = {
+  // Trial sequence timing, in ms.
+  blankBeforeFixationMs: 250,
+  fixationMs: 500,
+  blankAfterFixationMs: 250,
+  targetMs: 500,
+  maskMs: 200,
+  deadlineMs: 8000,
+  feedbackMs: 600,
+  itiMs: 400,
+
+  canvas: 221, // the study's stimulus tifs are 221x221 px
+  background: 128, // mid grey; the glyph is drawn at the signal level
+
+  /*
+   * Gaussian pixel noise, sigma scaled by 255 * 0.5.
+   *
+   * The code and Readme in the corpus both say sigma = 0.25; the published
+   * paper reports 0.125. The code is what ran, so 0.25 it is — but the
+   * disagreement is recorded in the fidelity doc rather than quietly resolved.
+   */
+  noiseSigma: 0.25,
+  noiseScale: 255 * 0.5,
+
+  // Contrast staircase on the glyph's grey level. 2-up-1-down: two consecutive
+  // correct makes it harder, one error makes it easier.
+  signalStart: 153,
+  signalMin: 128, // equal to the background: invisible
+  signalMax: 255, // pure white on mid grey: easy
+  calibrationTrials: 15,
+  calibrationStep: 3,
+  anchorFromLast: 6,
+  // Test contrasts, relative to the calibrated anchor. The study used
+  // anchor-3 .. anchor+1.
+  testOffsets: [-3, -2, -1, 0, 1],
+
+  maskGrid: 40, // the study's masks are a 40x40 random matrix rendered large
+  wheelOuter: 150,
+  wheelInner: 58,
 };
 
-const wheelOfFortuneHtml = `
-    <style>
-        /* New container to center the entire application */
-        #main-app-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center children horizontally */
-            width: 100%; /* Take full width */
-            max-width: 900px; /* Match wheel-container's max-width for consistency */
-            margin: 20px auto; /* Center the entire app horizontally with some top/bottom margin */
-            padding: 10px; /* Add some padding around the whole app */
-            box-sizing: border-box; /* Include padding in width calculation */
-        }
+/*
+ * Nine items per set. Zero was excluded from the study "due to similarities
+ * across numeric-types", which is why every confusion matrix is 9x9.
+ */
+const SETS = {
+  arabic: {
+    label: "Arabic",
+    familiar: "familiar to most readers",
+    glyphs: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    font: '"Calibri", "Carlito", "Inter", sans-serif',
+    kind: "text",
+  },
+  chinese: {
+    label: "Chinese",
+    familiar: "familiar only if you read Chinese",
+    glyphs: ["一", "二", "三", "四", "五", "六", "七", "八", "九"],
+    font: '"DFKai-SB", "Kaiti TC", "AR PL UKai TW", "Noto Serif CJK TC", "Noto Sans CJK TC", serif',
+    kind: "text",
+  },
+  thai: {
+    label: "Thai",
+    familiar: "unfamiliar to most readers",
+    glyphs: ["๑", "๒", "๓", "๔", "๕", "๖", "๗", "๘", "๙"],
+    font: '"Noto Sans Thai", "Tlwg Typo", "Garuda", "Calibri", sans-serif',
+    kind: "text",
+  },
+  dots: {
+    label: "Dots",
+    familiar: "non-symbolic — quantity without a symbol",
+    glyphs: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    kind: "dots",
+  },
+};
 
-        #wheel-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background-color: #fffacd; /* Lemon Chiffon */
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            width: 100%; /* Take full width of its parent (#main-app-container) */
-            margin: 0; /* Remove auto margin here, parent handles centering */
-            position: relative; /* For absolute positioning of overlays and buttons */
-            min-height: 600px; /* Ensure enough space for the canvases */
-            border-radius: 0; /* Make edges square */
-            border: 4px solid #FFD700; /* Outer orange border */
-            box-shadow: 0 0 0 4px #FFA500, /* Inner yellow panel */
-                        0 0 0 8px rgb(255, 77, 0); /* Outer red panel (extends beyond the yellow) */
-        }
+/*
+ * Playing-card dot layouts on a 3x3 grid, as the study used. 8 and 9 are
+ * "slightly altered to fit" in the original; these follow the same idea.
+ * Each entry lists [column, row] cells, 0-2.
+ */
+const DOT_LAYOUTS = {
+  1: [[1, 1]],
+  2: [[0, 0], [2, 2]],
+  3: [[0, 0], [1, 1], [2, 2]],
+  4: [[0, 0], [2, 0], [0, 2], [2, 2]],
+  5: [[0, 0], [2, 0], [1, 1], [0, 2], [2, 2]],
+  6: [[0, 0], [2, 0], [0, 1], [2, 1], [0, 2], [2, 2]],
+  7: [[0, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [2, 2]],
+  8: [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1], [0, 2], [1, 2], [2, 2]],
+  9: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]],
+};
 
-        #trial-info {
-            font-family: 'Press Start 2P', cursive;
-            color: #6a5acd;
-            font-size: 1.2em;
-            margin-bottom: 20px; /* Space below trial info */
-            text-align: center;
-            width: 100%; /* Occupy full width within its parent */
-            padding: 10px 0; /* Add some padding for visual separation */
-        }
+// ---------------------------------------------------------------------------
+// Markup
+// ---------------------------------------------------------------------------
 
-        #stimulus-canvas {
-            border: 2px solid #4682B4; /* SteelBlue border */
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            background-color: white; /* Ensure a white background for drawing */
-            /* Added fluid sizing for responsiveness */
-            max-width: 90%;
-            height: auto;
-        }
+const demoHtml = `
+<style>
+  .wf-wrap {
+    display: flex; flex-direction: column; gap: 0.9rem; align-items: center;
+    width: 100%; max-width: 880px; margin: 0 auto; font-family: 'Inter', sans-serif;
+  }
+  .wf-controls {
+    display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem;
+    align-items: flex-end; justify-content: center; width: 100%;
+  }
+  .wf-field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .wf-field label {
+    font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7;
+  }
+  .wf-field select {
+    font: inherit; font-size: 0.85rem; padding: 0.35rem 0.5rem;
+    background: #141414; color: #f4f4f4; border: 1px solid #555;
+    border-radius: 3px; min-width: 12rem;
+  }
+  .wf-start {
+    font-family: 'Press Start 2P', cursive; font-size: 0.75rem;
+    padding: 0.7rem 1.1rem; cursor: pointer;
+    background: #FFD700; color: #1a1a1a; border: none; border-radius: 3px;
+  }
+  .wf-start:hover { background: #FFA500; }
 
-        #stimulus-canvas {
-            display: block; /* Initially visible */
-        }
+  .wf-stage {
+    position: relative; width: 100%; min-height: 440px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 1.25rem 1rem; gap: 0.6rem;
+    background: #808080; border: 1px solid #333; border-radius: 4px; color: #111;
+  }
+  .wf-status {
+    position: absolute; top: 0.6rem; left: 0.9rem; right: 0.9rem;
+    display: flex; justify-content: space-between;
+    font-size: 0.72rem; letter-spacing: 0.04em; opacity: 0.8;
+  }
 
-        /* Overlays */
-        #instructions-overlay, #completion-overlay {
-            position: absolute; /* Position relative to #wheel-container */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 250, 205, 0.95); /* Semi-transparent Lemon Chiffon */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            border-radius: 15px; /* Match container border-radius */
-        }
+  .wf-wheel { position: relative; width: 360px; height: 360px; }
+  .wf-canvas {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 110px; height: 110px; image-rendering: pixelated;
+  }
+  .wf-sector {
+    position: absolute; width: 54px; height: 54px; transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; line-height: 1; cursor: pointer; user-select: none;
+    background: #9a9a9a; color: #111; border: 2px solid #6e6e6e; border-radius: 6px;
+    visibility: hidden; padding: 0;
+  }
+  .wf-sector.wf-shown { visibility: visible; }
+  .wf-sector:hover { background: #b4b4b4; }
+  .wf-sector.wf-correct { border-color: #1f9d3c; background: #bfe8c8; }
+  .wf-sector.wf-wrong { border-color: #c0392b; background: #f0c2bc; }
+  .wf-sector canvas { width: 40px; height: 40px; display: block; }
 
-        .overlay-content {
-            background-color: #fffacd; /* Light background from your theme */
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 600px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            /* Added fluid padding for smaller screens */
-            padding: 20px;
-        }
+  .wf-prompt { font-size: 0.9rem; min-height: 1.3rem; text-align: center; }
 
-        .overlay-content h2 {
-            font-family: 'Press Start 2P', cursive;
-            color: #6a5acd;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
+  .wf-overlay {
+    position: absolute; inset: 0; overflow-y: auto;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    gap: 0.7rem; padding: 1.4rem; text-align: center;
+    background: rgba(24, 24, 28, 0.97); color: #f4f4f4;
+  }
+  .wf-overlay h3 {
+    font-family: 'Press Start 2P', cursive; font-size: 0.9rem; line-height: 1.7;
+    margin: 0 0 0.3rem; color: #FFD700;
+  }
+  .wf-overlay p { margin: 0; max-width: 38rem; font-size: 0.9rem; line-height: 1.5; }
+  .wf-warn {
+    font-size: 0.82rem; border: 1px solid #a37; border-radius: 3px;
+    padding: 0.45rem 0.7rem; max-width: 38rem; background: rgba(170,51,119,0.12);
+  }
+  .wf-hidden { display: none !important; }
 
-        .overlay-content p {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
+  .wf-matrix { border-collapse: collapse; font-size: 0.7rem; font-variant-numeric: tabular-nums; }
+  .wf-matrix th { font-weight: 600; padding: 2px 4px; opacity: 0.8; }
+  .wf-matrix td { width: 24px; height: 24px; text-align: center; border: 1px solid #333; }
 
-        .overlay-button {
-            background-color: #98fb98; /* Button color from your theme */
-            color: #fff; /* White text */
-            font-family: 'Press Start 2P', cursive;
-            padding: 12px 25px;
-            border-radius: 8px;
-            border: none;
-            text-shadow: 1px 1px 0px #000;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+  .wf-map { position: relative; width: 300px; height: 300px; border: 1px solid #444; }
+  .wf-map span {
+    position: absolute; transform: translate(-50%, -50%);
+    font-size: 17px; line-height: 1;
+  }
+  .wf-map canvas { position: absolute; transform: translate(-50%, -50%); width: 26px; height: 26px; }
 
-        .overlay-button:hover {
-            background-color: #3cb371; /* Hover color */
-            color: #fff;
-            transform: translateY(-2px);
-        }
+  .wf-stats { font-size: 0.85rem; border-collapse: collapse; }
+  .wf-stats td { padding: 0.15rem 0.6rem; }
+  .wf-stats td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
 
-        /* Styles for response buttons */
-        #response-buttons {
-            position: absolute; /* Change to absolute positioning */
-            top: 50%; /* Center vertically relative to #wheel-container */
-            left: 50%; /* Center horizontally relative to #wheel-container */
-            transform: translate(-50%, -50%); /* Adjust to truly center the container */
-            width: auto; /* Let content define width */
-            height: auto; /* Let content define height */
-            display: none; /* Still hidden until response phase */
-            z-index: 50; /* Ensure buttons are above the canvas if needed */
-        }
+  .wf-note { width: 100%; font-size: 0.82rem; line-height: 1.6; opacity: 0.85; }
+  .wf-note h4 { font-size: 0.9rem; margin: 0 0 0.3rem; }
+  .wf-note ul { margin: 0.2rem 0 0.8rem; padding-left: 1.2rem; }
+  .wf-note li { margin-bottom: 0.2rem; }
+</style>
 
-        .response-button {
-            position: absolute; /* Each button is absolutely positioned */
-            background-color: #ADD8E6; /* LightBlue */
-            color: #4682B4; /* SteelBlue */
-            font-family: 'Inter', cursive;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 2px solid #4682B4;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            min-width: 45px;
-            text-align: center;
-            transform: translate(-50%, -50%); /* Add transform to center the button on its calculated point */
-        }
-
-        .response-button:hover:not(.correct-feedback-border):not(.incorrect-feedback-border):not(.correct-answer-outline) {
-            background-color: #7B68EE; /* MediumSlateBlue */
-            color: #E0FFFF; /* LightCyan */
-            border-color: #7B68EE;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-        }
-
-        /* Feedback border styles */
-        .correct-feedback-border {
-            border: 4px solid #4CAF50 !important; /* Green */
-            padding: 8px 13px !important; /* Reduce padding by 2px on each side (top/bottom, left/right) */
-            box-shadow: 0 0 15px #4CAF50;
-        }
-
-        .incorrect-feedback-border {
-            border: 4px solid #E53935 !important; /* Red */
-            padding: 8px 13px !important; /* Reduce padding by 2px on each side (top/bottom, left/right) */
-            box-shadow: 0 0 15px #E53935;
-        }
-
-        /* Style for outlining the correct answer when an incorrect response is made */
-        .correct-answer-outline {
-            border: 4px dashed #4CAF50 !important; /* Green dashed border */
-            padding: 8px 13px !important; /* Reduce padding by 2px on each side (top/bottom, left/right) */
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); /* Subtle green glow */
-        }
-
-        /* --- New Media Query for Mobile Responsiveness --- */
-        @media (max-width: 600px) {
-            #wheel-container {
-                /* Reduce the overall border thickness to save space */
-                border: 2px solid #FFD700;
-                box-shadow: 0 0 0 2px #FFA500,
-                            0 0 0 4px rgb(255, 77, 0);
-            }
-            .overlay-content {
-                padding: 15px;
-            }
-            .overlay-content h2 {
-                font-size: 1.5em; /* Scale down headings */
-            }
-            .overlay-content p {
-                font-size: 1em; /* Scale down paragraph text */
-            }
-            .response-button {
-                min-width: 30px; /* Make buttons smaller */
-                padding: 8px 10px; /* Reduce button padding */
-                font-size: 1em; /* Reduce font size in buttons */
-            }
-        }
-    </style>
-
-    <div id="main-app-container">
-        <div id="trial-info">Trial 0 / ${conf.nTrialsPerBlock}</div> <div id="wheel-container">
-            <canvas id="stimulus-canvas" width="200" height="200"></canvas>
-
-            <div id="response-buttons">
-                </div>
-
-            <div id="instructions-overlay">
-                <div class="overlay-content">
-                    <h2>Wheel of Fortune Task Demo</h2>
-                    <p>Your task is to identify the number displayed in the center, which will be briefly shown and then masked.</p>
-                    <p>After the mask, select the number you saw by clicking the corresponding button from the wheel of buttons surrounding the display.</p>
-                    <button id="start-demo-button" class="overlay-button">Start Demo</button>
-                </div>
-            </div>
-
-            <div id="completion-overlay" style="display:none;">
-                <div class="overlay-content">
-                    <h2>Demo Complete!</h2>
-                    <p>You've completed all trials in this demonstration.</p>
-                    <p>Thanks for participating!</p>
-                    <button id="restart-demo-button" class="overlay-button">Restart Demo</button>
-                </div>
-            </div>
-        </div>
+<div class="wf-wrap">
+  <div class="wf-controls">
+    <div class="wf-field">
+      <label for="wf-set">Numeral set</label>
+      <select id="wf-set">
+        <option value="arabic" selected>Arabic — 1 2 3</option>
+        <option value="chinese">Chinese — 一 二 三</option>
+        <option value="thai">Thai — ๑ ๒ ๓</option>
+        <option value="dots">Dots — non-symbolic</option>
+      </select>
     </div>
+    <div class="wf-field">
+      <label for="wf-trials">Test trials</label>
+      <select id="wf-trials">
+        <option value="45" selected>45</option>
+        <option value="72">72</option>
+        <option value="90">90</option>
+      </select>
+    </div>
+    <button class="wf-start" id="wf-start">Start</button>
+  </div>
+
+  <div class="wf-stage">
+    <div class="wf-status"><span id="wf-phase"></span><span id="wf-counter"></span></div>
+    <div class="wf-wheel" id="wf-wheel">
+      <canvas class="wf-canvas" id="wf-canvas" width="${WF.canvas}" height="${WF.canvas}"></canvas>
+    </div>
+    <div class="wf-prompt" id="wf-prompt"></div>
+
+    <div class="wf-overlay" id="wf-overlay">
+      <h3>WHEEL OF FORTUNE</h3>
+      <p>
+        A numeral flashes for half a second, buried in noise, then a mask wipes
+        it out. You pick which one you saw from the ring of nine.
+      </p>
+      <p>
+        You will get plenty wrong — that is the point. <strong>Which</strong>
+        mistakes you make says how close two numerals sit in your head, and
+        enough of them draw a map of that mental space.
+      </p>
+      <p>
+        It starts with a short calibration that tunes the contrast to your eyes,
+        with feedback. After that the feedback stops.
+      </p>
+      <p>Pick a set above, then press <strong>Start</strong>.</p>
+    </div>
+  </div>
+
+  <div class="wf-note">
+    <h4>What was measured</h4>
+    <p>
+      Confusing a $2 price tag for $9 costs more than confusing 2 for 3, and
+      which numerals get confused depends on how well you know them. The study
+      ran this task over four sets &mdash; Arabic, Chinese, Thai and
+      non-symbolic dots &mdash; in English-speaking and Chinese-speaking
+      cohorts. Raw confusions are contaminated by response bias, a habit of
+      picking some answers more than others, so
+      <strong>Luce's similarity choice model</strong> separates bias from
+      genuine confusability; multidimensional scaling then turns what is left
+      into a map. Arabic, Chinese and Thai numerals came out arranged by
+      <em>visual</em> similarity; dots by both visual and <em>numerical</em>
+      similarity.
+    </p>
+    <h4>How this differs from the study</h4>
+    <ul>
+      <li><strong>Length.</strong> One set, tens of trials. Participants did four 90-minute sessions, one per set: 135 calibration trials then 1,170 test trials, each.</li>
+      <li><strong>Response.</strong> Click a sector. The original logged the answer the moment the cursor crossed the inner circle, recording the full mouse path.</li>
+      <li><strong>Glyphs.</strong> Rendered live from fonts on your machine. The study used fixed 221&times;221 pixel images, so the exact shapes depend on what you have installed.</li>
+      <li><strong>Model fit.</strong> Townsend's closed-form estimator, which is what the study used to <em>initialise</em> its fit before a differential-evolution search over 45 parameters &mdash; too much to ask of a few dozen trials.</li>
+      <li><strong>Nothing is recorded.</strong> Everything is computed in your browser and discarded.</li>
+    </ul>
+    <p>
+      The trial timing, the noise and mask construction, the 2-up-1-down
+      contrast staircase and the nine-item sets are the study's.
+    </p>
+  </div>
+</div>
 `;
 
-// Get the element where the demo HTML will be injected.
-let demoArea = document.getElementById("demo-area");
+// ---------------------------------------------------------------------------
+// Stimulus drawing
+// ---------------------------------------------------------------------------
 
-// Inject the HTML into the demo area.
-if (demoArea) {
-  demoArea.innerHTML = wheelOfFortuneHtml;
-} else {
-  console.error("Could not find #demo-area to inject Wheel of Fortune demo.");
+function drawGlyph(ctx, set, index, signalLevel) {
+  const size = WF.canvas;
+  ctx.save();
+  ctx.fillStyle = `rgb(${WF.background},${WF.background},${WF.background})`;
+  ctx.fillRect(0, 0, size, size);
+
+  const level = Math.round(signalLevel);
+  ctx.fillStyle = `rgb(${level},${level},${level})`;
+
+  if (set.kind === "dots") {
+    const cells = DOT_LAYOUTS[index + 1];
+    const spacing = size * 0.26;
+    const radius = size * 0.075;
+    for (const [col, row] of cells) {
+      ctx.beginPath();
+      ctx.arc(
+        size / 2 + (col - 1) * spacing,
+        size / 2 + (row - 1) * spacing,
+        radius,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    }
+  } else {
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `${Math.round(size * 0.62)}px ${set.font}`;
+    ctx.fillText(set.glyphs[index], size / 2, size / 2);
+  }
+  ctx.restore();
 }
-// --- Game State ---
-let state = {
-  currentTrialIndex: 0, // 0-indexed global trial index
-  currentBlock: 0, // 0-indexed current block
-  currentTrialInBlock: 0, // 0-indexed trial within the current block
-  responseMade: false, // Flag to prevent multiple responses per trial
-  correctStimulus: null, // The actual number displayed
-  currentNoiseLevel: null, // Noise level for the current stimulus
-  responseNumber: null, // Number selected by button
-  responseTime: null, // Time taken to respond
-  isResponding: false, // Flag to indicate if response phase is active
-  responseTimeoutId: null, // To clear the response timeout
-  mousePath: [], // For tracking mouse movement (optional, but good for analysis)
-};
 
-// --- DOM Element References ---
-let $stimulusCanvas, $stimulusCtx;
-let $trialInfo;
-let $instructionsOverlay, $completionOverlay;
-let $startDemoButton, $restartDemoButton;
-let $responseButtonsContainer; // Reference to the buttons container
-let $responseButtons = []; // Array to hold references to individual buttons
+/*
+ * Add i.i.d. Gaussian noise to every pixel. The study used sigma = 0.25 scaled
+ * by 255 * 0.5, on a mid-grey background with the glyph at the signal level.
+ */
+function addNoise(ctx, random = Math.random) {
+  const size = WF.canvas;
+  const image = ctx.getImageData(0, 0, size, size);
+  const data = image.data;
+  const sd = WF.noiseSigma * WF.noiseScale;
+  for (let i = 0; i < data.length; i += 4) {
+    // Box-Muller, one draw per pixel.
+    const u1 = Math.max(random(), 1e-12);
+    const u2 = random();
+    const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    const value = Math.max(0, Math.min(255, data[i] + z * sd));
+    data[i] = value;
+    data[i + 1] = value;
+    data[i + 2] = value;
+  }
+  ctx.putImageData(image, 0, 0);
+}
 
-// Function to initialize DOM element references and contexts after HTML is injected
-function initializeDemoElements() {
-  $stimulusCanvas = document.getElementById("stimulus-canvas");
-  $stimulusCtx = $stimulusCanvas.getContext("2d");
-  $trialInfo = document.getElementById("trial-info");
-  $instructionsOverlay = document.getElementById("instructions-overlay");
-  $completionOverlay = document.getElementById("completion-overlay");
-  $startDemoButton = document.getElementById("start-demo-button");
-  $restartDemoButton = document.getElementById("restart-demo-button");
-  $responseButtonsContainer = document.getElementById("response-buttons");
-
-  $responseButtonsContainer.innerHTML = "";
-  $responseButtons = [];
-
-  const containerRect =
-    $responseButtonsContainer.parentElement.getBoundingClientRect();
-  const containerCenterX = containerRect.width / 2;
-  const containerCenterY = containerRect.height / 2;
-  const canvasRect = $stimulusCanvas.getBoundingClientRect();
-  const buttonCircleRadius =
-    Math.max(canvasRect.width, canvasRect.height) / 2 + 80;
-  const numButtons = 9;
-  const angleIncrement = (2 * Math.PI) / numButtons;
-
-  for (let i = 0; i < numButtons; i++) {
-    const button = document.createElement("button");
-    button.classList.add("response-button");
-    button.textContent = i + 1;
-    button.dataset.value = i + 1;
-    const angle = i * angleIncrement - Math.PI / 2;
-    const buttonX =
-      containerCenterX + buttonCircleRadius * Math.cos(angle) - 240;
-    const buttonY =
-      containerCenterY + buttonCircleRadius * Math.sin(angle) - 320;
-    button.style.position = "absolute";
-    button.style.left = `${buttonX}px`;
-    button.style.top = `${buttonY}px`;
-    $responseButtonsContainer.appendChild(button);
-    $responseButtons.push(button);
+/* The study's mask: a 40x40 random matrix blown up to the stimulus size. */
+function drawMask(ctx, random = Math.random) {
+  const size = WF.canvas;
+  const cell = size / WF.maskGrid;
+  for (let row = 0; row < WF.maskGrid; row++) {
+    for (let col = 0; col < WF.maskGrid; col++) {
+      const value = Math.round(50 + (random() - 0.5) * 2 * 30);
+      const clamped = Math.max(0, Math.min(255, value * 2.2));
+      ctx.fillStyle = `rgb(${clamped},${clamped},${clamped})`;
+      ctx.fillRect(col * cell, row * cell, Math.ceil(cell), Math.ceil(cell));
+    }
   }
 }
 
-// --- Helper Functions ---
+/*
+ * Does this machine actually have a font covering the set's glyphs?
+ *
+ * The study used fixed bitmap images, so the shapes were guaranteed. Rendering
+ * live from fonts means a visitor without a Thai or CJK font sees .notdef
+ * boxes, and would be identifying tofu rather than numerals. Detect it by
+ * comparing each glyph's advance width against a codepoint nothing defines: if
+ * they match, the font is falling back.
+ */
+function glyphsRenderable(ctx, set) {
+  if (set.kind !== "text") return true;
+  ctx.save();
+  ctx.font = `48px ${set.font}`;
+  const missing = ctx.measureText("\u{10FFFD}").width;
+  const ok = set.glyphs.every((glyph) => {
+    const width = ctx.measureText(glyph).width;
+    return width > 0 && Math.abs(width - missing) > 0.01;
+  });
+  ctx.restore();
+  return ok;
+}
 
-// Helper to shuffle an array (Fisher-Yates algorithm)
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+function drawFixation(ctx) {
+  const size = WF.canvas;
+  ctx.fillStyle = `rgb(${WF.background},${WF.background},${WF.background})`;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = "#111";
+  ctx.fillRect(size / 2 - 12, size / 2 - 2, 24, 4);
+  ctx.fillRect(size / 2 - 2, size / 2 - 12, 4, 24);
+}
+
+function drawBlank(ctx) {
+  ctx.fillStyle = `rgb(${WF.background},${WF.background},${WF.background})`;
+  ctx.fillRect(0, 0, WF.canvas, WF.canvas);
+}
+
+// ---------------------------------------------------------------------------
+// Luce's similarity choice model, and MDS
+// ---------------------------------------------------------------------------
+
+/*
+ * Townsend's (1971) closed-form estimator for Luce's (1963) similarity choice
+ * model. The model is
+ *
+ *   P(respond j | show i) = b_j * eta_ij / sum_k b_k * eta_ik
+ *
+ * with eta symmetric and eta_ii = 1. Townsend's estimate separates the
+ * bias-free similarity from the response bias:
+ *
+ *   eta_ij = sqrt( p_ij * p_ji / (p_ii * p_jj) )
+ *
+ * This is exactly what f_DE_optim_Luce.m uses to initialise its chains before a
+ * differential-evolution search over all 45 parameters. The search needs far
+ * more data than a demo session provides, so the demo stops at the estimator
+ * and says so.
+ *
+ * `smoothing` adds a constant to every cell first, because any empty cell makes
+ * the ratio undefined and a short session leaves many.
+ */
+function luceSimilarity(counts, { smoothing = 0.5 } = {}) {
+  const n = counts.length;
+  const p = [];
+  for (let i = 0; i < n; i++) {
+    const row = counts[i].map((c) => c + smoothing);
+    const total = row.reduce((a, b) => a + b, 0);
+    p.push(row.map((c) => c / total));
   }
-  return array;
+
+  const eta = Array.from({ length: n }, () => new Array(n).fill(1));
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const value = Math.sqrt((p[i][j] * p[j][i]) / (p[i][i] * p[j][j]));
+      const bounded = Math.max(0, Math.min(1, value));
+      eta[i][j] = bounded;
+      eta[j][i] = bounded;
+    }
+  }
+  return eta;
 }
 
-/**
- * Draws a fixation cross on the canvas.
- * @param {CanvasRenderingContext2D} ctx The 2D rendering context.
+/*
+ * Response bias per alternative, from the same estimator: how much a person
+ * leans on answer j irrespective of what was shown. Normalised to sum to 1, as
+ * the paper does when it reports 44 free parameters rather than 45.
  */
-function drawFixationCross(ctx) {
-  const canvas = ctx.canvas;
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const crossSize = 10;
-  ctx.fillStyle = "black";
-  ctx.fillRect(centerX - crossSize, centerY - 2, crossSize * 2, 4); // Horizontal line
-  ctx.fillRect(centerX - 2, centerY - crossSize, 4, crossSize * 2); // Vertical line
+function luceBias(counts, { smoothing = 0.5 } = {}) {
+  const n = counts.length;
+  const columnTotals = new Array(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) columnTotals[j] += counts[i][j] + smoothing;
+  }
+  const total = columnTotals.reduce((a, b) => a + b, 0);
+  return columnTotals.map((c) => c / total);
 }
 
-/**
- * Draws a noisy numerical stimulus on the given canvas with subtle grayscale noise.
- * The noise affects the entire canvas, making it appear grainy, but the number remains visible.
- * @param {HTMLCanvasElement} canvas The canvas to draw on.
- * @param {CanvasRenderingContext2D} ctx The 2D rendering context.
- * @param {number} number The number to display.
- * @param {number} noiseLevel A value from 0 to 1, indicating noise intensity.
- * @param {number} pixelSize The size of each "pixel" in the final display.
- */
-function drawNoisyStimulus(canvas, ctx, number, noiseLevel, pixelSize) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+/* Jacobi eigenvalue iteration for a small symmetric matrix. */
+function jacobiEigen(matrix, { sweeps = 100 } = {}) {
+  const n = matrix.length;
+  const a = matrix.map((row) => row.slice());
+  let v = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)),
+  );
 
-  // 1. Draw the number directly onto the main canvas in pure black
-  ctx.font = `${canvas.width * 0.8}px 'Inter', cursive`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "black";
-  ctx.fillText(number.toString(), canvas.width / 2, canvas.height / 2);
+  for (let sweep = 0; sweep < sweeps; sweep++) {
+    let off = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) off += a[i][j] * a[i][j];
+    }
+    if (off < 1e-12) break;
 
-  // 2. Get the image data of the canvas *after* the number is drawn
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const pixels = imageData.data;
-
-  // 3. Apply random grayscale noise to ALL pixels (or pixel blocks)
-  for (let y = 0; y < canvas.height; y += pixelSize) {
-    for (let x = 0; x < canvas.width; x += pixelSize) {
-      // Calculate the average color of the current pixel block
-      let sumGray = 0;
-      let count = 0;
-      for (let dy = 0; dy < pixelSize; dy++) {
-        for (let dx = 0; dx < pixelSize; dx++) {
-          const currentX = x + dx;
-          const currentY = y + dy;
-          if (currentX < canvas.width && currentY < canvas.height) {
-            const pixelIndex = (currentY * canvas.width + currentX) * 4;
-            // Sum the grayscale value (average of R, G, B)
-            sumGray +=
-              (pixels[pixelIndex] +
-                pixels[pixelIndex + 1] +
-                pixels[pixelIndex + 2]) /
-              3;
-            count++;
-          }
+    for (let p = 0; p < n; p++) {
+      for (let q = p + 1; q < n; q++) {
+        if (Math.abs(a[p][q]) < 1e-15) continue;
+        const theta = (a[q][q] - a[p][p]) / (2 * a[p][q]);
+        const t =
+          Math.sign(theta || 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1));
+        const c = 1 / Math.sqrt(t * t + 1);
+        const s = t * c;
+        for (let k = 0; k < n; k++) {
+          const akp = a[k][p];
+          const akq = a[k][q];
+          a[k][p] = c * akp - s * akq;
+          a[k][q] = s * akp + c * akq;
+        }
+        for (let k = 0; k < n; k++) {
+          const apk = a[p][k];
+          const aqk = a[q][k];
+          a[p][k] = c * apk - s * aqk;
+          a[q][k] = s * apk + c * aqk;
+        }
+        for (let k = 0; k < n; k++) {
+          const vkp = v[k][p];
+          const vkq = v[k][q];
+          v[k][p] = c * vkp - s * vkq;
+          v[k][q] = s * vkp + c * vkq;
         }
       }
-      const originalGrayOfBlock = sumGray / count;
-
-      // Apply a small random grayscale noise
-      // noiseLevel (0-1) controls the *proportion* of the full grayscale range (0-255) that noise can span.
-      const noiseRange = noiseLevel * 255; // Max deviation from original color
-      const randomNoise = (Math.random() * 2 - 1) * noiseRange; // Noise from -noiseRange to +noiseRange
-
-      let finalColorValue = originalGrayOfBlock + randomNoise;
-
-      // Clamp the value to ensure it stays within 0-255
-      finalColorValue = Math.max(0, Math.min(255, finalColorValue));
-
-      // Fill the entire pixel block with the calculated final color
-      ctx.fillStyle = `rgb(${finalColorValue}, ${finalColorValue}, ${finalColorValue})`;
-      ctx.fillRect(x, y, pixelSize, pixelSize);
     }
   }
+  const values = a.map((row, i) => row[i]);
+  return { values, vectors: v };
 }
 
-/**
- * Draws a pixelated mask on the given canvas.
- * @param {HTMLCanvasElement} canvas The canvas to draw on.
- * @param {CanvasRenderingContext2D} ctx The 2D rendering context.
- * @param {number} pixelSize The size of each square pixel in the mask grid.
+/*
+ * Classical (Torgerson) multidimensional scaling into two dimensions.
+ * Dissimilarity is 1 - eta, so identical items sit on top of each other.
+ * The study used non-metric mdscale; classical is the honest simplification
+ * for nine points and it is stated on the page.
  */
-function drawPixelatedMask(canvas, ctx, pixelSize) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "white"; // Background for the mask
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+function classicalMds(eta) {
+  const n = eta.length;
+  const d2 = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => {
+      const d = 1 - eta[i][j];
+      return d * d;
+    }),
+  );
 
-  for (let x = 0; x < canvas.width; x += pixelSize) {
-    for (let y = 0; y < canvas.height; y += pixelSize) {
-      // Randomly choose black or white for each pixel block
-      ctx.fillStyle = Math.random() > 0.5 ? "black" : "white";
-      ctx.fillRect(x, y, pixelSize, pixelSize);
+  const rowMean = d2.map((row) => row.reduce((a, b) => a + b, 0) / n);
+  const grand = rowMean.reduce((a, b) => a + b, 0) / n;
+  const b = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => -0.5 * (d2[i][j] - rowMean[i] - rowMean[j] + grand)),
+  );
+
+  const { values, vectors } = jacobiEigen(b);
+  const order = values
+    .map((value, index) => ({ value, index }))
+    .sort((x, y) => y.value - x.value);
+
+  const coords = [];
+  for (let i = 0; i < n; i++) {
+    const point = [];
+    for (let k = 0; k < 2; k++) {
+      const { value, index } = order[k];
+      point.push(value > 0 ? vectors[i][index] * Math.sqrt(value) : 0);
     }
+    coords.push(point);
+  }
+  return coords;
+}
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+
+let els = {};
+let timers = [];
+let run = null;
+const DEFAULTS = { set: "arabic", trials: "45" };
+
+function clearTimers() {
+  for (const t of timers) clearTimeout(t);
+  timers = [];
+}
+
+function later(fn, ms) {
+  const t = setTimeout(fn, ms);
+  timers.push(t);
+  return t;
+}
+
+function shuffled(array) {
+  const out = array.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = out[i];
+    out[i] = out[j];
+    out[j] = tmp;
+  }
+  return out;
+}
+
+function readSet() {
+  return SETS[els.set.value] ? els.set.value : DEFAULTS.set;
+}
+
+function readTrials() {
+  const n = Number(els.trials.value);
+  return Number.isInteger(n) && n > 0 ? n : Number(DEFAULTS.trials);
+}
+
+// ---------------------------------------------------------------------------
+// Wheel
+// ---------------------------------------------------------------------------
+
+function buildWheel(setKey) {
+  const set = SETS[setKey];
+  for (const old of Array.from(els.wheel.querySelectorAll(".wf-sector"))) old.remove();
+
+  // The study shuffled which numeral sat in which sector, per session.
+  run.wheelOrder = shuffled(set.glyphs.map((_, i) => i));
+
+  const step = (Math.PI * 2) / 9;
+  run.wheelOrder.forEach((stimulusIndex, position) => {
+    const angle = -Math.PI / 2 + position * step;
+    const node = document.createElement("div");
+    node.className = "wf-sector";
+    node.dataset.stimulus = String(stimulusIndex);
+    node.style.left = `${180 + Math.cos(angle) * WF.wheelOuter}px`;
+    node.style.top = `${180 + Math.sin(angle) * WF.wheelOuter}px`;
+
+    if (set.kind === "dots") {
+      const mini = document.createElement("canvas");
+      mini.width = WF.canvas;
+      mini.height = WF.canvas;
+      const ctx = mini.getContext("2d");
+      drawGlyph(ctx, set, stimulusIndex, 20);
+      node.append(mini);
+    } else {
+      node.textContent = set.glyphs[stimulusIndex];
+      node.style.fontFamily = set.font;
+    }
+    node.addEventListener("click", () => respond(stimulusIndex));
+    els.wheel.append(node);
+  });
+}
+
+function showWheel(visible) {
+  for (const node of els.wheel.querySelectorAll(".wf-sector")) {
+    node.classList.toggle("wf-shown", visible);
+    node.classList.remove("wf-correct", "wf-wrong");
   }
 }
 
-// Updates the trial information display
-function updateTrialInfo() {
-  $trialInfo.textContent = `Trial ${state.currentTrialInBlock + 1} / ${
-    conf.nTrialsPerBlock
-  }`; // (Block ${state.currentBlock + 1} / ${conf.nBlocks})`;
+// ---------------------------------------------------------------------------
+// Trials
+// ---------------------------------------------------------------------------
+
+function startRun() {
+  clearTimers();
+  const setKey = readSet();
+
+  if (!glyphsRenderable(els.ctx, SETS[setKey])) {
+    showMissingFont(SETS[setKey]);
+    return;
+  }
+
+  run = {
+    setKey,
+    set: SETS[setKey],
+    testTrials: readTrials(),
+    phase: "calibration",
+    index: 0,
+    signal: WF.signalStart,
+    consecutiveCorrect: 0,
+    calibrationLevels: [],
+    anchor: null,
+    counts: Array.from({ length: 9 }, () => new Array(9).fill(0)),
+    records: [],
+    trial: null,
+  };
+
+  els.overlay.classList.add("wf-hidden");
+  els.start.textContent = "Restart";
+  buildWheel(setKey);
+  nextTrial();
 }
 
-// --- Game Logic ---
-
-// Resets the game to its initial state
-function resetGame() {
-  state.currentTrialIndex = 0;
-  state.currentBlock = 0;
-  state.currentTrialInBlock = 0;
-  state.responseMade = false;
-  state.correctStimulus = null;
-  state.currentNoiseLevel = null;
-  state.responseNumber = null;
-  state.responseTime = null;
-  state.isResponding = false;
-  state.mousePath = [];
-
-  clearTimeout(state.responseTimeoutId); // Clear any pending timeouts
-  $stimulusCanvas.style.display = "none";
-  $responseButtonsContainer.style.display = "none"; // Hide buttons
-  $completionOverlay.style.display = "none";
-  showInstructionsOverlay();
-  updateTrialInfo(); // Reset trial info display
+function phaseTotal() {
+  return run.phase === "calibration" ? WF.calibrationTrials : run.testTrials;
 }
 
-// Shows a specific overlay
-function showOverlay(overlayElem) {
-  overlayElem.style.display = "flex";
-}
-
-// Hides a specific overlay
-function hideOverlay(overlayElem) {
-  overlayElem.style.display = "none";
-}
-
-function showInstructionsOverlay() {
-  showOverlay($instructionsOverlay);
-  hideOverlay($completionOverlay);
-  $stimulusCanvas.style.display = "none";
-  $responseButtonsContainer.style.display = "none"; // Hide buttons
-}
-
-function showCompletionOverlay() {
-  showOverlay($completionOverlay);
-  hideOverlay($instructionsOverlay);
-  $stimulusCanvas.style.display = "none";
-  //   $responseButtonsContainer.style.display = "none"; // Hide buttons
-}
-
-// Starts a new trial with pre-trial sequence (blank, fixation, blank)
-async function startTrial() {
-  console.log(
-    "startTrial() called. Current trial index:",
-    state.currentTrialIndex
-  );
-  console.log(
-    `Trial ${state.currentTrialIndex + 1}: Stimulus = ${
-      state.correctStimulus
-    }, Noise Level = ${state.currentNoiseLevel}`
-  );
-
-  if (state.currentTrialInBlock >= conf.nTrialsPerBlock) {
-    state.currentBlock++;
-    state.currentTrialInBlock = 0;
-    if (state.currentBlock >= conf.nBlocks) {
-      showCompletionOverlay();
+function nextTrial() {
+  if (run.index >= phaseTotal()) {
+    if (run.phase === "calibration") {
+      const tail = run.calibrationLevels.slice(-WF.anchorFromLast);
+      run.anchor = tail.reduce((a, b) => a + b, 0) / tail.length;
+      run.phase = "test";
+      run.index = 0;
+      showCalibrationOver();
       return;
     }
+    showSummary();
+    return;
   }
 
-  state.responseMade = false;
-  state.responseNumber = null;
-  state.responseTime = null;
-  state.isResponding = false;
-  state.mousePath = [];
-  clearTimeout(state.responseTimeoutId);
-
-  $responseButtons.forEach((button) => {
-    button.classList.remove(
-      "correct-feedback-border",
-      "incorrect-feedback-border",
-      "correct-answer-outline"
-    );
-  });
-
-  updateTrialInfo();
-
-  $stimulusCanvas.style.display = "block";
-  $responseButtonsContainer.style.display = "block";
-  let ctx = $stimulusCtx;
-
-  // Blank screen
-  ctx.clearRect(0, 0, $stimulusCanvas.width, $stimulusCanvas.height);
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, $stimulusCanvas.width, $stimulusCanvas.height);
-  await new Promise((resolve) => setTimeout(resolve, 250));
-
-  // Fixation cross
-  ctx.clearRect(0, 0, $stimulusCanvas.width, $stimulusCanvas.height);
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, $stimulusCanvas.width, $stimulusCanvas.height);
-  drawFixationCross(ctx);
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // Blank screen
-  ctx.clearRect(0, 0, $stimulusCanvas.width, $stimulusCanvas.height);
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, $stimulusCanvas.width, $stimulusCanvas.height);
-  await new Promise((resolve) => setTimeout(resolve, 250));
-
-  state.correctStimulus = shuffleArray([...conf.stimulusValues])[0];
-  state.currentNoiseLevel = shuffleArray([...conf.noiseLevels])[0];
-
-  // Phase 1: Display Noisy Stimulus
-  drawNoisyStimulus(
-    $stimulusCanvas,
-    $stimulusCtx,
-    state.correctStimulus,
-    state.currentNoiseLevel,
-    conf.stimulusPixelSize
-  );
-  console.log(
-    "Stimulus canvas displayed with number:",
-    state.correctStimulus,
-    "Noise level:",
-    state.currentNoiseLevel
-  );
-
-  await new Promise((resolve) => setTimeout(resolve, conf.stimulusDisplayTime));
-
-  // Phase 2: Display Mask
-  drawPixelatedMask($stimulusCanvas, $stimulusCtx, conf.maskPixelSize);
-  console.log("Mask displayed.");
-
-  await new Promise((resolve) => setTimeout(resolve, conf.maskTime));
-
-  // Phase 3: Response Phase
-  $responseButtonsContainer.style.display = "flex"; // Show buttons
-  console.log("Response buttons displayed.");
-
-  state.isResponding = true;
-  state.responseStartTime = performance.now();
-
-  state.responseTimeoutId = setTimeout(() => {
-    if (!state.responseMade) {
-      console.log("Trial timed out. No response.");
-      logTrialData({
-        stimulus: state.correctStimulus,
-        noise: state.currentNoiseLevel,
-        response: "timeout",
-        accuracy: "N/A",
-        rt: conf.maxResponseTime,
-        mousePath: state.mousePath,
-      });
-      endTrial();
-    }
-  }, conf.maxResponseTime);
-}
-
-// Function to handle response triggered by button click
-function handleButtonClick(event) {
-  if (!state.isResponding || state.responseMade) return; // Only process if responding and no response yet
-
-  const clickedButton = event.target;
-  const responseValue = parseInt(clickedButton.dataset.value); // Get the number from data-value
-
-  processResponse(responseValue, clickedButton);
-}
-
-// Refactored function to process the response, now called by button click
-function processResponse(responseValue, clickedButton) {
-  state.responseMade = true;
-  state.isResponding = false;
-  clearTimeout(state.responseTimeoutId); // Clear timeout as response is made
-
-  state.responseTime = performance.now() - state.responseStartTime;
-  state.responseNumber = responseValue;
-
-  const isCorrect = state.responseNumber === state.correctStimulus;
-  const accuracy = isCorrect ? 1 : 0;
-
-  // Log trial data (for demonstration purposes, output to console)
-  logTrialData({
-    stimulus: state.correctStimulus,
-    noise: state.currentNoiseLevel,
-    response: state.responseNumber,
-    accuracy: accuracy,
-    rt: state.responseTime,
-    mousePath: state.mousePath,
-  });
-
-  // Apply feedback border to the clicked button
-  if (clickedButton) {
-    if (isCorrect) {
-      clickedButton.classList.add("correct-feedback-border");
-    } else {
-      // If incorrect, apply red border to selected button
-      clickedButton.classList.add("incorrect-feedback-border");
-      // Also, apply green outline to the correct answer
-      $responseButtons.forEach((button) => {
-        if (parseInt(button.dataset.value) === state.correctStimulus) {
-          button.classList.add("correct-answer-outline"); // Changed to correct-answer-outline
-        }
-      });
-    }
-  }
-
-  // Show the mask immediately after the response
-  drawPixelatedMask($stimulusCanvas, $stimulusCtx, conf.maskPixelSize);
-
-  // After the mask, proceed to next trial
-  setTimeout(() => {
-    endTrial();
-  }, conf.maskTime);
-}
-
-// Logs trial data to the console (in a real experiment, this would be sent to a server)
-function logTrialData(data) {
-  console.log("Trial Data:", data);
-}
-
-// Ends the current trial and prepares for the next
-function endTrial() {
-  state.currentTrialIndex++;
-  state.currentTrialInBlock++;
-
-  // Clear canvases
-  $stimulusCtx.clearRect(0, 0, $stimulusCanvas.width, $stimulusCanvas.height);
-
-  // If there are more trials, start the next one after a brief delay
-  if (state.currentTrialIndex < conf.nTrialsPerBlock * conf.nBlocks) {
-    setTimeout(startTrial, 1000); // 1-second inter-trial interval
+  const stimulus = Math.floor(Math.random() * 9);
+  let signal;
+  if (run.phase === "calibration") {
+    signal = run.signal;
   } else {
-    showCompletionOverlay(); // All trials complete
+    const offset = WF.testOffsets[Math.floor(Math.random() * WF.testOffsets.length)];
+    signal = Math.max(WF.signalMin, Math.min(WF.signalMax, run.anchor + offset));
   }
+
+  run.trial = {
+    phase: run.phase,
+    stimulus,
+    signal,
+    response: null,
+    rt: null,
+    endedOn: null,
+    shownAt: null,
+    closed: false,
+  };
+
+  els.phase.textContent =
+    run.phase === "calibration" ? "Calibration — feedback on" : "Test — no feedback";
+  els.counter.textContent = `${run.index + 1} / ${phaseTotal()}`;
+  els.prompt.textContent = "";
+  showWheel(false);
+  runSequence();
 }
 
-// --- Event Listeners ---
-function setupEventListeners() {
-  $startDemoButton.addEventListener("click", () => {
-    console.log("Start Demo button clicked.");
-    hideOverlay($instructionsOverlay);
-    console.log("Instructions overlay hidden.");
-    startTrial();
-    console.log("startTrial() called.");
-  });
-
-  $restartDemoButton.addEventListener("click", () => {
-    resetGame();
-  });
-
-  // Add click listeners to all response buttons
-  $responseButtons.forEach((button) => {
-    button.addEventListener("click", handleButtonClick);
-  });
-
-  // Global keydown listener for instructions/start
-  document.addEventListener("keydown", (event) => {
-    // Prevent default spacebar behavior (scrolling)
-    if (event.key === " ") {
-      event.preventDefault();
-    }
-
-    // If instructions are visible and space is pressed, start the demo
-    if ($instructionsOverlay.style.display === "flex" && event.key === " ") {
-      $startDemoButton.click(); // Simulate click on start button
-    }
-  });
+function runSequence() {
+  const ctx = els.ctx;
+  drawBlank(ctx);
+  later(() => {
+    drawFixation(ctx);
+    later(() => {
+      drawBlank(ctx);
+      later(() => {
+        const trial = run.trial;
+        drawGlyph(ctx, run.set, trial.stimulus, trial.signal);
+        addNoise(ctx);
+        later(() => {
+          drawMask(ctx);
+          later(() => {
+            drawBlank(ctx);
+            showWheel(true);
+            els.prompt.textContent = "Which did you see?";
+            trial.shownAt = performance.now();
+            later(onDeadline, WF.deadlineMs);
+          }, WF.maskMs);
+        }, WF.targetMs);
+      }, WF.blankAfterFixationMs);
+    }, WF.fixationMs);
+  }, WF.blankBeforeFixationMs);
 }
 
-// Main initialization sequence
-initializeDemoElements(); // Call this AFTER demoHtml is injected
+function onDeadline() {
+  if (!run || !run.trial || run.trial.closed) return;
+  run.trial.endedOn = "timeout";
+  finishTrial();
+}
 
-// Load all necessary resources before starting
-async function initDemo() {
-  try {
-    console.log("Demo ready (no external images to load).");
-    showInstructionsOverlay(); // Show instructions after everything is ready
-    setupEventListeners(); // Setup event listeners
-  } catch (error) {
-    console.error("Failed to initialize demo:", error);
-    demoArea.innerHTML = `<p style="color: red; text-align: center;">Error: Failed to load demo resources. Please try again later.</p>`;
+function respond(stimulusIndex) {
+  const trial = run && run.trial;
+  if (!trial || trial.closed || trial.shownAt === null) return;
+
+  clearTimers();
+  trial.response = stimulusIndex;
+  trial.rt = performance.now() - trial.shownAt;
+  trial.endedOn = "response";
+  finishTrial();
+}
+
+function finishTrial() {
+  const trial = run.trial;
+  trial.closed = true;
+  const correct = trial.response === trial.stimulus;
+
+  if (trial.phase === "calibration") {
+    // 2-up-1-down on the glyph's grey level: harder after two in a row,
+    // easier after any error.
+    if (trial.endedOn === "response" && correct) {
+      run.consecutiveCorrect += 1;
+      if (run.consecutiveCorrect >= 2) {
+        run.signal = Math.max(WF.signalMin, run.signal - WF.calibrationStep);
+        run.consecutiveCorrect = 0;
+      }
+    } else {
+      run.consecutiveCorrect = 0;
+      run.signal = Math.min(WF.signalMax, run.signal + WF.calibrationStep);
+    }
+    run.calibrationLevels.push(run.signal);
+
+    // Feedback in calibration only, as the study does.
+    for (const node of els.wheel.querySelectorAll(".wf-sector")) {
+      const index = Number(node.dataset.stimulus);
+      if (index === trial.stimulus) node.classList.add("wf-correct");
+      else if (index === trial.response) node.classList.add("wf-wrong");
+    }
+    els.prompt.textContent =
+      trial.endedOn === "timeout" ? "Too slow" : correct ? "Correct" : "Not that one";
+  } else if (trial.endedOn === "response") {
+    run.counts[trial.stimulus][trial.response] += 1;
   }
+
+  run.records.push(trial);
+  const hold = trial.phase === "calibration" ? WF.feedbackMs : WF.itiMs;
+  later(() => {
+    showWheel(false);
+    els.prompt.textContent = "";
+    run.index += 1;
+    nextTrial();
+  }, hold);
 }
 
-initDemo(); // Call the async initialization function
+// ---------------------------------------------------------------------------
+// Summary
+// ---------------------------------------------------------------------------
+
+function showMissingFont(set) {
+  els.overlay.innerHTML = `
+    <h3>NO FONT FOR THIS SET</h3>
+    <p>
+      Your browser has no font covering the ${set.label} numerals, so they would
+      render as empty boxes rather than glyphs. That would make the task
+      meaningless rather than hard, so it is not offered here.
+    </p>
+    <p>
+      The study sidestepped this by using fixed images; this demo renders live
+      from your installed fonts. Try the <strong>Dots</strong> set, which is
+      drawn rather than typeset, or <strong>Arabic</strong>.
+    </p>
+  `;
+  els.overlay.classList.remove("wf-hidden");
+}
+
+function showCalibrationOver() {
+  clearTimers();
+  showWheel(false);
+  drawBlank(els.ctx);
+  els.overlay.innerHTML = `
+    <h3>CALIBRATION DONE</h3>
+    <p>
+      The contrast is now tuned so you get a useful share of trials wrong — that
+      is deliberate, and it is where the information is.
+    </p>
+    <p>From here there is <strong>no feedback</strong>, as in the study.</p>
+    <p>Press <strong>Continue</strong> when ready.</p>
+    <button class="wf-start" id="wf-continue">Continue</button>
+  `;
+  els.overlay.classList.remove("wf-hidden");
+  document.getElementById("wf-continue").addEventListener("click", () => {
+    els.overlay.classList.add("wf-hidden");
+    nextTrial();
+  });
+}
+
+function renderMatrix(counts, glyphs, kind) {
+  const max = Math.max(1, ...counts.flat());
+  const label = (i) => (kind === "dots" ? String(i + 1) : glyphs[i]);
+  const header = `<tr><th></th>${counts
+    .map((_, j) => `<th>${label(j)}</th>`)
+    .join("")}</tr>`;
+  const rows = counts
+    .map((row, i) => {
+      const cells = row
+        .map((value, j) => {
+          const weight = value / max;
+          const bg =
+            i === j
+              ? `rgba(31,157,60,${0.12 + 0.75 * weight})`
+              : `rgba(224,99,58,${0.1 + 0.8 * weight})`;
+          return `<td style="background:${value ? bg : "transparent"}">${value || ""}</td>`;
+        })
+        .join("");
+      return `<tr><th>${label(i)}</th>${cells}</tr>`;
+    })
+    .join("");
+  return `<table class="wf-matrix"><tbody>${header}${rows}</tbody></table>`;
+}
+
+function renderMap(coords, set) {
+  const xs = coords.map((c) => c[0]);
+  const ys = coords.map((c) => c[1]);
+  const spanX = Math.max(...xs) - Math.min(...xs) || 1;
+  const spanY = Math.max(...ys) - Math.min(...ys) || 1;
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+
+  const items = coords
+    .map((point, i) => {
+      const left = 30 + ((point[0] - minX) / spanX) * 240;
+      const top = 30 + ((point[1] - minY) / spanY) * 240;
+      if (set.kind === "dots") {
+        return `<canvas class="wf-dotmap" data-index="${i}" style="left:${left}px;top:${top}px"></canvas>`;
+      }
+      return `<span style="left:${left}px;top:${top}px;font-family:${set.font}">${set.glyphs[i]}</span>`;
+    })
+    .join("");
+  return `<div class="wf-map">${items}</div>`;
+}
+
+function showSummary() {
+  clearTimers();
+  showWheel(false);
+  drawBlank(els.ctx);
+
+  const { counts, records, set } = run;
+  const test = records.filter((r) => r.phase === "test");
+  const answered = test.filter((r) => r.endedOn === "response");
+  const correct = answered.filter((r) => r.response === r.stimulus).length;
+  const accuracy = answered.length ? correct / answered.length : null;
+  const timeouts = test.length - answered.length;
+  const rts = answered.map((r) => r.rt);
+  const meanRt = rts.length ? rts.reduce((a, b) => a + b, 0) / rts.length : null;
+
+  const eta = luceSimilarity(counts);
+  const bias = luceBias(counts);
+  const coords = classicalMds(eta);
+
+  // How lopsided is the response bias? 1/9 each would be perfectly even.
+  const evenness = 1 / 9;
+
+  const stats = [
+    ["Test trials answered", `${answered.length} of ${test.length}`],
+    ["Correct", accuracy === null ? "–" : `${correct} (${Math.round(accuracy * 100)}%)`],
+    ["Mean response time", meanRt === null ? "–" : `${Math.round(meanRt)} ms`],
+    ["Calibrated grey level", run.anchor === null ? "–" : Math.round(run.anchor)],
+  ];
+  if (timeouts > 0) stats.push(["Timed out (8 s)", String(timeouts)]);
+  stats.push([
+    "Strongest response bias",
+    `${(Math.max(...bias) / evenness).toFixed(2)}× even`,
+  ]);
+
+  const sparse = answered.length < 36;
+  const caution = sparse
+    ? `<p class="wf-warn">
+         With ${answered.length} answered trials this map is mostly noise — nine
+         numerals need far more confusions before the structure is real. The
+         study collected 1,170 trials per person per set. Run it longer to see
+         it settle.
+       </p>`
+    : `<p class="wf-warn">
+         Even at ${answered.length} trials this is a thin sample: the study used
+         1,170 per person per set, and pooled 11 people per cohort. Treat the
+         shape as suggestive, not as a result.
+       </p>`;
+
+  els.overlay.innerHTML = `
+    <h3>YOUR CONFUSIONS</h3>
+    <p>${set.label} numerals, ${set.familiar}.</p>
+    <p>Rows are what was shown, columns what you picked. The diagonal is correct.</p>
+    ${renderMatrix(counts, set.glyphs, set.kind)}
+    <p>
+      With response bias removed by Luce's model, and the remaining similarities
+      laid out in two dimensions &mdash; near means easily confused:
+    </p>
+    ${renderMap(coords, set)}
+    <table class="wf-stats"><tbody>
+      ${stats.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}
+    </tbody></table>
+    ${caution}
+    <p>Try a set you cannot read &mdash; the map changes shape when the numerals stop being familiar.</p>
+    <p>Change the set above and press <strong>Restart</strong>.</p>
+  `;
+  els.overlay.classList.remove("wf-hidden");
+
+  // Dot maps need drawing after the markup lands.
+  if (set.kind === "dots") {
+    for (const node of els.overlay.querySelectorAll(".wf-dotmap")) {
+      node.width = WF.canvas;
+      node.height = WF.canvas;
+      drawGlyph(node.getContext("2d"), set, Number(node.dataset.index), 20);
+    }
+  }
+
+  els.phase.textContent = "";
+  els.counter.textContent = "";
+  run = null;
+}
+
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+
+function boot() {
+  const mount = document.getElementById("demo-area");
+  if (!mount) {
+    console.error("wheel-of-fortune: #demo-area not found");
+    return;
+  }
+  mount.innerHTML = demoHtml;
+
+  els = {
+    set: document.getElementById("wf-set"),
+    trials: document.getElementById("wf-trials"),
+    start: document.getElementById("wf-start"),
+    wheel: document.getElementById("wf-wheel"),
+    canvas: document.getElementById("wf-canvas"),
+    phase: document.getElementById("wf-phase"),
+    counter: document.getElementById("wf-counter"),
+    prompt: document.getElementById("wf-prompt"),
+    overlay: document.getElementById("wf-overlay"),
+  };
+  els.ctx = els.canvas.getContext("2d");
+
+  els.set.value = DEFAULTS.set;
+  els.trials.value = DEFAULTS.trials;
+
+  drawBlank(els.ctx);
+  els.start.addEventListener("click", startRun);
+}
+
+boot();

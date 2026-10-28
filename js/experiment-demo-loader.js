@@ -32,7 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // note their choice task "differed in a few important ways" from a DCE.
     },
     "wheel-of-fortune": {
-      title: "Wheel of Fortune Experiment",
+      // The paper is literally titled "Wheel of Fortune"; the task is numeral
+      // identification under noise, and the scale comes from the confusions.
+      title: "Wheel of Fortune: mapping numeral confusions",
       scriptPath: "/js/demos/wheel-of-fortune.js",
     },
     // Not "Human Teams": this demo is the human-machine arm. The human-human
