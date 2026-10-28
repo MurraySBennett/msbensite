@@ -218,12 +218,6 @@ nav ul li a.active {
   top: 0.5rem;
 }
 
-.intro-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-}
-
 a:focus-visible, button:focus-visible {
   outline: 3px solid #d46b25;
   outline-offset: 3px;
@@ -483,9 +477,6 @@ footer a {
   header #dark-mode-row {
     order: 1;
     margin-left: auto;
-  }
-  .intro-actions {
-    justify-content: center;
   }
   html:not(.game-running) .top-row {
     justify-content: center;
