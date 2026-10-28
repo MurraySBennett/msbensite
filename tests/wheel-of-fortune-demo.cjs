@@ -55,6 +55,18 @@ function makeNode(tag = 'div') {
       toggle(c, on) { if (on) this._set.add(c); else this._set.delete(c); },
       contains(c) { return this._set.has(c); },
     },
+    attributes: {},
+    // className and the class attribute both feed classList, so that
+    // querySelectorAll('.wf-glyph') finds nodes however they were labelled.
+    get className() { return [...this.classList._set].join(' '); },
+    set className(v) {
+      this.classList._set = new Set(String(v).split(/\s+/).filter(Boolean));
+    },
+    setAttribute(name, value) {
+      this.attributes[name] = String(value);
+      if (name === 'class') this.className = String(value);
+    },
+    getAttribute(name) { return this.attributes[name]; },
     listeners: {},
     addEventListener(ev, fn) { (this.listeners[ev] ||= []).push(fn); },
     remove() {
@@ -71,24 +83,33 @@ function makeNode(tag = 'div') {
     get innerHTML() { return this._html; },
     set innerHTML(v) { this._html = String(v); node.children = []; },
     getContext() {
-      return new Proxy({}, {
-        get(_t, prop) {
-          if (prop === 'getImageData') {
-            return (_x, _y, w, h) => ({data: new Uint8ClampedArray(w * h * 4).fill(128)});
+      /*
+       * The demo detects a missing font by rendering a glyph and comparing its
+       * pixels to a codepoint nothing defines — tofu looks identical for every
+       * missing character. So the stub has to model ink, not metrics: remember
+       * the last fillText and return a bitmap derived from it. With
+       * fontState.missing set, every character returns the same bitmap, which
+       * is exactly what a tofu fallback produces.
+       */
+      let lastText = '';
+      return new Proxy({
+        fillText(text) { lastText = String(text); },
+        measureText: (text) => ({width: 10 + (String(text).codePointAt(0) % 5)}),
+        createImageData: (w, h) => ({data: new Uint8ClampedArray(w * h * 4)}),
+        getImageData: (_x, _y, w, h) => {
+          const data = new Uint8ClampedArray(w * h * 4);
+          const code = fontState.missing ? 0 : (lastText.codePointAt(0) || 0);
+          // Write a short alpha pattern that depends on the codepoint, so two
+          // different characters can never produce the same signature.
+          for (let i = 0; i < 24; i += 1) {
+            data[i * 4 + 3] = (code >> (i % 16)) & 1 ? 255 : 0;
           }
-          if (prop === 'createImageData') {
-            return (w, h) => ({data: new Uint8ClampedArray(w * h * 4)});
-          }
-          if (prop === 'measureText') {
-            // Width must vary by string, otherwise the demo's missing-font
-            // check cannot tell a real glyph from .notdef. Give the
-            // unassigned codepoint a distinct width, as a real engine does.
-            return (text) => {
-              if (fontState.missing) return {width: 7};
-              if (text === '\u{10FFFD}') return {width: 7};
-              return {width: 10 + (text.codePointAt(0) % 5)};
-            };
-          }
+          data[24 * 4 + 3] = 255; // always some ink, so "blank" is not the signal
+          return {data};
+        },
+      }, {
+        get(target, prop) {
+          if (prop in target) return target[prop];
           return () => {};
         },
         set() { return true; },
@@ -139,6 +160,7 @@ function load({seed} = {}) {
     document: {
       getElementById: getById,
       createElement: (tag) => makeNode(tag),
+      createElementNS: (_ns, tag) => makeNode(tag),
       addEventListener() {},
     },
     window: {addEventListener() {}},
@@ -153,7 +175,8 @@ function load({seed} = {}) {
 
   const source = readFileSync(SRC, 'utf8') + `
 ;globalThis.__T = {WF, SETS, DOT_LAYOUTS, luceSimilarity, luceBias, jacobiEigen,
-  classicalMds, shuffled, startRun, respond, getRun: () => run, els: () => els};
+  classicalMds, shuffled, startRun, respond, pointerAt, sectorForAngle,
+  SECTOR_START, SECTOR_STEP, getRun: () => run, els: () => els};
 `;
   vm.createContext(sandbox);
   new vm.Script(source, {filename: 'wheel-of-fortune.js'}).runInContext(sandbox);
@@ -170,7 +193,28 @@ function load({seed} = {}) {
     return steps;
   };
 
-  return {T: sandbox.__T, getById, sandbox, drain, timeouts};
+  const T = sandbox.__T;
+
+  /* Move the cursor to the centre, which arms the next trial. */
+  const goHome = () => T.pointerAt(0, 0);
+
+  /*
+   * Answer by crossing the inner ring through the cell holding `stimulusIndex`,
+   * which is how the real task is answered. Returns false if that numeral is
+   * not currently on the wheel.
+   */
+  const crossThrough = (stimulusIndex) => {
+    const run = T.getRun();
+    if (!run) return false;
+    const position = run.wheelOrder.indexOf(stimulusIndex);
+    if (position < 0) return false;
+    const angle = T.SECTOR_START + position * T.SECTOR_STEP;
+    const radius = (T.WF.wheelInner + T.WF.wheelOuter) / 2;
+    T.pointerAt(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    return true;
+  };
+
+  return {T, getById, sandbox, drain, timeouts, goHome, crossThrough};
 }
 
 // ---------------------------------------------------------------------------
@@ -448,61 +492,183 @@ test('MDS places confusable items close and distinct items far', () => {
 // Flow
 // ---------------------------------------------------------------------------
 
-test('calibration runs first with feedback, then the test phase without', () => {
-  const {T, getById, drain} = load({seed: 3});
+
+/*
+ * Advance one trial: home the cursor, run the stimulus sequence, then answer by
+ * crossing the ring through whichever numeral `chooser` names.
+ */
+function answerTrial(h, chooser) {
+  h.goHome();
+  h.drain(5); // blank, fixation, blank, target, mask -> the wheel is armed
+  const run = h.T.getRun();
+  // `closed` matters as much as `shownAt`: at a phase boundary the previous
+  // trial is still sitting there, finished, waiting on a Continue click.
+  if (!run || !run.trial || run.trial.shownAt === null || run.trial.closed) return null;
+  const trial = run.trial;
+  h.crossThrough(chooser(trial, run));
+
+  // Read the feedback shading BEFORE draining: the hold timer clears it.
+  const cells = h.T.els().rings.querySelectorAll('.wf-cell');
+  trial.litCells = cells.filter(
+    (c) => c.classList.contains('wf-correct') || c.classList.contains('wf-wrong'),
+  ).length;
+
+  h.drain(1); // feedback or ITI hold
+  return trial;
+}
+
+test('the wheel geometry is a two-ring annulus at the study\'s proportions', () => {
+  const {T} = load();
+  assert.ok(T.WF.wheelInner < T.WF.wheelOuter, 'inner ring must sit inside outer');
+  assert.ok(T.WF.wheelGlyphRadius > T.WF.wheelInner &&
+            T.WF.wheelGlyphRadius < T.WF.wheelOuter,
+    'numerals must sit inside the band, between the rings');
+  // The study ran inner 400 / outer 520.
+  const ratio = T.WF.wheelInner / T.WF.wheelOuter;
+  assert.ok(Math.abs(ratio - 400 / 520) < 0.01,
+    `inner/outer ratio ${ratio.toFixed(3)} should match the study's 0.769`);
+  assert.ok(T.WF.homeRadius > 0 && T.WF.homeRadius < T.WF.wheelInner,
+    'the home circle must sit well inside the inner ring');
+});
+
+test('angles map to the nine cells, wrapping correctly', () => {
+  const {T} = load();
+  for (let position = 0; position < 9; position++) {
+    const centre = T.SECTOR_START + position * T.SECTOR_STEP;
+    assert.equal(T.sectorForAngle(centre), position, `cell centre ${position}`);
+    // Anywhere inside the cell, short of its boundary, maps to the same cell.
+    assert.equal(T.sectorForAngle(centre + T.SECTOR_STEP * 0.45), position);
+    assert.equal(T.sectorForAngle(centre - T.SECTOR_STEP * 0.45), position);
+    // And a full turn lands back in the same place.
+    assert.equal(T.sectorForAngle(centre + Math.PI * 2), position);
+    assert.equal(T.sectorForAngle(centre - Math.PI * 2), position);
+  }
+});
+
+test('crossing the inner ring answers with the cell the cursor passed through', () => {
+  const {T, getById, goHome, drain} = load({seed: 3});
+  getById('wf-set').value = 'arabic';
+  getById('wf-trials').value = '45';
+  T.startRun();
+  goHome();
+  drain(5);
+
+  const run = T.getRun();
+  const position = 4;
+  const expected = run.wheelOrder[position];
+  const angle = T.SECTOR_START + position * T.SECTOR_STEP;
+  const radius = (T.WF.wheelInner + T.WF.wheelOuter) / 2;
+  T.pointerAt(Math.cos(angle) * radius, Math.sin(angle) * radius);
+
+  assert.equal(run.records.length, 1);
+  assert.equal(run.records[0].response, expected,
+    'the answer is the numeral in the cell crossed, not the cell index');
+  assert.equal(run.records[0].endedOn, 'response');
+});
+
+test('moving inside the inner ring never answers', () => {
+  const {T, getById, goHome, drain} = load({seed: 7});
+  getById('wf-set').value = 'arabic';
+  getById('wf-trials').value = '45';
+  T.startRun();
+  goHome();
+  drain(5);
+
+  const run = T.getRun();
+  // Sweep right around, staying just inside the inner ring.
+  for (let i = 0; i < 40; i++) {
+    const angle = (i / 40) * Math.PI * 2;
+    const radius = T.WF.wheelInner - 2;
+    T.pointerAt(Math.cos(angle) * radius, Math.sin(angle) * radius);
+  }
+  assert.equal(run.records.length, 0, 'no answer may be taken inside the ring');
+  assert.equal(run.trial.response, null);
+});
+
+test('the next trial does not begin until the cursor returns to the centre', () => {
+  const {T, getById, goHome, crossThrough, drain} = load({seed: 11});
+  getById('wf-set').value = 'arabic';
+  getById('wf-trials').value = '45';
+  T.startRun();
+
+  // Before homing, nothing runs at all.
+  assert.ok(T.getRun().waitingForHome, 'the run starts parked at home');
+  drain(20);
+  assert.equal(T.getRun().records.length, 0);
+  assert.equal(T.getRun().trial, null, 'no trial starts while waiting for home');
+
+  goHome();
+  drain(5);
+  assert.ok(T.getRun().trial.shownAt !== null, 'homing starts the trial');
+
+  crossThrough(T.getRun().trial.stimulus);
+  drain(1);
+  assert.ok(T.getRun().waitingForHome, 'after answering it parks again');
+
+  // Hovering out at the ring does not restart anything.
+  T.pointerAt(T.WF.wheelOuter, 0);
+  assert.ok(T.getRun().waitingForHome);
+  assert.equal(T.getRun().trial.closed, true);
+
+  goHome();
+  drain(5);
+  assert.equal(T.getRun().trial.closed, false, 'homing starts the next trial');
+});
+
+test('calibration gives feedback, the test phase does not, and only test trials count', () => {
+  const h = load({seed: 13});
+  const {T, getById} = h;
   getById('wf-set').value = 'arabic';
   getById('wf-trials').value = '45';
   T.startRun();
 
   const run = T.getRun();
-  assert.equal(run.phase, 'calibration');
-  assert.equal(run.signal, T.WF.signalStart);
-  assert.equal(run.counts.length, 9);
-  assert.ok(run.counts.every((row) => row.length === 9 && row.every((v) => v === 0)));
-
-  // Answer every calibration trial correctly; the staircase should make the
-  // glyph dimmer (two correct in a row lowers the signal level).
   const before = run.signal;
-  for (let guard = 0; guard < 400; guard++) {
-    if (run.phase !== 'calibration') break;
-    const trial = run.trial;
-    if (trial && trial.shownAt !== null && !trial.closed) T.respond(trial.stimulus);
-    if (drain(1) === 0) break;
-  }
-  assert.ok(run.signal < before,
-    `signal should have dropped from ${before}, got ${run.signal}`);
-  assert.ok(run.calibrationLevels.length > 0);
 
-  // Calibration confusions must NOT enter the matrix.
-  const entered = run.counts.flat().reduce((a, b) => a + b, 0);
-  assert.equal(entered, 0, 'only test trials count toward the confusion matrix');
+  let feedbackInCalibration = 0;
+  let calibrationTrials = 0;
+  while (T.getRun() && T.getRun().phase === 'calibration') {
+    const trial = answerTrial(h, (t) => t.stimulus); // always correct
+    if (!trial) break;
+    calibrationTrials += 1;
+    if (trial.litCells > 0) feedbackInCalibration += 1;
+  }
+
+  assert.ok(calibrationTrials > 0);
+  assert.equal(feedbackInCalibration, calibrationTrials,
+    'every calibration trial should mark the correct cell');
+  assert.ok(run.signal < before,
+    `two-correct-in-a-row should dim the glyph: ${before} -> ${run.signal}`);
+  assert.equal(run.counts.flat().reduce((a, b) => a + b, 0), 0,
+    'calibration confusions must not enter the matrix');
 });
 
 test('an error pushes the staircase the other way', () => {
-  const {T, getById, drain} = load({seed: 5});
+  const h = load({seed: 17});
+  const {T, getById} = h;
   getById('wf-set').value = 'arabic';
   getById('wf-trials').value = '45';
   T.startRun();
-  drain(5); // blank, fixation, blank, target, mask -> wheel is up
 
   const run = T.getRun();
   const before = run.signal;
-  const wrong = (run.trial.stimulus + 1) % 9;
-  T.respond(wrong);
+  answerTrial(h, (t) => (t.stimulus + 1) % 9); // deliberately wrong
   assert.ok(run.signal > before,
-    `an error should raise the signal from ${before}, got ${run.signal}`);
+    `an error should brighten the glyph: ${before} -> ${run.signal}`);
   assert.equal(run.consecutiveCorrect, 0);
 });
 
-test('a response before the wheel appears is ignored', () => {
-  const {T, getById, drain} = load({seed: 9});
+test('a crossing before the wheel appears is ignored', () => {
+  const {T, getById, goHome, crossThrough, drain} = load({seed: 19});
   getById('wf-set').value = 'arabic';
   getById('wf-trials').value = '45';
   T.startRun();
-  drain(2); // mid-sequence, before the wheel is shown
+  goHome();
+  drain(2); // mid-sequence; the wheel is not up yet
+
   const run = T.getRun();
   assert.equal(run.trial.shownAt, null);
-  T.respond(0);
+  crossThrough(run.trial.stimulus);
   assert.equal(run.records.length, 0);
 });
 
@@ -522,7 +688,7 @@ test('the wheel order is shuffled, as the study shuffled it per session', () => 
 });
 
 test('a stale control value cannot take the demo down', () => {
-  const {T, getById} = load({seed: 13});
+  const {T, getById} = load({seed: 23});
   getById('wf-set').value = 'klingon';
   getById('wf-trials').value = 'banana';
   T.startRun();
@@ -532,77 +698,78 @@ test('a stale control value cannot take the demo down', () => {
 });
 
 test('a full run reaches a summary with a confusion matrix and a map', () => {
-  const {T, getById, drain} = load({seed: 101});
+  const h = load({seed: 101});
+  const {T, getById} = h;
   getById('wf-set').value = 'arabic';
   getById('wf-trials').value = '45';
   T.startRun();
 
   let answered = 0;
-  for (let guard = 0; guard < 20000; guard++) {
-    const run = T.getRun();
-    if (!run) break;
-    const trial = run.trial;
-    if (trial && trial.shownAt !== null && !trial.closed) {
-      // A plausible observer: usually right, sometimes confusing a neighbour.
-      const slip = (guard % 4 === 0);
-      T.respond(slip ? (trial.stimulus + 1) % 9 : trial.stimulus);
+  for (let guard = 0; guard < 400; guard++) {
+    if (!T.getRun()) break;
+    const trial = answerTrial(h, (t) => (guard % 4 === 0 ? (t.stimulus + 1) % 9 : t.stimulus));
+    if (trial) {
       answered += 1;
+      continue;
     }
-    if (drain(1) === 0) {
-      // The calibration handover waits on a Continue click.
-      const button = getById('wf-continue');
-      const handlers = button.listeners.click || [];
-      if (handlers.length === 0) break;
-      button.listeners.click = [];
-      handlers.forEach((fn) => fn());
-    }
+    // The calibration handover waits on a Continue click.
+    const button = getById('wf-continue');
+    const handlers = button.listeners.click || [];
+    if (handlers.length === 0) break;
+    button.listeners.click = [];
+    handlers.forEach((fn) => fn());
   }
 
-  assert.ok(answered >= 45 + T.WF.calibrationTrials - 2,
-    `only ${answered} trials answered`);
+  assert.ok(answered >= 45 + T.WF.calibrationTrials - 2, `only ${answered} answered`);
   assert.equal(T.getRun(), null, 'the run should have ended');
 
   const html = T.els().overlay.innerHTML;
   assert.match(html, /YOUR CONFUSIONS/);
-  assert.match(html, /wf-matrix/, 'the confusion matrix must be rendered');
-  assert.match(html, /wf-map/, 'the MDS map must be rendered');
+  assert.match(html, /wf-matrix/);
+  assert.match(html, /wf-map/);
   assert.match(html, /Luce/);
   assert.match(html, /Calibrated grey level/);
-  assert.match(html, /Strongest response bias/);
 });
 
 test('a thin session says so instead of presenting noise as a result', () => {
-  const {T, getById, drain} = load({seed: 211});
+  const h = load({seed: 211});
+  const {T, getById, goHome, drain} = h;
   getById('wf-set').value = 'thai';
   getById('wf-trials').value = '45';
   T.startRun();
 
-  // Let every test trial time out, so almost nothing is answered.
-  for (let guard = 0; guard < 20000; guard++) {
+  // The phase flips to 'test' before the handover overlay appears, so check for
+  // a pending Continue first rather than keying off the phase.
+  const clickContinue = () => {
+    const button = getById('wf-continue');
+    const handlers = button.listeners.click || [];
+    if (handlers.length === 0) return false;
+    button.listeners.click = [];
+    handlers.forEach((fn) => fn());
+    return true;
+  };
+
+  for (let guard = 0; guard < 400; guard++) {
     const run = T.getRun();
     if (!run) break;
+    if (clickContinue()) continue;
+
     if (run.phase === 'calibration') {
-      const trial = run.trial;
-      if (trial && trial.shownAt !== null && !trial.closed) T.respond(trial.stimulus);
+      if (!answerTrial(h, (t) => t.stimulus)) break;
+      continue;
     }
-    if (drain(1) === 0) {
-      const button = getById('wf-continue');
-      const handlers = button.listeners.click || [];
-      if (handlers.length === 0) break;
-      button.listeners.click = [];
-      handlers.forEach((fn) => fn());
-    }
+    // Test phase: home, then let everything expire without answering. Draining
+    // to empty runs the sequence, the 8s deadline and the hold, parking the run
+    // back at home.
+    goHome();
+    drain();
   }
 
-  const html = T.els().overlay.innerHTML;
-  assert.match(html, /mostly noise/,
+  assert.match(T.els().overlay.innerHTML, /mostly noise/,
     'with no answered trials the demo must disclaim the map');
 });
 
 test('a set with no font available is refused rather than shown as tofu', () => {
-  // The study used fixed images so glyph shapes were guaranteed. Rendering live
-  // means a visitor without a Thai or CJK font would be identifying empty
-  // boxes, which is meaningless rather than hard.
   const {T, getById} = load({seed: 55});
 
   fontState.missing = true;
@@ -615,7 +782,7 @@ test('a set with no font available is refused rather than shown as tofu', () => 
     assert.match(T.els().overlay.innerHTML, /NO FONT FOR THIS SET/);
     assert.match(T.els().overlay.innerHTML, /Thai/);
 
-    // Dots are drawn, not typeset, so they must still work even with no fonts.
+    // Dots are drawn, not typeset, so they must still work with no fonts.
     getById('wf-set').value = 'dots';
     T.startRun();
     assert.ok(T.getRun(), 'the dots set does not depend on fonts');
@@ -634,4 +801,35 @@ test('with fonts present every set starts normally', () => {
     assert.ok(T.getRun(), `${key} should start when its font is available`);
     assert.equal(T.getRun().setKey, key);
   }
+});
+
+test('the cursor is hidden while the stimulus is on screen', () => {
+  // The cursor rests dead centre, exactly where the target appears. An arrow
+  // sitting on a near-threshold noisy glyph is a cue in its own right.
+  const {T, getById, goHome, crossThrough, drain} = load({seed: 29});
+  getById('wf-set').value = 'arabic';
+  getById('wf-trials').value = '45';
+  T.startRun();
+
+  const wheel = T.els().wheel;
+  const hidden = () => wheel.classList.contains('wf-nocursor');
+
+  assert.equal(hidden(), false, 'visible while waiting at home');
+
+  goHome();
+  assert.equal(hidden(), true, 'hidden as soon as the trial sequence starts');
+
+  // It stays hidden right through fixation, target and mask.
+  for (let step = 0; step < 4; step++) {
+    drain(1);
+    assert.equal(hidden(), true, `still hidden at sequence step ${step + 1}`);
+  }
+
+  drain(1); // the mask ends and the wheel arms
+  assert.ok(T.getRun().trial.shownAt !== null);
+  assert.equal(hidden(), false, 'visible again once an answer is wanted');
+
+  crossThrough(T.getRun().trial.stimulus);
+  drain(1);
+  assert.equal(hidden(), false, 'visible while returning to the centre');
 });

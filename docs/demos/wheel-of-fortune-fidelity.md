@@ -92,10 +92,13 @@ correct makes it dimmer, one error makes it brighter, bounded 128–255. The anc
 is the mean of the last 30 calibration trials, and test contrasts are
 `anchor-3 … anchor+1`.
 
-Response is by **mouse**: the answer is logged the instant the cursor's distance
-from centre exceeds the inner radius, and the crossing angle maps to a sector.
-The nine numerals are shuffled across sectors per session. Timeouts log
-`RT = -8000`.
+Response is by **mouse**, and nothing is clicked. The wheel is a **two-ring
+annulus**, divided into nine cells by radial lines, with a numeral inside each
+cell — outer radius 520 px, inner 400 px, so the band is 120 px and the glyphs
+are 100 px. **It is on screen for the whole session, not revealed per trial.**
+The answer is logged the instant the cursor's distance from centre exceeds the
+inner radius, and the crossing angle picks the cell. The nine numerals are
+shuffled across cells per session. Timeouts log `RT = -8000`.
 
 Verbatim instructions include: *"In the following task, you will be briefly
 presented with one of nine symbols."* / *"A response is taken when the cursor
@@ -193,7 +196,9 @@ Item 4 is the one a visitor would feel: the task was not hard, it was impossible
 | Noise | Gaussian, sigma 0.25, scaled 255 × 0.5, mid-grey background |
 | Calibration | 15 trials, 2-up-1-down from 153, anchor from the last 6, then `anchor-3 … anchor+1` |
 | Feedback | Calibration only, with an explicit "feedback stops now" screen |
-| Wheel | Nine sectors, order shuffled per run |
+| Wheel | Two-ring annulus, nine cells with the numerals inside, order shuffled per run, **always on screen** |
+| Response | Cursor-crossing: moving out through a cell past the inner ring commits that numeral. Nothing is clicked |
+| Between trials | The cursor returns to a marked home circle at centre, which arms the next trial — so every trial starts from the same place |
 | Session shape | **Not reproduced.** One set, 45–90 test trials; the five differences are listed under the task |
 
 Three deliberate demo-only departures, all stated on the page:
@@ -203,16 +208,30 @@ Three deliberate demo-only departures, all stated on the page:
   search over 45 parameters from a few dozen trials would fit noise.
 - **Classical MDS rather than non-metric `mdscale`.** Nine points, and the
   simplification is named.
-- **Click a sector rather than cross the inner radius.** The original's
-  cursor-crossing logging is not worth reproducing, and the mouse path is not
-  recorded.
+- **The mouse path is not recorded.** The original logged the full trajectory;
+  only the crossing is kept here.
 
-Plus one thing the study did not need: **a missing-font guard**. The study used
-fixed images, so glyph shapes were guaranteed. Rendering live from fonts means a
-visitor without a Thai or CJK font would be identifying `.notdef` boxes — hard
-for the wrong reason. The demo measures each glyph's advance width against an
-unassigned codepoint and refuses the set with an explanation rather than showing
-tofu. Dots are drawn on canvas and so always work.
+Plus two things the study did not need.
+
+**A missing-font guard.** The study used fixed images, so glyph shapes were
+guaranteed. Rendering live from fonts means a visitor without a Thai or CJK font
+would be identifying `.notdef` boxes — hard for the wrong reason. The demo
+refuses the set with an explanation rather than showing tofu. Dots are drawn on
+canvas and so always work.
+
+> The first version of this guard compared each glyph's **advance width**
+> against an unassigned codepoint, and was wrong: measured in Firefox here,
+> `.notdef` is 31 px wide while the Arabic digits run 19.5–29.6, and one of them
+> collides — so the demo refused to run its own default set. It now compares
+> **rendered pixels**, which cannot collide, because tofu renders identically
+> for every missing character. Worth remembering as a general point: width-based
+> font detection is a coincidence away from being wrong.
+
+**The cursor is hidden during the presentation.** It rests dead centre, exactly
+where the target appears, and an arrow sitting on a near-threshold noisy glyph
+is a cue in its own right. It is hidden from the start of the trial sequence and
+restored when the answer is wanted. The original had this problem too and, as
+far as the corpus shows, did not solve it.
 
 Smoothing: `+0.5` to every cell before taking the Townsend ratio, because a short
 session leaves empty cells and the ratio is otherwise undefined. The demo also
