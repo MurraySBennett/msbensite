@@ -121,26 +121,30 @@ test('snake uses the requested colors and gives no unlock hint', async t => {
   assert.equal(before.status, '');
 });
 
-test('powerups first appear at five points without a hint and the HUD stays top-right', async t => {
+test('powerups first appear at five points without a hint and the inventory stays beside the profile', async t => {
   const page = await startGame(t);
   await page.evaluate(() => {
     for (let move = 0; move < 4; move++) window.__snakeRunLoop();
   });
   const state = await page.evaluate(() => ({
     score: document.querySelector('.score-display').textContent,
-    status: document.querySelector('.powerup-status').textContent,
-    timer: document.querySelector('.powerup-timer').textContent,
+    status: document.querySelector('.snake-inventory .powerup-status').textContent,
+    timer: document.querySelector('.snake-inventory .powerup-timer').textContent,
     game: document.querySelector('#game-area').getBoundingClientRect().toJSON(),
+    profile: document.querySelector('#pacman-container').getBoundingClientRect().toJSON(),
+    inventory: document.querySelector('.snake-inventory').getBoundingClientRect().toJSON(),
     scoreBox: document.querySelector('.score-display').getBoundingClientRect().toJSON(),
-    statusBox: document.querySelector('.powerup-status').getBoundingClientRect().toJSON(),
-    timerBox: document.querySelector('.powerup-timer').getBoundingClientRect().toJSON(),
+    statusBox: document.querySelector('.snake-inventory .powerup-status').getBoundingClientRect().toJSON(),
+    timerBox: document.querySelector('.snake-inventory .powerup-timer').getBoundingClientRect().toJSON(),
   }));
   assert.equal(state.score, 'Score: 5');
   assert.doesNotMatch(state.status, /unlock/i);
-  assert.match(state.timer, /Pickup: 5s/);
-  assert.ok(state.scoreBox.left > state.game.left + state.game.width * 0.5);
-  assert.ok(state.statusBox.left > state.game.left + state.game.width * 0.4);
-  assert.ok(state.timerBox.left > state.game.left + state.game.width * 0.4);
+  assert.equal(state.timer, '5s');
+  assert.ok(state.inventory.left >= state.profile.right - 1);
+  assert.ok(state.game.left >= state.inventory.right - 1);
+  for (const box of [state.scoreBox, state.statusBox, state.timerBox]) {
+    assert.ok(box.left >= state.inventory.left && box.right <= state.inventory.right);
+  }
 });
 
 test('an uncollected pickup expires after five seconds and starts a new randomized wait', async t => {
@@ -162,20 +166,20 @@ test('portal pickup pauses for placement and exposes the two countdown phases', 
   const page = await startGame(t, portalIndex);
   await reachPowerupThreshold(page);
   await collectAvailablePowerup(page);
-  assert.match(await page.locator('.powerup-status').innerText(), /Lemon|portal/i);
-  assert.match(await page.locator('.powerup-timer').innerText(), /8/);
+  assert.match(await page.locator('.snake-inventory .powerup-status').innerText(), /Lemon|portal/i);
+  assert.match(await page.locator('.snake-inventory .powerup-timer').innerText(), /8/);
 
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('a');
-  assert.match(await page.locator('.powerup-status').innerText(), /Choose an empty portal tile/);
+  assert.match(await page.locator('.snake-inventory .powerup-status').innerText(), /Choose an empty portal tile/);
   await page.keyboard.press('ArrowUp');
   await page.keyboard.press('ArrowUp');
   await page.keyboard.press('ArrowUp');
   await page.keyboard.press('a');
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('b');
-  assert.match(await page.locator('.powerup-timer').innerText(), /30/);
+  assert.match(await page.locator('.snake-inventory .powerup-timer').innerText(), /30/);
   await page.keyboard.press('ArrowUp');
   for (let move = 0; move < 3; move++) await page.evaluate(() => window.__snakeRunLoop());
   const exitTileBluePixels = await page.evaluate(() => {
@@ -190,7 +194,7 @@ test('portal pickup pauses for placement and exposes the two countdown phases', 
   assert.ok(exitTileBluePixels > 0, `portal exit tile only has ${exitTileBluePixels} snake pixels`);
   await page.evaluate(() => window.__snakeAdvance(30000));
   await page.evaluate(() => window.__snakeRunLoop());
-  assert.equal(await page.locator('.powerup-timer').innerText(), '');
+  assert.equal(await page.locator('.snake-inventory .powerup-timer').innerText(), '');
 });
 
 test('each fruit applies its named effect and the portal placement timeout resumes movement', async t => {
@@ -209,7 +213,7 @@ test('each fruit applies its named effect and the portal placement timeout resum
     const page = await startGame(t, type);
     await reachPowerupThreshold(page);
     await collectAvailablePowerup(page);
-    assert.match(await page.locator('.powerup-status').innerText(), expected[type], `powerup ${type}`);
+    assert.match(await page.locator('.snake-inventory .powerup-status').innerText(), expected[type], `powerup ${type}`);
     const nextSpawnDelay = await page.evaluate(() => window.__snakeTimers
       .filter(timer => !timer.cleared && timer.delay >= 10000 && timer.delay <= 30000)
       .map(timer => timer.delay));
@@ -284,7 +288,7 @@ test('each fruit applies its named effect and the portal placement timeout resum
     if (type === 8) {
       await page.evaluate(() => window.__snakeAdvance(8000));
       await page.evaluate(() => window.__snakeRunLoop());
-      assert.match(await page.locator('.powerup-status').innerText(), /timed out/i);
+      assert.match(await page.locator('.snake-inventory .powerup-status').innerText(), /timed out/i);
     }
   }
 });
@@ -299,7 +303,7 @@ test('portal endpoints can be placed with the mobile gamepad without overflowing
   await tap(page, '#right-key');
   await tap(page, '#b-key');
   const state = await page.evaluate(() => ({
-    timer: document.querySelector('.powerup-timer').textContent,
+    timer: document.querySelector('.snake-inventory .powerup-timer').textContent,
     active: document.querySelector('#virtual-gamepad').className,
     a: document.querySelector('#a-key').getBoundingClientRect().toJSON(),
     b: document.querySelector('#b-key').getBoundingClientRect().toJSON(),
