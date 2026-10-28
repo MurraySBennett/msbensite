@@ -8,6 +8,6 @@ I develop GRIN, a research tool that trains neural networks on simulated experim
 
 ## What is available
 
-The current tool supports count-based analyses and exploration of perceptual spaces. The project includes a browser interface and R/Python interfaces; the manuscript is being prepared for coauthor review.
+The current tool supports count-based analyses and exploration of perceptual spaces. The project includes a browser interface and R and Python interfaces. The paper is in preparation.
 
-[Open GRIN](https://grin.murraysbennett.com) for the tool, worked examples and validation evidence. Results should be interpreted within the model and training conditions documented there. Response-time inference is a developing extension and is not part of the current count-only capability.
+[Open GRIN](https://grin.murraysbennett.com) for the tool, worked examples and validation evidence. Results should be interpreted within the model and training conditions documented there.

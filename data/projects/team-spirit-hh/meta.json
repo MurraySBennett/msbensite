@@ -1,11 +1,11 @@
 {
   "id": "team-spirit-hh",
-  "title": "Measuring Performance in Human and Human–Machine Teams",
+  "title": "Performance in human and human-machine teams",
   "category": "Human-AI collaboration",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/team-spirit-demo.png",
   "thumbnail_alt": "Team Spirit experiment screenshot showing paddle game",
-  "summary": "Workload-capacity analysis compares team performance with an independent-player benchmark, revealing coordination costs that raw scores can miss.",
+  "summary": "Pairs of people, and people paired with an AI agent, played a custom arcade-style multiplayer game together called Team Spirit. Teams outperformed individuals, but at a cost to their overall efficiency, and that cost was larger with an AI teammate.",
   "tags": [
     "workload capacity",
     "teamwork",
@@ -21,6 +21,7 @@
   },
   "publications": [
     "bennett2025human",
-    "hedley2023relationship"
+    "hedley2023relationship",
+    "hedley2026novelBench"
   ]
 }

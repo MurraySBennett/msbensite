@@ -1,11 +1,11 @@
 {
   "id": "dutch-auction",
-  "title": "Competitive Decision Making in Dutch Auctions",
+  "title": "Competitive decision making in Dutch auctions",
   "category": "Cognitive modelling and decision science",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/dutch-auction-demo.png",
   "thumbnail_alt": "Dutch auction experiment interface screenshot",
-  "summary": "Group experiments test how a falling price shapes bidding; a preliminary prospect-theory model describes the decision to bid now or keep waiting.",
+  "summary": "In a Dutch auction the price falls over time until someone bids. Each bidder has to weigh a better price against the growing risk that someone else bids first. Groups of three bid in computer auctions, and a model of risky choice described when people bid and when they kept waiting.",
   "tags": [
     "Dutch auction",
     "decision making",

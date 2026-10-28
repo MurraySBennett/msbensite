@@ -1,11 +1,11 @@
 {
   "id": "wheel-of-fortune",
-  "title": "How Experience Shapes Numeral Recognition",
+  "title": "How experience shapes numeral recognition",
   "category": "Perception and applied vision",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/wheel-of-fortune-demo.png",
   "thumbnail_alt": "Wheel of Fortune experiment interface screenshot",
-  "summary": "Confusion patterns and cognitive models help compare the perceived similarity of familiar and unfamiliar numerals in two language groups.",
+  "summary": "English and Chinese speakers identified low-contrast Arabic, Chinese and Thai numerals. Their mistakes showed which numerals look alike to each group, and how familiarity changes that.",
   "tags": [
     "perception",
     "mental representation",

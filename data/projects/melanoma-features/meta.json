@@ -1,11 +1,11 @@
 {
   "id": "melanoma-features",
-  "title": "Measuring Perceived Features of Melanoma Images",
+  "title": "Feature perception for skin cancer identification",
   "category": "Perception and applied vision",
   "status": "under-review",
   "thumbnail": "/assets/images/project-icons/melanoma-features-demo.png",
   "thumbnail_alt": "Melanoma ABC feature rating experiment screenshot",
-  "summary": "Pairwise judgments and a perceptual model provide human feature estimates that can be compared and combined with computer-vision measurements.",
+  "summary": "People compared pairs of skin lesion images for asymmetry, border and colour. Combined with computer measurements, their judgements classified the images better than either source alone.",
   "tags": [
     "melanoma",
     "perception",
