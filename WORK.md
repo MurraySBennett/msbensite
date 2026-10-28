@@ -6,7 +6,7 @@ project: msbensite
 
 ## Now
 
-The tutorial pilot now uses Myung (2003) on MLE, matching the author's familiarity and the existing complete intro-level #001 workshop. The revised design draft at `docs/superpowers/specs/2026-10-28-mle-primer-design.md` and browser review are ready; implementation and publishing remain gated on design approval and later explicit launch.
+The MLE tutorial prototype is now authorized: source-led article left, concept-responsive sandbox right, with the paper's forgetting example represented. A local preview is requested on port 6476 for immediate feedback; no public deployment.
 The academic site and seven static project pages are live at https://murraysbennett.com; the compact Burdle game and recent snake fixes remain local. No game changes were deployed.
 The practical public research-tools direction is exploratory. The private fantasy lineup pilot remains unlisted and noindex; its next evidence step is a frozen real pregame decision and reviewed postgame outcome.
 Four experiment-demo fidelity reviews remain, with `team-spirit-hh` rebuild next; melanoma author order and IAT title still need canonical-bibliography confirmation.
@@ -14,7 +14,8 @@ Four experiment-demo fidelity reviews remain, with `team-spirit-hh` rebuild next
 ## Streams
 
 ### build
-- [ ] now — Design and build one short, open tutorial primer from Myung (2003) on maximum likelihood estimation for psychology readers with no assumed calculus background; use the pilot to shape reusable exploratory-space infrastructure. No tracking or course machinery. The revised design draft at `docs/superpowers/specs/2026-10-28-mle-primer-design.md` awaits review; implementation plan follows approval, and no publishing.
+- [ ] now — Build the first MLE tutorial page prototype for immediate feedback on port 6476. Keep Myung's source-led article in the left column and the concept-responsive exploratory/applied sandbox in the right; include the paper's full learning arc and a worked forgetting-model interaction, separating source material and our additions. No tracking or public publishing.
+- [x] 2026-10-28 — Expand the MLE design from a short primer to a source-led tutorial with Myung's forgetting-model example at its center; set the article-left/sandbox-right interaction and separate source summary, teaching explanations, and extensions. The user directed implementation and immediate browser feedback.
 - [x] 2026-10-28 — Draft the initial #004 kernel-primer design, then recommend Myung (2003) on MLE after reconsidering author familiarity; revise the design and browser review around a binomial likelihood explorer. Design awaits review before planning or implementation.
 - [x] 2026-10-28 — Implement the compact random-word Burdle mini-game in `#game-area` from `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; randomize the answer per start, show a single active row with a letter-status keyboard, and use trans-flag blue/pink synthwave feedback colors. Build, syntax, generated-artifact, and read-only review checks pass; not deployed.
 - [x] 2026-10-28 — Remove the cloud clicker and its publish/style references. Recommend Arcade's one-button Reflex game as the best short-loop candidate; don't embed it while the Arcade app is undeployed and framework-bound.
