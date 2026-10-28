@@ -6,6 +6,12 @@ project: msbensite
 
 ## Now
 
+Executing `~/.claude/plans/i-don-t-mind-if-ancient-deer.md` (research tools wave 1) on
+`feature/demos-prefix`, worktree `~/projects/.worktrees/msbensite-demos`. Phase 1 done: the
+`demos/` bucket prefix is reserved, both deleting syncs exclude it, and
+`DemosPrefixReservationTests` is the guard. Nothing pushed, nothing deployed. Next in this repo
+is Phase 5 (the `tools.html` front door from `data/tools.json`), which waits on Phases 2–4
+producing tiles.
 The compact random-word Burdle game is implemented locally per `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; the latest keyboard layout rebuild is live at local port 8303. No deployment was made.
 Snake's nine fruit powerups, persistent portal pairs, and 3×3 inventory are live on murraysbennett.com; the board is three rows shorter. GitHub checks and deployment passed, and the public Snake script and stylesheet contain the release. Next: review the live game.
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked. Snake food placement and queued direction input are corrected locally; the cloud clicker is removed. Reflex remains a recommendation for a future Arcade link; the Arcade app is not live.
@@ -15,6 +21,10 @@ Next: identify the strongest small tool and its evidence/privacy boundary before
 Canonical-bibliography confirmation of melanoma author order and IAT title remains open; the public site cites registered preprints.
 
 ## Streams
+
+### infra
+- [x] 2026-10-28 — Reserve the `demos/` S3 prefix for the interactive research tools: add `--exclude 'demos/*'` after the `--include` on both deleting `aws s3 sync` steps in `.github/workflows/deploy.yml`, so a CV update cannot wipe a published tool. Guarded by `tests/test_build_site.py::DemosPrefixReservationTests` (3 tests, RED against the old workflow, GREEN after). Python suite 8/8; `scripts/check_site.py` is unrunnable locally (no `node_modules`, and Playwright chromium is broken on this box) — CI owns it.
+- [ ] next — Phase 5 of the wave-1 plan: render `tools.html` tiles from `data/tools.json`, three sections (find out something about yourself / run your own data through it / play the experiment we ran), sector-tag filter chips, an evidence link on every tile.
 
 ### build
 - [x] 2026-10-28 — Implement the compact random-word Burdle mini-game in `#game-area` from `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; randomize the answer per start, show a single active row with a letter-status keyboard, and use trans-flag blue/pink synthwave feedback colors. Build, syntax, generated-artifact, and read-only review checks pass; not deployed.

@@ -47,16 +47,30 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+      # The `demos/` prefix on this bucket is a reserved namespace that no
+      # msbensite build ever writes to. Interactive research tools (each with
+      # its own repo and its own deploy workflow) sync into `demos/<slug>/`.
+      #
+      # Both sync steps below run with `--delete`, which deletes every bucket
+      # key the local tree does not contain -- so without these excludes, the
+      # next CV update would wipe every published tool. The exclude MUST come
+      # after the `--include` on the HTML pass: s3 filters are evaluated in
+      # order and the last match wins.
       - name: Sync HTML without browser caching
         run: |
           aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} \
-            --exclude '*' --include '*.html' \
+            --exclude '*' --include '*.html' --exclude 'demos/*' \
             --cache-control 'no-cache, no-store, must-revalidate' --delete
       - name: Sync static assets
         run: |
           aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} \
-            --exclude '*.html' \
+            --exclude '*.html' --exclude 'demos/*' \
             --cache-control 'public, max-age=3600, must-revalidate' --delete
+      # Left at '/*' deliberately. It counts as a single path against the
+      # 1,000 free invalidation paths per month, and over-invalidating a
+      # tool prefix is harmless (the edge refetches bytes that did not
+      # change). An enumerated list would silently miss a new top-level
+      # directory, which is a real breakage for no saving.
       - name: Invalidate CloudFront
         run: |
           aws cloudfront create-invalidation \

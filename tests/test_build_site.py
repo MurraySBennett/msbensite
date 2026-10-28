@@ -77,5 +77,52 @@ class BuildSiteTests(unittest.TestCase):
                 validate(out)
 
 
+class DemosPrefixReservationTests(unittest.TestCase):
+    """The `demos/` bucket prefix belongs to the interactive research tools.
+
+    Each tool lives in its own repository with its own deploy workflow and
+    syncs into `demos/<slug>/`. This site's deploy runs `aws s3 sync --delete`,
+    which removes every bucket key the local `dist/` does not contain -- so a
+    missing `--exclude 'demos/*'` means the next CV update silently deletes
+    every published tool. There is no error anywhere when that happens; the
+    tool pages simply 404. Hence a test rather than a comment.
+    """
+
+    WORKFLOW = ROOT / '.github/workflows/deploy.yml'
+
+    def _delete_sync_steps(self):
+        lines = self.WORKFLOW.read_text().splitlines()
+        steps, current = [], None
+        for line in lines:
+            if 'aws s3 sync' in line:
+                current = [line]
+            elif current is not None:
+                current.append(line)
+                if not line.rstrip().endswith('\\'):
+                    steps.append(' '.join(part.rstrip(' \\') for part in current))
+                    current = None
+        return [step for step in steps if '--delete' in step]
+
+    def test_every_deleting_sync_excludes_the_demos_prefix(self):
+        steps = self._delete_sync_steps()
+        self.assertEqual(len(steps), 2, f'expected 2 deleting syncs, found {len(steps)}: {steps}')
+        for step in steps:
+            _, found, tail = step.partition("--exclude 'demos/*'")
+            self.assertTrue(found, step)
+            # s3 filters are evaluated left to right and the last match wins,
+            # so a later `--include '*.html'` would re-admit demo HTML.
+            self.assertNotIn('--include', tail, step)
+
+    def test_build_output_never_writes_into_the_reserved_prefix(self):
+        # The repo has a source `demos/` directory, but it is documentation
+        # only (`demos/README.md`) and unrelated to the bucket prefix. If a
+        # build ever starts emitting `dist/demos/`, the excludes above would
+        # strand it un-uploaded -- a silent no-op deploy.
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp) / 'site'
+            build(ROOT, out)
+            self.assertFalse((out / 'demos').exists(), 'build emitted dist/demos/')
+
+
 if __name__ == '__main__':
     unittest.main()
