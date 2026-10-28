@@ -42,7 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
       scriptPath: "/js/demos/team-spirit-hh.js",
     },
     "mel-features": {
-      title: "Melanoma Lesion Feature Rating",
+      // Not "rating": it is a forced choice between two lesions. The scale
+      // comes from the Bradley-Terry-Luce fit, not from a rating response.
+      title: "Scaling lesion features by comparison",
       scriptPath: "/js/demos/mel-features.js",
     },
     // Add more demos here:
