@@ -24,7 +24,7 @@ than saying nothing.
 ```json
 {
   "id": "bayesian-capacity",
-  "category": "Cognitive Modeling & Decision Science",
+  "category": "Cognitive modelling and decision science",
   "status": "in-progress"
 }
 ```

@@ -1,12 +1,12 @@
 {
   "id": "noisy-grt",
   "title": "Noisy General Recognition Theory",
-  "category": "Cognitive Modeling & Decision Science",
+  "category": "Cognitive modelling and decision science",
   "status": "in-progress",
   "thumbnail": "",
   "thumbnail_alt": "Noisy GRT project placeholder",
   "summary": "Extending General Recognition Theory to explicitly incorporate noise and dimensional collapse, providing a more accurate account of perceptual decision-making — particularly relevant for complex stimuli like medical images where subtle features are critical but can be noisy or correlated.",
-  "tags": ["GRT", "perception", "decision making", "cognitive modeling", "dimensional collapse"],
+  "tags": ["GRT", "perception", "decision making", "cognitive modelling", "dimensional collapse"],
   "links": {
     "osf": "",
     "experiment_demo": "",

@@ -20,7 +20,7 @@ premature.
 ```json
 {
   "id": "adaptive-reliance",
-  "category": "Human-AI Collaboration",
+  "category": "Human-AI collaboration",
   "status": "in-progress"
 }
 ```

@@ -1,37 +1,37 @@
 [
   {
     "id": "team-spirit-hh",
-    "category": "Human-AI Collaboration",
+    "category": "Human-AI collaboration",
     "status": "published"
   },
   {
     "id": "confidnet",
-    "category": "Human-AI Collaboration",
+    "category": "Human-AI collaboration",
     "status": "under-review"
   },
   {
     "id": "discrete-choice-rating",
-    "category": "Cognitive Modeling & Decision Science",
+    "category": "Cognitive modelling and decision science",
     "status": "published"
   },
   {
     "id": "dutch-auction",
-    "category": "Cognitive Modeling & Decision Science",
+    "category": "Cognitive modelling and decision science",
     "status": "published"
   },
   {
     "id": "grin",
-    "category": "Cognitive Modeling & Decision Science",
+    "category": "Cognitive modelling and decision science",
     "status": "in-progress"
   },
   {
     "id": "melanoma-features",
-    "category": "Perception & Applied Vision",
+    "category": "Perception and applied vision",
     "status": "under-review"
   },
   {
     "id": "wheel-of-fortune",
-    "category": "Perception & Applied Vision",
+    "category": "Perception and applied vision",
     "status": "published"
   }
 ]

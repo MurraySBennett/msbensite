@@ -1,7 +1,7 @@
 {
   "id": "discrete-choice-rating",
   "title": "Do Choices and Ratings Measure the Same Thing?",
-  "category": "Cognitive Modeling & Decision Science",
+  "category": "Cognitive modelling and decision science",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/dc-rs-demo.png",
   "thumbnail_alt": "Discrete choice vs rating scale experiment screenshot",
@@ -9,7 +9,7 @@
   "tags": [
     "decision making",
     "preference elicitation",
-    "cognitive modeling",
+    "cognitive modelling",
     "Bayesian",
     "latent representations"
   ],

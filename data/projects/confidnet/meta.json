@@ -1,7 +1,7 @@
 {
   "id": "confidnet",
   "title": "Machine Metacognition: Estimating Neural-Network Uncertainty",
-  "category": "Human-AI Collaboration",
+  "category": "Human-AI collaboration",
   "status": "under-review",
   "thumbnail": "/assets/images/project-icons/kith-try-result.png",
   "thumbnail_alt": "KITH result showing the model answer and how familiar the image is to the model",
