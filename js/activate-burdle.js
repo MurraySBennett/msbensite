@@ -32,6 +32,7 @@
   let gameFinished = false;
   let doubleLetterDisplay = false;
   let hintButton = null;
+  let letterKeyboard = null;
   let currentCells = [];
   let leftRows = null;
   let historyRows = null;
@@ -121,20 +122,36 @@
     historyRows.replaceChildren();
     currentCells = [];
 
-    const remainingAttempts = Math.max(0, 6 - guesses.length);
-    for (let rowIndex = 0; rowIndex < remainingAttempts; rowIndex++) {
+    if (!gameFinished) {
       const entry = makeRow();
-      if (rowIndex === 0 && !gameFinished) {
-        entry.row.classList.add("burdle-active-row");
-        entry.row.setAttribute("aria-label", "Current guess. Tap to type.");
-        entry.row.addEventListener("click", () => activeInput.focus());
-        entry.row.appendChild(activeInput);
-        currentCells = entry.cells;
-      } else {
-        entry.row.setAttribute("aria-hidden", "true");
-      }
+      entry.row.classList.add("burdle-active-row");
+      entry.row.setAttribute("aria-label", "Current guess. Tap to type.");
+      entry.row.addEventListener("click", () => activeInput.focus());
+      entry.row.appendChild(activeInput);
+      currentCells = entry.cells;
       leftRows.appendChild(entry.row);
     }
+
+    const letterStatuses = Object.create(null);
+    const statusRank = { absent: 1, present: 2, correct: 3 };
+    for (const guess of guesses) {
+      guess.word.split("").forEach((letter, index) => {
+        const next = guess.score[index];
+        if (!letterStatuses[letter] || statusRank[next] > statusRank[letterStatuses[letter]]) {
+          letterStatuses[letter] = next;
+        }
+      });
+    }
+    letterKeyboard.querySelectorAll("[data-letter]").forEach((key) => {
+      const letter = key.dataset.letter;
+      const keyStatus = letterStatuses[letter];
+      key.classList.remove("key-absent", "key-present", "key-correct");
+      if (keyStatus) key.classList.add(`key-${keyStatus}`);
+      key.setAttribute(
+        "aria-label",
+        keyStatus ? `${letter.toUpperCase()}, ${keyStatus}` : `${letter.toUpperCase()}, unused`
+      );
+    });
 
     for (const guess of guesses) {
       const entry = makeRow();
@@ -271,9 +288,17 @@
       <div class="burdle-tools">
         <button class="burdle-hint" type="button">2×</button>
       </div>
-      <section class="burdle-column burdle-current-column" aria-label="Current and unused guesses">
+      <section class="burdle-column burdle-current-column" aria-label="Current guess and letter keyboard">
         <h2>GUESS</h2>
         <div class="burdle-rows burdle-left-rows"></div>
+        <div class="burdle-keyboard" role="group" aria-label="Letter keyboard. Unmarked letters are unused; colored letters have been guessed.">
+          <div class="burdle-key-row">${"qwertyuiop".split("").map((letter) => `<button type="button" data-letter="${letter}">${letter}</button>`).join("")}</div>
+          <div class="burdle-key-row">${"asdfghjkl".split("").map((letter) => `<button type="button" data-letter="${letter}">${letter}</button>`).join("")}</div>
+          <div class="burdle-key-row">
+            <button type="button" data-action="backspace" aria-label="Backspace">⌫</button>
+            ${"zxcvbnm".split("").map((letter) => `<button type="button" data-letter="${letter}">${letter}</button>`).join("")}
+          </div>
+        </div>
       </section>
       <section class="burdle-column burdle-history-column" aria-label="Previous guesses">
         <h2><span>PAST</span><button class="burdle-close" type="button" aria-label="Close Burdle">×</button></h2>
@@ -290,6 +315,7 @@
 
     hintButton = surface.querySelector(".burdle-hint");
     leftRows = surface.querySelector(".burdle-left-rows");
+    letterKeyboard = surface.querySelector(".burdle-keyboard");
     historyRows = surface.querySelector(".burdle-history-rows");
     status = surface.querySelector(".burdle-status");
     activeInput = surface.querySelector(".burdle-input");
@@ -306,6 +332,21 @@
         event.preventDefault();
         submitGuess();
       }
+    });
+    letterKeyboard.addEventListener("mousedown", (event) => event.preventDefault());
+    letterKeyboard.addEventListener("click", (event) => {
+      const key = event.target.closest("button");
+      if (!key || gameFinished) return;
+      if (key.dataset.letter && currentGuess.length < 5) {
+        currentGuess += key.dataset.letter;
+        activeInput.value = currentGuess;
+        renderCurrentGuess();
+      } else if (key.dataset.action === "backspace") {
+        currentGuess = currentGuess.slice(0, -1);
+        activeInput.value = currentGuess;
+        renderCurrentGuess();
+      }
+      activeInput.focus({ preventScroll: true });
     });
     hintButton.addEventListener("click", () => {
       doubleLetterDisplay = !doubleLetterDisplay;

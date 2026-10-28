@@ -9,7 +9,7 @@ Replace the removed cloud clicker with a small word-guessing game in the homepag
 - Start from the existing “Postdoctoral Scholar” trigger in the homepage profile area.
 - Choose a random family-safe answer from Burdle's answer list every time a new game starts. Daily rotation, custom puzzles, share links, and saved game progress are out of scope.
 - Keep Burdle's six-guess loop, duplicate-aware Wordle scoring, valid-guess dictionary, and optional duplicate-letter hint.
-- In the compact game area, show active and unused guess entries on the left and submitted guesses on the right. Put the “Double-letter display” toggle to the left of the guess columns.
+- In the compact game area, show one active guess row and an on-screen letter keyboard on the left, with prior guesses on the right. The keyboard marks letters as correct, present, absent, or unused. Put the “Double-letter display” toggle to the left of the guess columns.
 - Save only the display-toggle preference locally. Dismissing the game frees the shared area and allows other site games to start.
 - Support desktop keyboard entry and mobile text entry without showing the site's arrow D-pad for this word game.
 - Preserve existing site games, theme styling, and the current build allowlist model. Do not deploy or publish.
@@ -19,6 +19,7 @@ Replace the removed cloud clicker with a small word-guessing game in the homepag
 - Add a site-owned Burdle game script and include Burdle's existing word dictionary in the site's static build allowlist.
 - Keep the game inside `#game-area`; do not use an iframe or navigate away.
 - Use an accessible trigger and game controls. Provide a close action and an immediate replay action that selects a new answer.
+- Make the on-screen keyboard usable for letter entry and backspace as well as showing each letter's best status from submitted guesses.
 - Keep game state in memory; only the hint toggle persists.
 
 ## Approaches
@@ -31,7 +32,7 @@ Replace the removed cloud clicker with a small word-guessing game in the homepag
 
 - The homepage trigger starts a fresh random game in `#game-area`; replay also chooses a fresh answer.
 - Guesses are limited to valid five-letter words and receive duplicate-aware correct/present/absent scoring, with the optional duplicate-letter border hint.
-- Previous guesses appear in the right column; the current and unused entries appear in the left column; the display toggle sits to the left.
+- Previous guesses appear in the right column; one active row and a status keyboard appear in the left column; the display toggle sits to the left.
 - Closing the game removes its listeners and markup, resets the shared game state, and leaves other easter eggs usable.
 - The site build completes and the generated artifact contains the game and dictionary without the removed cloud-clicker references.
 - No changes are published or deployed.
