@@ -26,8 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
       scriptPath: "/js/demos/dutch-auction.js",
     },
     "dc-rs": {
-      title: "Discrete Choice vs Rating Scale Decisions",
+      title: "Choice task vs rating scale: which square is darkest?",
       scriptPath: "/js/demos/dc-rs.js",
+      // Not "discrete choice": the paper's terms are CT and RS, and the authors
+      // note their choice task "differed in a few important ways" from a DCE.
     },
     "wheel-of-fortune": {
       title: "Wheel of Fortune Experiment",
