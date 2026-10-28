@@ -1,14 +1,14 @@
 {
   "id": "confidnet",
-  "title": "Machine Metacognition: Estimating Neural-Network Uncertainty",
+  "title": "K-nearest index of typicality in hidden layers (KITH): Machine metacognition for AI models",
   "category": "Human-AI collaboration",
   "status": "under-review",
   "thumbnail": "/assets/images/project-icons/kith-try-result.png",
   "thumbnail_alt": "KITH result showing the model answer and how familiar the image is to the model",
-  "summary": "Can the neighbourhood around an image in a network’s learned representation add useful information about the reliability of its prediction?",
+  "summary": "AI models are often as confident when they are wrong as when they are right. KITH is a general method that lets a model judge how far to trust its own answer, by checking how familiar a new case is compared with the cases it learned from. The idea borrows from how people judge their own confidence. In a skin lesion demonstration, it improved classification, especially for confident mistakes.",
   "tags": [
     "confidence estimation",
-    "neural networks",
+    "AI models",
     "melanoma",
     "calibration",
     "human-AI"
