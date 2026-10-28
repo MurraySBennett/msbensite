@@ -904,6 +904,10 @@ html:not(.game-running) #game-area {
 }
 
 .burdle-surface {
+  --burdle-blue: #5bcefa;
+  --burdle-pink: #f5a9b8;
+  --burdle-neon-pink: #ff5fc8;
+  --burdle-muted: #51436b;
   position: absolute;
   top: 0;
   right: 0;
@@ -940,8 +944,9 @@ html:not(.game-running) #game-area {
   cursor: pointer;
 }
 .burdle-hint.enabled {
-  border-color: #ffcf3f;
-  color: #ffcf3f;
+  border-color: var(--burdle-neon-pink);
+  color: var(--burdle-pink);
+  box-shadow: 0 0 6px rgb(255 95 200 / 45%);
 }
 .burdle-column {
   display: grid;
@@ -994,25 +999,27 @@ html:not(.game-running) #game-area {
   padding: 0;
   border: 1px solid #7968ac;
   border-radius: 3px;
-  background: #514768;
+  background: var(--burdle-muted);
   color: #f2ecff;
   font: 6px ui-sans-serif, system-ui, sans-serif;
   text-transform: uppercase;
   cursor: pointer;
 }
 .burdle-key-row button.key-absent {
-  background: #625b71;
+  background: #423653;
   color: #c1bacd;
 }
 .burdle-key-row button.key-present {
-  background: #c4922e;
-  border-color: #c4922e;
-  color: #fff;
+  background: var(--burdle-pink);
+  border-color: var(--burdle-neon-pink);
+  color: #24142d;
+  box-shadow: 0 0 5px rgb(255 95 200 / 45%);
 }
 .burdle-key-row button.key-correct {
-  background: #4f9d61;
-  border-color: #4f9d61;
-  color: #fff;
+  background: var(--burdle-blue);
+  border-color: var(--burdle-blue);
+  color: #17203a;
+  box-shadow: 0 0 5px rgb(91 206 250 / 45%);
 }
 .burdle-rows {
   display: grid;
@@ -1051,19 +1058,23 @@ html:not(.game-running) #game-area {
   border-color: #c2b2e8;
 }
 .burdle-tile.correct {
-  background: #4f9d61;
-  border-color: #4f9d61;
+  background: var(--burdle-blue);
+  border-color: var(--burdle-blue);
+  color: #17203a;
+  box-shadow: 0 0 8px rgb(91 206 250 / 45%);
 }
 .burdle-tile.present {
-  background: #c4922e;
-  border-color: #c4922e;
+  background: var(--burdle-pink);
+  border-color: var(--burdle-neon-pink);
+  color: #24142d;
+  box-shadow: 0 0 8px rgb(255 95 200 / 45%);
 }
 .burdle-tile.absent {
-  background: #625b71;
-  border-color: #625b71;
+  background: #423653;
+  border-color: #665477;
 }
 .burdle-tile.duplicate-letter {
-  box-shadow: inset 0 0 0 2px #ffcf3f;
+  box-shadow: inset 0 0 0 2px #fff, 0 0 5px var(--burdle-blue);
 }
 .burdle-input {
   position: absolute;
@@ -1116,7 +1127,7 @@ html:not(.game-running) #game-area {
 }
 .burdle-surface button:focus-visible,
 .burdle-active-row:focus-within {
-  outline: 2px solid #ffcf3f;
+  outline: 2px solid var(--burdle-blue);
   outline-offset: 1px;
 }
 
