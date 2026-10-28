@@ -25,82 +25,62 @@
   <body data-page="tools">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <script src="/js/components.js" defer></script>
+    <script src="/js/tools-filter.js" defer></script>
     <div id="nav-placeholder"></div>
 
     <main id="main-content" class="container">
       <section id="tools-intro">
         <h1>Tools</h1>
-        <p>Tools developed from my research.</p>
-      </section>
-
-      <section id="tools-list">
-        <h2>Available tools</h2>
-        <div class="research-grid">
-          <a
-            href="https://grin.murraysbennett.com"
-            class="research-tile"
-            target="_blank"
-            rel="noopener"
-          >
-            <img
-              src="/assets/images/project-icons/grin-space-plot.webp"
-              alt="GRIN Space Builder: plot of the perceptual space created by four stimuli"
-              class="tile-thumbnail"
-              width="900"
-              height="900"
-              loading="lazy"
-            />
-            <div class="tile-body">
-              <div class="tile-header">
-                <h3>GRIN: General Recognition Inference Network</h3>
-                <span class="status-badge status-available">Available</span>
-              </div>
-              <p>
-                A free online tool that fits General Recognition Theory to
-                identification data in milliseconds, with an uncertainty range
-                for every estimate. It shows each result beside a standard fit
-                and reports how well it recovers known values in simulated data.
-                It runs in the browser, Python and R.
-              </p>
-              <span class="tile-link">Open GRIN <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></span>
-            </div>
-          </a>
-          <a
-            href="https://kith.murraysbennett.com"
-            class="research-tile"
-            target="_blank"
-            rel="noopener"
-          >
-            <img
-              src="/assets/images/project-icons/kith-familiarity-map.webp"
-              alt="KITH final step: training images mapped, with two new images placed and scored"
-              class="tile-thumbnail"
-              width="1150"
-              height="420"
-              loading="lazy"
-            />
-            <div class="tile-body">
-              <div class="tile-header">
-                <h3>KITH: K-nearest index of typicality in hidden layers</h3>
-                <span class="status-badge status-available">Available</span>
-              </div>
-              <p>
-                A demonstration of KITH, a general method that lets an AI model
-                judge how familiar it is with your query. We use melanoma
-                identification as the demonstration. Choose a close-up photo of
-                a skin lesion, or take your own, to see the model's prediction
-                along with a late (decisional) and an early (perceptual) score
-                showing how familiar your image is compared with what the model
-                has seen before. All images stay on your computer and nothing
-                you enter is recorded. This is a research demonstration only and
-                is positively <strong>not</strong> medical advice. We are not
-                that kind of Doctor.
-              </p>
-              <span class="tile-link">Open KITH <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></span>
-            </div>
-          </a>
+        <p class="lede">
+          Whether a judgement goes well is rarely a property of one side of it. It
+          depends on the pairing — and the pairing has properties you can measure.
+          Each of these measures one, in a person or in a machine.
+        </p>
+        <p>
+          Everything here runs in your browser. Nothing you upload leaves your
+          computer and nothing you do is recorded.
+        </p>
+        <div class="sector-filter-bar">
+          <span id="sector-filter-label" class="filter-label">Show me</span>
+          <div class="sector-filters" role="group" aria-labelledby="sector-filter-label"></div>
         </div>
       </section>
+
+      <section class="tools-section" id="about-you">
+        <h2>Find out something about yourself</h2>
+        <p class="section-blurb">
+          Short tasks that end with a number about you, placed against people who
+          did the same task.
+        </p>
+        <div class="research-grid" data-tools-section="about-you"></div>
+      </section>
+
+      <section class="tools-section" id="your-data">
+        <h2>Run your own data through it</h2>
+        <p class="section-blurb">
+          Bring a spreadsheet. These fit a model to it in your browser and hand the
+          estimates back.
+        </p>
+        <div class="research-grid" data-tools-section="your-data"></div>
+      </section>
+
+      <section class="tools-section" id="the-experiment">
+        <h2>Play the experiment we actually ran</h2>
+        <p class="section-blurb">
+          The task itself, as participants saw it.
+        </p>
+        <div class="research-grid" data-tools-section="the-experiment"></div>
+        <p class="section-pending">
+          Nothing here yet. From now on, every new project ships the task you can
+          play alongside the paper — the older ones are being checked against the
+          client participants actually saw before they go up.
+        </p>
+      </section>
+
+      <p id="no-tools-match" class="empty-filter" hidden>
+        Nothing here is tagged that way yet.
+      </p>
+
     </main>
 
     <div id="footer-placeholder"></div>

@@ -18,7 +18,7 @@ CORE_PAGES = ('index.html', 'research.html', 'cv.html', 'teaching.html',
 SCRIPTS = ('components.js', 'dark-mode-toggle.js', 'cv.js', 'orcid-sync.js',
            'dpad.js', 'activate-konami.js',
            'activate-snake.js', 'activate-pong.js', 'burdle-dictionary.js',
-           'activate-burdle.js', 'steal-the-doi.js')
+           'activate-burdle.js', 'steal-the-doi.js', 'tools-filter.js')
 BASE_IMAGES = (
     'assets/images/murray_small.png',
     'assets/images/sprites/seeing-eye.gif',
@@ -113,6 +113,96 @@ def render_tile(meta, size=None):
             f'<p>{esc(meta["summary"])}</p></div></a>')
 
 
+def render_tool_tile(tool, sectors):
+    """One tile on tools.html, from a `data/tools.json` entry.
+
+    Three things are required and raise rather than degrade, because each is a
+    promise the page makes as a whole and a tile quietly missing one would not
+    look broken:
+
+    `evidence`  every tile carries a link to the thing that makes it real. It
+                is what separates a programme from a toy box, and it is the
+                first thing a sceptical visitor looks for.
+    `sectors`   the filter chips are how a non-academic self-selects. A tile
+                with no sector is invisible to every filter but "all".
+    `headline`  second person or imperative, saying what the visitor gets. A
+                methods sentence here is the failure mode the page exists to
+                avoid.
+    """
+    for field in ('id', 'section', 'url', 'headline', 'what_you_get', 'evidence', 'sectors'):
+        if not tool.get(field):
+            raise ValueError(f'tool {tool.get("id", "?")!r} is missing {field!r}')
+    unknown = set(tool['sectors']) - set(sectors)
+    if unknown:
+        raise ValueError(f'tool {tool["id"]!r} has unknown sector(s): {sorted(unknown)}')
+    if not tool['evidence'].get('url') or not tool['evidence'].get('label'):
+        raise ValueError(f'tool {tool["id"]!r} needs an evidence label and url')
+    status = tool.get('status', 'available')
+    if status not in STATUS_LABELS:
+        raise ValueError(f'tool {tool["id"]!r} has invalid status: {status}')
+
+    external = ' target="_blank" rel="noopener"' if tool.get('external') else ''
+    new_tab = ('<span aria-hidden="true">↗</span>'
+               '<span class="visually-hidden"> (opens in a new tab)</span>') if tool.get('external') else ''
+    thumbnail = tool.get('thumbnail')
+    size = (f'width="{tool["width"]}" height="{tool["height"]}" '
+            if tool.get('width') and tool.get('height') else '')
+    image = (f'<img src="{esc(thumbnail)}" alt="{esc(tool.get("alt", ""))}" {size}'
+             f'class="tile-thumbnail" loading="lazy" />') if thumbnail else ''
+    chips = ''.join(f'<span class="sector-chip">{esc(s)}</span>' for s in tool['sectors'])
+    caution = f'<p class="tile-caution">{esc(tool["caution"])}</p>' if tool.get('caution') else ''
+    load = f'<p class="tile-load">{esc(tool["load_note"])}</p>' if tool.get('load_note') else ''
+
+    return (
+        f'<article class="research-tile tool-tile" data-sectors="{esc(" ".join(tool["sectors"]))}">'
+        f'<a class="tile-main" href="{esc(tool["url"])}"{external}>{image}'
+        f'<div class="tile-body"><div class="tile-header"><h3>{esc(tool["headline"])}</h3>'
+        f'<span class="status-badge {STATUS_CLASSES[status]}">{STATUS_LABELS[status]}</span></div>'
+        f'<p>{esc(tool["what_you_get"])}</p>{caution}{load}'
+        f'<span class="tile-link">Open it {new_tab}</span></div></a>'
+        f'<p class="tile-meta"><span class="tile-sectors">{chips}</span>'
+        f'<a class="tile-evidence" href="{esc(tool["evidence"]["url"])}">'
+        f'{esc(tool["evidence"]["label"])}</a></p></article>'
+    )
+
+
+def render_tools_page(output, source):
+    """Fill tools.html's section grids and its filter chips from data/tools.json."""
+    config = json.loads((source / 'data/tools.json').read_text(encoding='utf-8'))
+    sectors = config['sectors']
+    page = output / 'tools.html'
+    text = page.read_text(encoding='utf-8')
+
+    seen = {section['id'] for section in config['sections']}
+    for tool in config['tools']:
+        if tool['section'] not in seen:
+            raise ValueError(f'tool {tool["id"]!r} names unknown section {tool["section"]!r}')
+
+    for section in config['sections']:
+        tiles = ''.join(render_tool_tile(tool, sectors)
+                        for tool in config['tools'] if tool['section'] == section['id'])
+        pattern = re.compile(r'(<div class="research-grid" data-tools-section="'
+                             + re.escape(section['id']) + r'">).*?(</div>)', re.S)
+        text, count = pattern.subn(lambda m: m.group(1) + tiles + m.group(2), text, count=1)
+        if count != 1:
+            raise ValueError(f'missing tools grid: {section["id"]}')
+        # A section with no tools would render as a heading over empty space,
+        # which reads as a broken page rather than as a plan.
+        if not tiles:
+            text = text.replace(f'<section class="tools-section" id="{section["id"]}">',
+                                f'<section class="tools-section is-empty" id="{section["id"]}">')
+
+    used = sorted({s for tool in config['tools'] for s in tool['sectors']}, key=sectors.index)
+    chips = ''.join(f'<button type="button" class="sector-filter" data-sector="{esc(s)}">{esc(s)}</button>'
+                    for s in used)
+    text, count = re.subn(r'(<div class="sector-filters"[^>]*>).*?(</div>)',
+                          lambda m: m.group(1) + '<button type="button" class="sector-filter is-active" '
+                          'data-sector="all">everything</button>' + chips + m.group(2), text, count=1, flags=re.S)
+    if count != 1:
+        raise ValueError('missing sector-filters container in tools.html')
+    page.write_text(text, encoding='utf-8')
+
+
 def render_publications(meta, publications):
     related = [publications[pid] for pid in meta.get('publications', [])]
     if not related:
@@ -183,12 +273,44 @@ class LocalReferences(HTMLParser):
                     self.references.append(parsed.path)
 
 
-def validate(output):
+#: `demos/` is a reserved bucket prefix that this build never writes to; each
+#: interactive tool is deployed into `demos/<slug>/` by its own repository's
+#: workflow. See `demos/README.md` and the excludes in the deploy workflow.
+#: These links therefore cannot be checked against `dist/` -- they are correct
+#: at deploy time and absent at build time, and that is by design.
+DEMOS_PREFIX = '/demos/'
+
+
+def known_demo_slugs(source):
+    """Slugs this site is allowed to link into the reserved prefix.
+
+    Not a rubber stamp for everything under `/demos/`: a typo in a hand-written
+    link still fails the build. What it cannot catch is a slug that is declared
+    here and never actually deployed -- no build in this repository can see
+    another repository's bucket. The compensating check lives on the other
+    side, in each tool's own workflow, which refuses to publish a collapsed or
+    incomplete build.
+    """
+    config = read_json(source / 'data/tools.json')
+    return {tool['url'][len(DEMOS_PREFIX):].strip('/').split('/')[0]
+            for tool in config['tools'] if tool['url'].startswith(DEMOS_PREFIX)}
+
+
+def validate(output, source=None):
     root = output.resolve()
+    slugs = known_demo_slugs(source) if source else set()
     for page in output.rglob('*.html'):
         parser = LocalReferences()
         parser.feed(page.read_text(encoding='utf-8'))
         for reference in parser.references:
+            if reference.startswith(DEMOS_PREFIX):
+                slug = reference[len(DEMOS_PREFIX):].strip('/').split('/')[0]
+                if slug in slugs:
+                    continue
+                raise FileNotFoundError(
+                    f'{page.relative_to(output)} links {reference}, but {slug!r} is not a '
+                    f'tool in data/tools.json. The demos/ prefix is deployed from other '
+                    f'repositories; a link into it must be declared there.')
             target = (root / reference.lstrip('/')) if reference.startswith('/') else (page.parent / reference)
             target = target.resolve()
             if not target.is_relative_to(root) or not (target / 'index.html' if target.is_dir() else target).is_file():
@@ -265,8 +387,8 @@ def build(source: Path, output: Path):
         copy_file(source, output, name)
     for name in SCRIPTS:
         copy_file(source, output, f'js/{name}')
-    for name in ('css/style.css', 'data/publications.json', 'assets/documents/MurrayBennettCV.pdf',
-                 'assets/audio/steal.mp3'):
+    for name in ('css/style.css', 'data/publications.json', 'data/tools.json',
+                 'assets/documents/MurrayBennettCV.pdf', 'assets/audio/steal.mp3'):
         copy_file(source, output, name)
     for name in BASE_IMAGES + FAVICONS:
         copy_file(source, output, name)
@@ -313,9 +435,10 @@ def build(source: Path, output: Path):
                 ['/', '/research.html', '/cv.html', '/teaching.html', '/tools.html'] +
                 [f'/projects/{item["id"]}.html' for item in index]) + '</urlset>\n', encoding='utf-8')
     (output / 'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: ' + DOMAIN + '/sitemap.xml\n', encoding='utf-8')
+    render_tools_page(output, source)
     inline_components(output, source)
     add_favicons(output)
-    validate(output)
+    validate(output, source)
 
 
 if __name__ == '__main__':

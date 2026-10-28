@@ -1,0 +1,78 @@
+{
+  "_note": "Tiles for tools.html, rendered by scripts/build_site.py. Adding a tool is an edit here, not HTML surgery. Every tile MUST carry an `evidence` link and at least one `sector`; the build raises otherwise. Headlines are in the second person or the imperative and say what the visitor gets -- never a methods sentence. No 'hire me' register, no CV cross-links, no 'my research' framing.",
+
+  "sections": [
+    {
+      "id": "about-you",
+      "title": "Find out something about yourself",
+      "blurb": "Short tasks that end with a number about you, placed against people who did the same task."
+    },
+    {
+      "id": "your-data",
+      "title": "Run your own data through it",
+      "blurb": "Bring a spreadsheet. These fit a model to it in your browser and hand the estimates back."
+    },
+    {
+      "id": "the-experiment",
+      "title": "Play the experiment we actually ran",
+      "blurb": "The task itself, as participants saw it."
+    }
+  ],
+
+  "sectors": ["healthcare", "defence", "HR", "marketing", "education", "product", "research"],
+
+  "tools": [
+    {
+      "id": "grin",
+      "section": "your-data",
+      "url": "https://grin.murraysbennett.com",
+      "external": true,
+      "headline": "When two of your products get confused, is it people's eyes or their standards?",
+      "what_you_get": "Upload identification counts; get separate estimates of how distinguishable your items are and how your respondents were deciding, each with an uncertainty range.",
+      "sectors": ["marketing", "product", "research"],
+      "evidence": {
+        "label": "See the method and its recovery checks",
+        "url": "/projects/grin.html"
+      },
+      "status": "available",
+      "thumbnail": "/assets/images/project-icons/grin-space-plot.webp",
+      "alt": "GRIN Space Builder: plot of the perceptual space created by four stimuli",
+      "width": 900,
+      "height": 900
+    },
+    {
+      "id": "kith",
+      "section": "about-you",
+      "url": "https://kith.murraysbennett.com",
+      "external": true,
+      "headline": "Has this AI ever seen anything like your photo before?",
+      "what_you_get": "Pick or take a close-up photo and see the model's call beside two familiarity scores — how typical your image is of what it was trained on. Images stay on your computer.",
+      "sectors": ["healthcare", "product", "research"],
+      "evidence": {
+        "label": "Read the preprint",
+        "url": "https://doi.org/10.31234/osf.io/jp83f_v1"
+      },
+      "status": "available",
+      "caution": "A research demonstration, not medical advice. We are not that kind of Doctor.",
+      "thumbnail": "/assets/images/project-icons/kith-familiarity-map.webp",
+      "alt": "KITH final step: training images mapped, with two new images placed and scored",
+      "width": 1150,
+      "height": 420
+    },
+    {
+      "id": "workshops",
+      "section": "your-data",
+      "url": "/demos/workshops/",
+      "external": false,
+      "headline": "Eight methods papers, rebuilt as things you build instead of read.",
+      "what_you_get": "Commit to a prediction before each step shows you the answer, then pull the sliders yourself: likelihood surfaces, overfitting, Bayes factors, bandits, response times, simulation-based inference.",
+      "sectors": ["education", "research"],
+      "evidence": {
+        "label": "Every workshop cites the paper it rebuilds",
+        "url": "/demos/workshops/"
+      },
+      "status": "available",
+      "load_note": "Runs entirely in your browser. Nothing you do is recorded, and nothing is saved between visits."
+    }
+  ]
+}
