@@ -33,8 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Wheel of Fortune Experiment",
       scriptPath: "/js/demos/wheel-of-fortune.js",
     },
+    // Not "Human Teams": this demo is the human-machine arm. The human-human
+    // arm needed two networked screens and is not reproducible in a browser.
     "team-spirit-hh": {
-      title: "Team Spirit: Human Teams",
+      title: "Team Spirit: teaming with a machine partner",
       scriptPath: "/js/demos/team-spirit-hh.js",
     },
     "mel-features": {
