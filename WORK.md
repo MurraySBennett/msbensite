@@ -6,7 +6,7 @@ project: msbensite
 
 ## Now
 
-The compact random-word Burdle game is implemented locally per `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; the latest keyboard layout rebuild is live at local port 8303. No deployment was made. Next: continue with the existing site work below.
+The compact random-word Burdle game is committed and served locally at port 8303. Current: plan opted-in round capture and a private owner export through a first-party AWS endpoint; see `docs/superpowers/plans/2026-10-28-burdle-attempt-records.md`. Next: implement the plan and verify the local artifacts. Do not deploy or publish without explicit approval; preserve the separate Snake change.
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked. Snake food placement and queued direction input are corrected locally; the cloud clicker is removed. Reflex remains a recommendation for a future Arcade link; the Arcade app is not live.
 Seven static project pages, the CV download and the research index are live; 5 build checks and 11 browser checks passed in CI.
 New direction: practical public tools from simulation-based inference and Bayesian decision models for everyday users. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`.
@@ -16,6 +16,7 @@ Canonical-bibliography confirmation of melanoma author order and IAT title remai
 ## Streams
 
 ### build
+- [ ] now — Implement opted-in Burdle round capture, including abandoned/partial rounds, private AWS storage and a local owner export per `docs/superpowers/plans/2026-10-28-burdle-attempt-records.md`; this is for the owner's personal exploratory analysis, not enterprise/business data. Do not deploy.
 - [x] 2026-10-28 — Implement the compact random-word Burdle mini-game in `#game-area` from `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; randomize the answer per start, show a single active row with a letter-status keyboard, and use trans-flag blue/pink synthwave feedback colors. Build, syntax, generated-artifact, and read-only review checks pass; not deployed.
 - [x] 2026-10-28 — Remove the cloud clicker and its publish/style references. Recommend Arcade's one-button Reflex game as the best short-loop candidate; don't embed it while the Arcade app is undeployed and framework-bound.
 - [x] 2026-10-28 — Fix snake food spawning on occupied cells and buffer up to two ordered non-reversing turns across movement ticks.
