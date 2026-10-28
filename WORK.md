@@ -6,6 +6,7 @@ project: msbensite
 
 ## Now
 
+Snake's speed pickup is now a jalapeño; all move- or clock-timed effects are doubled, and the board has a collidable block perimeter that supports future internal walls. On small screens, active games hide the profile photo and reclaim its space, except for the photo-driven button-sequence game. Local only; no commit or deployment yet.
 The compact random-word Burdle game is implemented locally per `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; the latest keyboard layout rebuild is live at local port 8303. No deployment was made.
 Snake's nine fruit powerups, persistent portal pairs, and 3×3 inventory are live on murraysbennett.com; the board is three rows shorter. GitHub checks and deployment passed, and the public Snake script and stylesheet contain the release. Next: review the live game.
 The job-search site release is live at https://murraysbennett.com from `main` (`a34a5bd`); GitHub build/check/deploy succeeded and core public routes were checked. Snake food placement and queued direction input are corrected locally; the cloud clicker is removed. Reflex remains a recommendation for a future Arcade link; the Arcade app is not live.
@@ -21,6 +22,8 @@ Canonical-bibliography confirmation of melanoma author order and IAT title remai
 - [x] 2026-10-28 — Remove the cloud clicker and its publish/style references. Recommend Arcade's one-button Reflex game as the best short-loop candidate; don't embed it while the Arcade app is undeployed and framework-bound.
 - [x] 2026-10-28 — Fix snake food spawning on occupied cells and buffer up to two ordered non-reversing turns across movement ticks.
 - [x] 2026-10-28 — Add nine collectible Snake powerups, pixel fruit icons, portal placement, cooldowns, and a responsive 3×3 inventory beside the profile; shorten the board by three rows. See `docs/superpowers/plans/2026-10-28-snake-powerups.md` and `docs/superpowers/plans/2026-10-28-snake-hud-layout.md`.
+- [x] 2026-10-28 — Rename the speed pickup to a jalapeño, double timed effect durations, and add a solid perimeter wall grid with outer-wall wrapping for lime and extensible wall-cell collision.
+- [x] 2026-10-28 — Hide the profile photo during active games on small screens and reclaim the space, preserving the photo-driven Konami game.
 - [ ] now — Explore a practical public tool for nonresearch users, grounding candidates in available methods and examples rather than claiming unpublished outcomes.
 - [x] 2026-09-29 — Author accepted the site presentation; main deployment passed and public Home, GRIN, Research and CV routes were checked.
 - [x] 2026-09-29 — Build artifact passed five Python checks and eleven browser checks; reviewed desktop/mobile Home, Research and project screenshots.

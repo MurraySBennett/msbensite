@@ -5,9 +5,10 @@ const SNAKE_COLOR = "#5BCEFA";
 const APPLE_COLOR = "#F5A9B8";
 const SNAKE_BACKGROUND = "#100b2e";
 const SNAKE_GRID_COLOR = "rgba(126, 103, 255, 0.16)";
+const SNAKE_WALL_COLOR = "#E68FB2";
 
 const SNAKE_POWERUPS = [
-  { id: "pepper", name: "Pepper" },
+  { id: "jalapeno", name: "Jalapeño" },
   { id: "peach", name: "Peach" },
   { id: "grapes", name: "Grapes" },
   { id: "lime", name: "Lime" },
@@ -23,9 +24,9 @@ const FRUIT_SPRITES = {
     colors: { p: APPLE_COLOR, d: "#d97891", g: "#3f9b62", l: "#b6edbf" },
     pixels: ["...gg...", "..ggg...", ".ppppp..", "ppppppp.", "pppppppp", "pppppppp", ".pppppp.", "..dddd.."],
   },
-  pepper: {
-    colors: { r: "#ef4b5f", d: "#b92543", g: "#62b66c", y: "#ffc45e" },
-    pixels: ["...gg...", "..ggg...", "..rrrr..", ".rrrrrr.", ".rrrrrr.", "..rrrr..", "...rr...", "...yy..."],
+  jalapeno: {
+    colors: { g: "#69bd68", d: "#368a50", l: "#a1db72" },
+    pixels: ["...dd...", "..dgg...", "...ggl..", "..ggll..", ".gggll..", ".gggl...", "..ggd...", "...dd..."],
   },
   peach: {
     colors: { o: "#ffb468", p: "#ff7897", d: "#d76b70", g: "#5caa69" },
@@ -147,6 +148,15 @@ function startSnakeGame() {
   const gridSize = SNAKE_GRID_SIZE;
   const columns = Math.floor(canvas.width / gridSize);
   const rows = Math.floor(canvas.height / gridSize);
+  const wallCells = new Set();
+  for (let x = 0; x < columns; x++) {
+    wallCells.add(`${x},0`);
+    wallCells.add(`${x},${rows - 1}`);
+  }
+  for (let y = 1; y < rows - 1; y++) {
+    wallCells.add(`0,${y}`);
+    wallCells.add(`${columns - 1},${y}`);
+  }
   let snake = [{ x: 5, y: 5 }];
   let direction = { x: 1, y: 0 };
   const directionQueue = [];
@@ -208,6 +218,7 @@ function startSnakeGame() {
   }
 
   function isCellBlocked(x, y, { ignoreFood = false } = {}) {
+    if (isWallCell({ x, y })) return true;
     if (snake.some(part => part.x === x && part.y === y)) return true;
     if (!ignoreFood && food && foodContains(food, x, y)) return true;
     if (powerupPickup && powerupPickup.x === x && powerupPickup.y === y) return true;
@@ -285,7 +296,7 @@ function startSnakeGame() {
   }
 
   function addBonusApples(count) {
-    const expiresAt = Date.now() + 15000;
+    const expiresAt = Date.now() + 30000;
     for (let index = 0; index < count; index++) {
       const cell = randomEmptyCell();
       if (!cell) break;
@@ -304,14 +315,14 @@ function startSnakeGame() {
     effects.portalPlacement = {
       cursor: { x, y },
       first: null,
-      expiresAt: Date.now() + 8000,
+      expiresAt: Date.now() + 16000,
     };
   }
 
   function applyPowerup(powerup) {
     switch (powerup.id) {
-      case "pepper":
-        effects.speedMoves = 40;
+      case "jalapeno":
+        effects.speedMoves = 80;
         break;
       case "peach": {
         if (food && !food.large) {
@@ -341,7 +352,7 @@ function startSnakeGame() {
         effects.doubleAppleCount = 3;
         break;
       case "mango":
-        effects.magnetMoves = 40;
+        effects.magnetMoves = 80;
         break;
       case "pomegranate":
         addBonusApples(3);
@@ -412,7 +423,7 @@ function startSnakeGame() {
     powerupTimer.classList.toggle("active", Boolean(timerText));
 
     const active = {
-      pepper: [effects.speedMoves > 0, "Speed boost", effects.speedMoves],
+      jalapeno: [effects.speedMoves > 0, "Speed boost", effects.speedMoves],
       peach: [Boolean(food?.large), "Big apple", 0],
       grapes: [effects.tailPasses > 0, "Tail pass", effects.tailPasses],
       lime: [effects.wallWraps > 0, "Wall wrap", effects.wallWraps],
@@ -487,6 +498,15 @@ function startSnakeGame() {
       ctx.lineTo(canvas.width, y + 0.5);
     }
     ctx.stroke();
+
+    ctx.fillStyle = SNAKE_WALL_COLOR;
+    wallCells.forEach(cell => {
+      const [x, y] = cell.split(",").map(Number);
+      ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.22)";
+      ctx.fillRect(x * gridSize + 2, y * gridSize + 2, gridSize - 4, 2);
+      ctx.fillStyle = SNAKE_WALL_COLOR;
+    });
 
     ctx.fillStyle = SNAKE_COLOR;
     snake.forEach(part => ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 1, gridSize - 1));
@@ -572,7 +592,11 @@ function startSnakeGame() {
   }
 
   function isWallCell(cell) {
-    return cell.x < 0 || cell.y < 0 || cell.x >= columns || cell.y >= rows;
+    return cell.x < 0 || cell.y < 0 || cell.x >= columns || cell.y >= rows || wallCells.has(`${cell.x},${cell.y}`);
+  }
+
+  function isOuterWallCell(cell) {
+    return cell.x <= 0 || cell.y <= 0 || cell.x >= columns - 1 || cell.y >= rows - 1;
   }
 
   function portalExit(cell) {
@@ -615,12 +639,12 @@ function startSnakeGame() {
     if (effects.speedMoves > 0) effects.speedMoves--;
     const nextHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
     if (isWallCell(nextHead)) {
-      if (effects.wallWraps > 0) {
+      if (isOuterWallCell(nextHead) && effects.wallWraps > 0) {
         effects.wallWraps--;
-        if (nextHead.x < 0) nextHead.x = columns - 1;
-        else if (nextHead.x >= columns) nextHead.x = 0;
-        if (nextHead.y < 0) nextHead.y = rows - 1;
-        else if (nextHead.y >= rows) nextHead.y = 0;
+        if (nextHead.x <= 0) nextHead.x = columns - 2;
+        else if (nextHead.x >= columns - 1) nextHead.x = 1;
+        if (nextHead.y <= 0) nextHead.y = rows - 2;
+        else if (nextHead.y >= rows - 1) nextHead.y = 1;
       } else {
         finishGameOver();
         return;
