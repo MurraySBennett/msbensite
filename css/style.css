@@ -870,6 +870,56 @@ body.konami-mode::before {
   color: #cab8ff;
   font: 7px "Press Start 2P", monospace;
 }
+.burdle-current-column {
+  grid-template-rows: 16px auto minmax(0, 1fr);
+}
+.burdle-current-column .burdle-left-rows {
+  display: block;
+}
+.burdle-left-rows .burdle-row {
+  height: 22px;
+}
+.burdle-keyboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 0;
+}
+.burdle-key-row {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+}
+.burdle-key-row button {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 17px;
+  padding: 0;
+  border: 1px solid #7968ac;
+  border-radius: 3px;
+  background: #514768;
+  color: #f2ecff;
+  font: 6px ui-sans-serif, system-ui, sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.burdle-key-row button.key-absent {
+  background: #625b71;
+  color: #c1bacd;
+}
+.burdle-key-row button.key-present {
+  background: #c4922e;
+  border-color: #c4922e;
+  color: #fff;
+}
+.burdle-key-row button.key-correct {
+  background: #4f9d61;
+  border-color: #4f9d61;
+  color: #fff;
+}
 .burdle-rows {
   display: grid;
   grid-template-rows: repeat(6, minmax(0, 1fr));
