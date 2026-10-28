@@ -16,14 +16,14 @@ from markdown_it import MarkdownIt
 CORE_PAGES = ('index.html', 'research.html', 'cv.html', 'teaching.html',
               'tools.html', '404.html', 'project-detail.html')
 SCRIPTS = ('components.js', 'dark-mode-toggle.js', 'cv.js', 'orcid-sync.js',
-           'dpad.js', 'activate-pixel-chaser.js', 'activate-konami.js',
-           'activate-snake.js', 'activate-pong.js', 'steal-the-doi.js')
+           'dpad.js', 'activate-konami.js',
+           'activate-snake.js', 'activate-pong.js', 'burdle-dictionary.js',
+           'activate-burdle.js', 'steal-the-doi.js')
 BASE_IMAGES = (
     'assets/images/murray_small.png',
     'assets/images/sprites/seeing-eye.gif',
     'assets/images/sprites/web-design-worker.gif',
     'assets/images/sprites/declaration-of-independence.gif',
-    'assets/images/sprites/raincloud.gif',
     *(f'assets/images/button-icons/button-{name}.png' for name in ('up', 'down', 'left', 'right', 'a', 'b')),
 )
 FAVICONS = ('favicon.ico', 'favicon.svg', 'apple-touch-icon.png')

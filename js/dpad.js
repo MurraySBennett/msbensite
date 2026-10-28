@@ -25,7 +25,7 @@
 
   // Poll for changes to window.gameActive (simple and reliable)
   setInterval(() => {
-    if (window.gameActive) {
+    if (window.gameActive && window.gameUsesDpad !== false) {
       virtualGamepad.classList.add("active");
     } else {
       virtualGamepad.classList.remove("active");
@@ -49,13 +49,13 @@
     const key = btn.dataset.key;
 
     function pressHandler(e) {
-      if (!window.gameActive) return;
+      if (!window.gameActive || window.gameUsesDpad === false) return;
       e.preventDefault();
       triggerKeyEvent("keydown", key);
     }
 
     function releaseHandler(e) {
-      if (!window.gameActive) return;
+      if (!window.gameActive || window.gameUsesDpad === false) return;
       e.preventDefault();
       triggerKeyEvent("keyup", key);
     }
