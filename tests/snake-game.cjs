@@ -194,7 +194,6 @@ test('portal pickup pauses for placement and exposes the two countdown phases', 
   });
   assert.ok(exitTileBluePixels > 0, `portal exit tile only has ${exitTileBluePixels} snake pixels`);
   await page.evaluate(() => window.__snakeAdvance(60000));
-  for (let move = 0; move < 3; move++) await page.evaluate(() => window.__snakeRunLoop());
   assert.match(await page.locator('.powerup-slot').nth(portalIndex).getAttribute('aria-label'), /Lemon: Portal pair/);
 });
 
