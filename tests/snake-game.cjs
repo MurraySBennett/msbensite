@@ -230,7 +230,7 @@ test('each fruit applies its named effect and the portal placement timeout resum
       await page.keyboard.press('ArrowUp');
       await page.evaluate(() => window.__snakeRunLoop());
       assert.doesNotMatch(await page.locator('.powerup-status').innerText(), /Game over/);
-      assert.match(await page.locator('.powerup-slot').nth(type).getAttribute('aria-label'), /Grapes: Tail pass/);
+      assert.equal(await page.locator('.powerup-slot').nth(type).getAttribute('aria-label'), 'Grapes powerup');
     }
     if (type === 3) {
       for (let move = 0; move < 5; move++) await page.evaluate(() => window.__snakeRunLoop());
