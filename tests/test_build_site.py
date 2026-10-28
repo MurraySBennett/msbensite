@@ -37,6 +37,7 @@ class BuildSiteTests(unittest.TestCase):
             self.assertIn('<a href="https://kith.murraysbennett.com">Open KITH</a>', kith)
             self.assertIn('href="https://kith.murraysbennett.com"', (out / 'tools.html').read_text())
             self.assertTrue((out / 'assets/images/project-icons/kith-try-result.png').exists())
+            self.assertTrue((out / 'assets/images/project-icons/kith-final-step.webp').exists())
             self.assertIn('status-badge status-review', research)
             self.assertNotIn('Loading projects', research)
             self.assertFalse((out / 'data/projects').exists())

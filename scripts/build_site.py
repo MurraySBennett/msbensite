@@ -20,6 +20,7 @@ SCRIPTS = ('components.js', 'dark-mode-toggle.js', 'cv.js', 'orcid-sync.js',
            'activate-snake.js', 'activate-pong.js', 'steal-the-doi.js')
 BASE_IMAGES = (
     'assets/images/murray_small.png',
+    'assets/images/project-icons/kith-try-result.png',
     'assets/images/sprites/seeing-eye.gif',
     'assets/images/sprites/web-design-worker.gif',
     'assets/images/sprites/declaration-of-independence.gif',
