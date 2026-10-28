@@ -98,7 +98,11 @@ test('core and project pages expose navigation, headings and sharing metadata', 
     assert.equal(await page.locator('.skip-link').count(), 1, path);
   }
   await page.goto(`${base}/index.html`);
-  assert.equal(await page.getByRole('link', { name: 'Download CV' }).getAttribute('href'), '/assets/documents/MurrayBennettCV.pdf');
+  for (const path of ['/index.html', '/cv.html']) {
+    await page.goto(base + path);
+    assert.equal(await page.getByRole('link', { name: /(View|Download) CV/ }).count(), 0, path);
+  }
+  await page.goto(`${base}/index.html`);
   await page.locator('nav a[data-nav=home][aria-current=page]').waitFor();
   assert.equal(await page.locator('nav a[data-nav=home]').getAttribute('aria-current'), 'page');
 });
