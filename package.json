@@ -3,7 +3,7 @@
   "scripts": {
     "build": "python3 -m scripts.build_site",
     "test": "python3 -m unittest discover -s tests -p 'test_build_site.py' -v && npm run test:demos && python3 scripts/check_site.py",
-    "test:demos": "node --test tests/team-spirit-demo.cjs tests/dc-rs-demo.cjs tests/mel-features-demo.cjs"
+    "test:demos": "node --test tests/team-spirit-demo.cjs tests/dc-rs-demo.cjs tests/mel-features-demo.cjs tests/wheel-of-fortune-demo.cjs"
   },
   "devDependencies": {
     "playwright": "1.56.1"
