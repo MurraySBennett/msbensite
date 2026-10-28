@@ -20,7 +20,6 @@ SCRIPTS = ('components.js', 'dark-mode-toggle.js', 'cv.js', 'orcid-sync.js',
            'activate-snake.js', 'activate-pong.js', 'steal-the-doi.js')
 BASE_IMAGES = (
     'assets/images/murray_small.png',
-    'assets/images/project-icons/kith-try-result.png',
     'assets/images/sprites/seeing-eye.gif',
     'assets/images/sprites/web-design-worker.gif',
     'assets/images/sprites/declaration-of-independence.gif',
@@ -80,14 +79,34 @@ def insert_metadata(page, title, description, path):
     return page.replace('<!-- site-metadata -->', metadata(title, description, path))
 
 
-def render_tile(meta):
+def image_size(path):
+    """Return (width, height) for a PNG or WebP file, or None if unknown."""
+    data = Path(path).read_bytes()[:40]
+    if data[:8] == b'\x89PNG\r\n\x1a\n':
+        return int.from_bytes(data[16:20], 'big'), int.from_bytes(data[20:24], 'big')
+    if data[:4] == b'RIFF' and data[8:12] == b'WEBP':
+        chunk = data[12:16]
+        if chunk == b'VP8 ':
+            return (int.from_bytes(data[26:28], 'little') & 0x3FFF,
+                    int.from_bytes(data[28:30], 'little') & 0x3FFF)
+        if chunk == b'VP8L':
+            bits = int.from_bytes(data[21:25], 'little')
+            return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
+        if chunk == b'VP8X':
+            return (int.from_bytes(data[24:27], 'little') + 1,
+                    int.from_bytes(data[27:30], 'little') + 1)
+    return None
+
+
+def render_tile(meta, size=None):
     project_id = esc(meta['id'])
     status = meta['status']
     if status not in STATUS_LABELS:
         raise ValueError(f'invalid status: {status}')
     thumbnail = meta.get('thumbnail')
+    size_attrs = f'width="{size[0]}" height="{size[1]}" ' if size else ''
     image = (f'<img src="{esc(thumbnail)}" alt="{esc(meta.get("thumbnail_alt") or meta["title"])}" '
-             'class="tile-thumbnail" loading="lazy" />') if thumbnail else '<div class="tile-thumbnail-placeholder"></div>'
+             f'{size_attrs}class="tile-thumbnail" loading="lazy" />') if thumbnail else '<div class="tile-thumbnail-placeholder"></div>'
     return (f'<a href="/projects/{project_id}.html" class="research-tile">{image}'
             f'<div class="tile-body"><div class="tile-header"><h3>{esc(meta["title"])}</h3>'
             f'<span class="status-badge {STATUS_CLASSES[status]}">{STATUS_LABELS[status]}</span></div>'
@@ -260,7 +279,7 @@ def build(source: Path, output: Path):
         'research.html': ('Research — Murray S. Bennett', 'Published and current research in human-AI collaboration, cognitive modelling and decision science, and perception.'),
         'cv.html': ('CV — Murray S. Bennett', 'Curriculum vitae, research experience, publications, teaching, and professional service.'),
         'teaching.html': ('Teaching — Murray S. Bennett', 'Teaching experience and approach in psychology, research methods, and quantitative modelling.'),
-        'tools.html': ('Research Tools — Murray S. Bennett', 'Available research software, including GRIN for General Recognition Theory inference and KITH for checking whether a model has seen images like yours.'),
+        'tools.html': ('Tools — Murray S. Bennett', 'Free research software built from my work with collaborators: GRIN, the General Recognition Inference Network, for rapid and uncertainty-aware diagnosis of how people perceive complex, interacting stimuli, and KITH, a method that indexes how familiar an AI model is with an input given its training, to help both you and the AI temper trust in its response.'),
     }
     for name, (title, description) in page_info.items():
         page_path = output / name
@@ -276,7 +295,8 @@ def build(source: Path, output: Path):
     research = output / 'research.html'
     text = research.read_text(encoding='utf-8')
     for category in {item['category'] for item in index}:
-        tiles = ''.join(render_tile(meta) for meta, _ in projects if meta['category'] == category)
+        tiles = ''.join(render_tile(meta, image_size(source / meta['thumbnail'].lstrip('/')) if meta.get('thumbnail') else None)
+                        for meta, _ in projects if meta['category'] == category)
         pattern = re.compile(r'(<div class="research-grid" data-category="' + re.escape(category) + r'">).*?(</div>)', re.S)
         text, count = pattern.subn(lambda match: match.group(1) + tiles + match.group(2), text, count=1)
         if count != 1:

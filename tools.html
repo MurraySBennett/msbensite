@@ -30,16 +30,11 @@
     <main id="main-content" class="container">
       <section id="tools-intro">
         <h1>Tools</h1>
-        <p>
-          Standalone tools built from my research — not one-off demos, but full
-          working software you can use on your own data. Each one is its own
-          self-contained project with its own documentation; click through and
-          it opens as its own site.
-        </p>
+        <p>Tools developed from my research.</p>
       </section>
 
       <section id="tools-list">
-        <h2>Available Tools</h2>
+        <h2>Available tools</h2>
         <div class="research-grid">
           <a
             href="https://grin.murraysbennett.com"
@@ -48,18 +43,26 @@
             rel="noopener"
           >
             <img
-              src="/assets/images/project-icons/grin-space-builder.png"
-              alt="GRIN — amortised inference for General Recognition Theory"
+              src="/assets/images/project-icons/grin-space-plot.webp"
+              alt="GRIN Space Builder: plot of the perceptual space created by four stimuli"
+              class="tile-thumbnail"
+              width="900"
+              height="900"
+              loading="lazy"
             />
             <div class="tile-body">
-              <h3>GRIN</h3>
+              <div class="tile-header">
+                <h3>GRIN: General Recognition Inference Network</h3>
+                <span class="status-badge status-available">Available</span>
+              </div>
               <p>
-                Estimate perceptual parameters from identification counts using
-                simulation-based inference. Explore General Recognition Theory,
-                compare with classical fitting, and inspect the tool's validation
-                evidence. Current analyses use counts; response-time inference
-                remains in development.
+                A free online tool that fits General Recognition Theory to
+                identification data in milliseconds, with an uncertainty range
+                for every estimate. It shows each result beside a standard fit
+                and reports how well it recovers known values in simulated data.
+                It runs in the browser, Python and R.
               </p>
+              <span class="tile-link">Open GRIN <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></span>
             </div>
           </a>
           <a
@@ -69,18 +72,31 @@
             rel="noopener"
           >
             <img
-              src="/assets/images/project-icons/kith-try-result.png"
-              alt="KITH — checking whether a model has seen images like yours"
+              src="/assets/images/project-icons/kith-familiarity-map.webp"
+              alt="KITH final step: training images mapped, with two new images placed and scored"
+              class="tile-thumbnail"
+              width="1150"
+              height="420"
+              loading="lazy"
             />
             <div class="tile-body">
-              <h3>KITH</h3>
+              <div class="tile-header">
+                <h3>KITH: K-nearest index of typicality in hidden layers</h3>
+                <span class="status-badge status-available">Available</span>
+              </div>
               <p>
-                Give it a close-up photo of a skin lesion and see the model's
-                answer with its output probability, and how familiar the photo
-                is to the model at the early (perceptual) and late (decisional)
-                stages. Your photo stays on your computer. A research demo, not
-                medical advice.
+                A demonstration of KITH, a general method that lets an AI model
+                judge how familiar it is with your query. We use melanoma
+                identification as the demonstration. Choose a close-up photo of
+                a skin lesion, or take your own, to see the model's prediction
+                along with a late (decisional) and an early (perceptual) score
+                showing how familiar your image is compared with what the model
+                has seen before. All images stay on your computer and nothing
+                you enter is recorded. This is a research demonstration only and
+                is positively <strong>not</strong> medical advice. We are not
+                that kind of Doctor.
               </p>
+              <span class="tile-link">Open KITH <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></span>
             </div>
           </a>
         </div>

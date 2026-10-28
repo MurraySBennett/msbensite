@@ -3,8 +3,8 @@
   "title": "GRIN: General Recognition Inference Network",
   "category": "Cognitive modelling and decision science",
   "status": "available",
-  "thumbnail": "/assets/images/project-icons/grin-space-builder.png",
-  "thumbnail_alt": "GRIN Space Builder",
+  "thumbnail": "/assets/images/project-icons/grin-space-plot.webp",
+  "thumbnail_alt": "GRIN Space Builder: plot of the perceptual space created by four stimuli",
   "summary": "A free online tool that fits General Recognition Theory to identification data in milliseconds, with an uncertainty range for every estimate. It runs in the browser, Python and R.",
   "tags": [
     "General Recognition Theory",
