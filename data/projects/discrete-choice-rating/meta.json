@@ -4,7 +4,7 @@
   "category": "Cognitive Modeling & Decision Science",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/dc-rs-demo.png",
-  "thumbnail_alt": "Discrete choice vs rating scale experiment screenshot",
+  "thumbnail_alt": "Choice task vs rating scale experiment screenshot",
   "summary": "A perceptual experiment uses Bayesian model comparison to test whether choosing an option and rating it draw on a shared internal representation.",
   "tags": [
     "decision making",
