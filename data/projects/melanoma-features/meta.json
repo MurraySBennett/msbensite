@@ -4,7 +4,7 @@
   "category": "Perception & Applied Vision",
   "status": "under-review",
   "thumbnail": "/assets/images/project-icons/melanoma-features-demo.png",
-  "thumbnail_alt": "Melanoma ABC feature rating experiment screenshot",
+  "thumbnail_alt": "Two dermoscopic lesion photographs side by side for comparison",
   "summary": "Pairwise judgments and a perceptual model provide human feature estimates that can be compared and combined with computer-vision measurements.",
   "tags": [
     "melanoma",

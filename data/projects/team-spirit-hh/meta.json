@@ -4,7 +4,7 @@
   "category": "Human-AI Collaboration",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/team-spirit-demo.png",
-  "thumbnail_alt": "Team Spirit experiment screenshot showing paddle game",
+  "thumbnail_alt": "Two paddles below a field of purple balls, with the detection-task panels at the screen edges",
   "summary": "Workload-capacity analysis compares team performance with an independent-player benchmark, revealing coordination costs that raw scores can miss.",
   "tags": [
     "workload capacity",

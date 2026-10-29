@@ -4,7 +4,7 @@
   "category": "Perception & Applied Vision",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/wheel-of-fortune-demo.png",
-  "thumbnail_alt": "Wheel of Fortune experiment interface screenshot",
+  "thumbnail_alt": "A ring of nine numerals around a numeral buried in visual noise",
   "summary": "Confusion patterns and cognitive models help compare the perceived similarity of familiar and unfamiliar numerals in two language groups.",
   "tags": [
     "perception",
