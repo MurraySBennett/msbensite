@@ -23,6 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const demoMap = {
     "dutch-auction": {
       title: "Dutch Auction Experiment",
+      // NOT PUBLISHED: no fidelity diff has been done for this one, so it is
+      // absent from build_site.py's allowlist and from the experiments.html
+      // listing. Reaching it by direct URL shows the loader's error state,
+      // which is the honest outcome until it is reviewed.
       scriptPath: "/js/demos/dutch-auction.js",
     },
     "dc-rs": {

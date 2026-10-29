@@ -38,7 +38,6 @@ class BuildSiteTests(unittest.TestCase):
             self.assertIn('status-badge status-review', research)
             self.assertNotIn('Loading projects', research)
             self.assertFalse((out / 'data/projects').exists())
-            self.assertFalse((out / 'js/demos').exists())
             self.assertFalse((out / 'assets/images/_aseprite-sources').exists())
             self.assertTrue((out / 'assets/documents/MurrayBennettCV.pdf').exists())
             pilot = out / 'tools/fantasy-lineup'
@@ -51,6 +50,54 @@ class BuildSiteTests(unittest.TestCase):
             self.assertNotIn('/tools/fantasy-lineup/', (out / 'tools.html').read_text())
             self.assertNotIn('/tools/fantasy-lineup/', (out / 'sitemap.xml').read_text())
             self.assertFalse((pilot / 'outcomes').exists())
+
+    def test_only_reviewed_experiment_demos_are_published(self):
+        """Publishing a demo is a deliberate act, not a side effect.
+
+        Each of these four has a fidelity diff in docs/demos/ and a suite in
+        tests/*-demo.cjs. dutch-auction has neither, so it must stay out of the
+        artifact until it does. The loader still knows about it, which is why
+        this is checked here rather than trusted to the allowlist alone.
+        """
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp) / 'site'
+            build(ROOT, out)
+
+            for name in ('team-spirit-hh', 'dc-rs', 'mel-features', 'wheel-of-fortune'):
+                self.assertTrue((out / 'js/demos' / f'{name}.js').is_file(), name)
+            self.assertFalse((out / 'js/demos/dutch-auction.js').exists(),
+                             'dutch-auction has no fidelity diff and must not ship')
+
+            listing = (out / 'experiments.html').read_text()
+            self.assertNotIn('?demo=dutch-auction', listing)
+            for name in ('team-spirit-hh', 'dc-rs', 'mel-features', 'wheel-of-fortune'):
+                self.assertIn(f'?demo={name}', listing)
+
+            self.assertTrue((out / 'js/experiment-demo-loader.js').is_file())
+            self.assertTrue((out / 'experiment-demo-viewer.html').is_file())
+
+            # Each reviewed demo is reachable from its project page.
+            for project in ('team-spirit-hh', 'discrete-choice-rating',
+                            'melanoma-features', 'wheel-of-fortune'):
+                page = (out / 'projects' / f'{project}.html').read_text()
+                self.assertIn('experiment-demo-viewer.html?demo=', page, project)
+
+    def test_published_lesion_images_are_licence_clean(self):
+        """Only CC-0 and CC-BY may ship. 7,107 of the study's 10,000 images are
+        CC-BY-NC and serving one would be a licence breach, so the manifest is
+        checked against what actually lands in the artifact."""
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp) / 'site'
+            build(ROOT, out)
+            folder = out / 'assets/images/demos/mel-features'
+            manifest = json.loads((folder / 'manifest.json').read_text())
+            allowed = {record['isic_id']: record['licence'] for record in manifest['images']}
+            shipped = sorted(p.stem for p in folder.glob('*.jpg'))
+            self.assertTrue(shipped, 'no lesion images were published')
+            for isic_id in shipped:
+                self.assertIn(isic_id, allowed, f'{isic_id} is not in the manifest')
+                self.assertIn(allowed[isic_id], ('CC-0', 'CC-BY'),
+                              f'{isic_id} is {allowed[isic_id]}')
 
     def test_reviewed_outcome_snapshot_is_in_built_artifact_only_when_allowlisted(self):
         with tempfile.TemporaryDirectory() as temp:

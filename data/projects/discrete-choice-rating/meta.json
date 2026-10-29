@@ -15,7 +15,7 @@
   ],
   "links": {
     "osf": "",
-    "experiment_demo": "",
+    "experiment_demo": "/experiment-demo-viewer.html?demo=dc-rs",
     "interactive_demo": "",
     "publication": "https://doi.org/10.1016/j.jocm.2023.100437"
   },

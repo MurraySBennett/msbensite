@@ -15,13 +15,23 @@ from markdown_it import MarkdownIt
 
 
 CORE_PAGES = ('index.html', 'research.html', 'cv.html', 'teaching.html',
-              'tools.html', '404.html', 'project-detail.html')
+              'tools.html', '404.html', 'project-detail.html',
+              'experiments.html', 'experiment-demo-viewer.html')
 SCRIPTS = ('components.js', 'dark-mode-toggle.js', 'cv.js', 'orcid-sync.js',
            'dpad.js', 'activate-konami.js',
            'activate-snake.js', 'activate-pong.js', 'burdle-dictionary.js',
            'activate-burdle.js', 'steal-the-doi.js')
 FANTASY_FILES = ('index.html', 'methods.html', 'app.mjs', 'style.css',
                  'decision.mjs', 'scenarios.mjs', 'state.mjs', 'evaluation.mjs')
+# The experiment demos. The loader injects a demo script at runtime, so these
+# names never appear in any HTML and validate() cannot catch a missing one —
+# tests/*-demo.cjs is what holds them honest.
+DEMO_SCRIPTS = ('experiment-demo-loader.js', 'demos/team-spirit-hh.js',
+                'demos/dc-rs.js', 'demos/mel-features.js',
+                'demos/wheel-of-fortune.js')
+# Lesion photographs for mel-features. CC-0 and CC-BY only; manifest.json
+# carries per-image provenance and the test suite enforces the licence rule.
+DEMO_IMAGE_DIRS = ('assets/images/demos/mel-features',)
 BASE_IMAGES = (
     'assets/images/murray_small.png',
     'assets/images/sprites/seeing-eye.gif',
@@ -34,8 +44,8 @@ STATUS_LABELS = {'published': 'Published', 'under-review': 'Under Review',
                  'in-progress': 'In Progress'}
 STATUS_CLASSES = {'published': 'status-published', 'under-review': 'status-review',
                   'in-progress': 'status-progress'}
-LINK_LABELS = {'osf': 'OSF Project', 'interactive_demo': 'Open Tool',
-               'publication': 'Read the Paper'}
+LINK_LABELS = {'experiment_demo': 'Play the Task', 'osf': 'OSF Project',
+               'interactive_demo': 'Open Tool', 'publication': 'Read the Paper'}
 
 
 def esc(value):
@@ -208,9 +218,14 @@ def render_project(template, meta, content, publications):
         href = (meta.get('links') or {}).get(key)
         if href:
             parsed = urlparse(href)
-            if parsed.scheme not in ('http', 'https'):
+            # Site-relative links are allowed so a project can point at a page
+            # of this site (the experiment demos). "//host" is not relative.
+            internal = (not parsed.scheme and not parsed.netloc
+                        and href.startswith('/') and not href.startswith('//'))
+            if not internal and parsed.scheme not in ('http', 'https'):
                 raise ValueError(f'unsafe project link in {project_id}: {href}')
-            links.append(f'<a href="{esc(href)}" class="button" target="_blank" rel="noopener noreferrer">{label}</a>')
+            target = '' if internal else ' target="_blank" rel="noopener noreferrer"'
+            links.append(f'<a href="{esc(href)}" class="button"{target}>{label}</a>')
     values = {
         'TITLE': esc(meta['title']), 'SUMMARY': esc(meta['summary']),
         'STATUS': esc(STATUS_LABELS[status]), 'STATUS_CLASS': STATUS_CLASSES[status],
@@ -313,6 +328,14 @@ def build(source: Path, output: Path):
         copy_file(source, output, f'js/{name}')
     for name in FANTASY_FILES:
         copy_file(source, output, f'tools/fantasy-lineup/{name}')
+    for name in DEMO_SCRIPTS:
+        copy_file(source, output, f'js/{name}')
+    for directory in DEMO_IMAGE_DIRS:
+        files = sorted((source / directory).glob('*'))
+        if not files:
+            raise FileNotFoundError(f'missing publish input: {directory}/*')
+        for path in files:
+            copy_file(source, output, f'{directory}/{path.name}')
     copy_reviewed_outcomes(source, output)
     for name in ('css/style.css', 'data/publications.json', 'assets/documents/MurrayBennettCV.pdf',
                  'assets/audio/steal.mp3'):
@@ -329,6 +352,8 @@ def build(source: Path, output: Path):
         'cv.html': ('CV — Murray S. Bennett', 'Curriculum vitae, research experience, publications, teaching, and professional service.'),
         'teaching.html': ('Teaching — Murray S. Bennett', 'Teaching experience and approach in psychology, research methods, and quantitative modeling.'),
         'tools.html': ('Research Tools — Murray S. Bennett', 'Available research software, including GRIN for General Recognition Theory inference.'),
+        'experiments.html': ('Experiment Demos — Murray S. Bennett', 'Playable versions of the tasks behind the research, each fitting the published model to your own responses.'),
+        'experiment-demo-viewer.html': ('Experiment Demo — Murray S. Bennett', 'A playable version of a published experimental task.'),
     }
     for name, (title, description) in page_info.items():
         page_path = output / name
@@ -365,7 +390,8 @@ def build(source: Path, output: Path):
         path.write_text(render_project(template, meta, content, publications), encoding='utf-8')
     (output / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
         ''.join(f'  <url><loc>{DOMAIN}{path}</loc></url>\n' for path in
-                ['/', '/research.html', '/cv.html', '/teaching.html', '/tools.html'] +
+                ['/', '/research.html', '/cv.html', '/teaching.html', '/tools.html',
+                 '/experiments.html'] +
                 [f'/projects/{item["id"]}.html' for item in index]) + '</urlset>\n', encoding='utf-8')
     (output / 'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: ' + DOMAIN + '/sitemap.xml\n', encoding='utf-8')
     inline_components(output, source)
