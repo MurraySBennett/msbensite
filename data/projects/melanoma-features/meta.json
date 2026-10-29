@@ -4,7 +4,7 @@
   "category": "Perception and applied vision",
   "status": "under-review",
   "thumbnail": "/assets/images/project-icons/melanoma-features-demo.png",
-  "thumbnail_alt": "Melanoma ABC feature rating experiment screenshot",
+  "thumbnail_alt": "Two dermoscopic lesion photographs side by side for comparison",
   "summary": "A scalable method turns simple comparisons into continuous estimates of how people perceive asymmetry, border and colour. Combined with computer measurements, these human estimates classified skin lesion images better than either source alone.",
   "tags": [
     "melanoma",

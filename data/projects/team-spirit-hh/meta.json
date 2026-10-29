@@ -4,7 +4,7 @@
   "category": "Human-AI collaboration",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/team-spirit-demo.png",
-  "thumbnail_alt": "Team Spirit experiment screenshot showing paddle game",
+  "thumbnail_alt": "Two paddles below a field of purple balls, with the detection-task panels at the screen edges",
   "summary": "Pairs of people, and people paired with an AI agent, played a custom arcade-style multiplayer game together called Team Spirit. Teams outperformed individuals, but at a cost to their overall efficiency, and that cost was larger with an AI teammate.",
   "tags": [
     "workload capacity",

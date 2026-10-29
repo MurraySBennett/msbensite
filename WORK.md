@@ -9,7 +9,8 @@ project: msbensite
 Snake's jalapeño, doubled timed effects, block perimeter walls, and small-screen photo layout are deployed at murraysbennett.com from `51d4fc7`; CI and public JS/CSS checks passed.
 The compact random-word Burdle game remains local per `docs/superpowers/plans/2026-10-28-burdle-secret-game.md`; the latest keyboard layout rebuild is live at local port 8303. No deployment was made.
 The job-search site and seven static project pages, CV download, and research index remain live; Snake food placement and queued direction input are in the deployed release.
-Next: identify the strongest practical public tool from research methods and its evidence/privacy boundary. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`; demos and social outreach remain deferred.
+Four experiment demos — `team-spirit-hh`, `dc-rs`, `mel-features`, `wheel-of-fortune` — are diffed, rebuilt and in the publish artifact, each with a fidelity doc in `docs/demos/` and a suite (88 tests, `npm run test:demos`). `dutch-auction` is excluded on purpose: no fidelity diff, and a build test enforces that. The listing page has no nav entry, so the demos are reached from their project pages.
+Next: identify the strongest practical public tool from research methods and its evidence/privacy boundary. Handoff: `~/.agents/handoffs/HANDOFF-practical-research-tools.md`; social outreach remains deferred.
 Canonical-bibliography confirmation of melanoma author order and IAT title remains open; the public site cites registered preprints.
 
 ## Streams

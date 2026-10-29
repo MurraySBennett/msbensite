@@ -4,7 +4,7 @@
   "category": "Cognitive modelling and decision science",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/dc-rs-demo.png",
-  "thumbnail_alt": "Discrete choice vs rating scale experiment screenshot",
+  "thumbnail_alt": "Three squares of random black pixels, one very slightly darker than the others",
   "summary": "Choice tasks and rating scales are widely used to measure preferences, and are assumed to reveal the same underlying judgement. Preferences have no objectively correct answer, so this assumption is rarely tested. We used a task with a known correct answer, built one cognitive model for both formats and found that a single internal judgement supported both, with choices possibly measuring it more precisely.",
   "tags": [
     "decision making",
