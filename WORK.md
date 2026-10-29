@@ -9,7 +9,7 @@ project: msbensite
 The MLE tutorial prototype is now authorized: source-led article left, concept-responsive sandbox right, with the paper's forgetting example represented. A local preview is requested on port 6476 for immediate feedback; no public deployment.
 The academic site and seven static project pages are live at https://murraysbennett.com; the compact Burdle game and recent snake fixes remain local. No game changes were deployed.
 The practical public research-tools direction is exploratory. The private fantasy lineup pilot remains unlisted and noindex; its next evidence step is a frozen real pregame decision and reviewed postgame outcome.
-Four experiment demos — `team-spirit-hh`, `dc-rs`, `mel-features`, `wheel-of-fortune` — are diffed, rebuilt and **in the publish artifact**, each with a fidelity doc in `docs/demos/` and a suite (88 tests, `npm run test:demos`). Not yet deployed: the build is green locally but `npm test`'s browser stage needs chromium, which is broken on this box. `dutch-auction` is excluded on purpose — no fidelity diff, and a build test enforces that. Four project thumbnails still show the pre-rebuild UI. Melanoma author order and IAT title still need canonical-bibliography confirmation.
+The four experiment demos shipped from `main` via PR #3 (merge `3ba9041`) and are **live** at https://murraysbennett.com/experiments.html — they are not on this branch's history. Do not re-do that work here; merge `main` in before touching `scripts/build_site.py`, `experiments.html` or `js/demos/`, which all changed. Melanoma author order and IAT title still need canonical-bibliography confirmation.
 
 ## Streams
 
