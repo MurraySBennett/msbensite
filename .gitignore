@@ -24,3 +24,11 @@ dist/
 
 # AWS CLI cached credentials (never commit these)
 .aws/
+
+# Local venv for the Python build deps. This machine has no system pip, so
+# `python3 -m venv .venv && .venv/bin/pip install -r requirements-build.txt`
+# is how `scripts.build_site` becomes runnable locally. CI installs them directly.
+.venv/
+
+# Side worktrees for parked branches live here; they are checkouts, not content.
+.worktrees/
