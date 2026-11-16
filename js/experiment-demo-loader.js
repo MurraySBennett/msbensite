@@ -23,22 +23,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const demoMap = {
     "dutch-auction": {
       title: "Dutch Auction Experiment",
+      // NOT PUBLISHED: no fidelity diff has been done for this one, so it is
+      // absent from build_site.py's allowlist and from the experiments.html
+      // listing. Reaching it by direct URL shows the loader's error state,
+      // which is the honest outcome until it is reviewed.
       scriptPath: "/js/demos/dutch-auction.js",
     },
     "dc-rs": {
-      title: "Discrete Choice vs Rating Scale Decisions",
+      title: "Choice task vs rating scale: which square is darkest?",
       scriptPath: "/js/demos/dc-rs.js",
+      // Not "discrete choice": the paper's terms are CT and RS, and the authors
+      // note their choice task "differed in a few important ways" from a DCE.
     },
     "wheel-of-fortune": {
-      title: "Wheel of Fortune Experiment",
+      // The paper is literally titled "Wheel of Fortune"; the task is numeral
+      // identification under noise, and the scale comes from the confusions.
+      title: "Wheel of Fortune: mapping numeral confusions",
       scriptPath: "/js/demos/wheel-of-fortune.js",
     },
+    // Not "Human Teams": this demo is the human-machine arm. The human-human
+    // arm needed two networked screens and is not reproducible in a browser.
     "team-spirit-hh": {
-      title: "Team Spirit: Human Teams",
+      title: "Team Spirit: teaming with a machine partner",
       scriptPath: "/js/demos/team-spirit-hh.js",
     },
     "mel-features": {
-      title: "Melanoma Lesion Feature Rating",
+      // Not "rating": it is a forced choice between two lesions. The scale
+      // comes from the Bradley-Terry-Luce fit, not from a rating response.
+      title: "Scaling lesion features by comparison",
       scriptPath: "/js/demos/mel-features.js",
     },
     // Add more demos here:

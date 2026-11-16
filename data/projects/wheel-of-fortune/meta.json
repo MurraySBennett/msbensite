@@ -4,7 +4,7 @@
   "category": "Perception and applied vision",
   "status": "published",
   "thumbnail": "/assets/images/project-icons/wheel-of-fortune-demo.png",
-  "thumbnail_alt": "Wheel of Fortune experiment interface screenshot",
+  "thumbnail_alt": "A ring of nine numerals around a numeral buried in visual noise",
   "summary": "English and Chinese speakers identified low-contrast Arabic, Chinese and Thai numerals. Their mistakes showed which numerals look alike to each group, and how familiarity changes that.",
   "tags": [
     "perception",
@@ -15,7 +15,7 @@
   ],
   "links": {
     "osf": "",
-    "experiment_demo": "",
+    "experiment_demo": "/experiment-demo-viewer.html?demo=wheel-of-fortune",
     "interactive_demo": "",
     "publication": "https://doi.org/10.1007/s42113-021-00122-1"
   },

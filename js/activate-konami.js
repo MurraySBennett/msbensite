@@ -170,6 +170,7 @@ function startSpawning() {
 // End game and reset
 function endGame(message) {
   window.gameActive = false;
+  document.body.classList.remove("konami-game-active");
   gameRunning = false;
   cancelAnimationFrame(animationFrameId);
   animationFrameId = null;
@@ -242,6 +243,7 @@ window.addEventListener("keydown", (e) => {
           toggleKonamiMode();
           resetGame();
           window.gameActive = false;
+          document.body.classList.remove("konami-game-active");
           gameRunning = false;
         }
       }, 300);
@@ -255,6 +257,7 @@ window.addEventListener("keydown", (e) => {
 pacman.addEventListener("click", () => {
   if (window.gameActive) return;
   window.gameActive = true;
+  document.body.classList.add("konami-game-active");
   window.stopCurrentGame = () => endGame("Exited");
   if (gameRunning) return;
   resetGame();

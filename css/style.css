@@ -481,6 +481,19 @@ footer a {
   html:not(.game-running) .top-row {
     justify-content: center;
   }
+  html.game-running body:not(.konami-game-active) #pacman-container {
+    display: none;
+  }
+  html.game-running body:not(.konami-game-active) #game-area {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    padding-left: 0;
+  }
+  html.game-running body:not(.konami-game-active) .burdle-surface {
+    left: 0;
+  }
   .profile-section {
     flex-direction: column;
     text-align: center;

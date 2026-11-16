@@ -1,0 +1,425 @@
+{
+  "source": "ISIC Archive (https://api.isic-archive.com)",
+  "selected_from": "the 10,000-image set used by the published study (images/feature-rating-image-list.txt @ melanoma-identification 9a77166^)",
+  "licence_policy": "CC-0 and CC-BY only. CC-BY-NC images are excluded and must never be served from this site.",
+  "counts": {
+    "served": 48,
+    "by_licence": {
+      "CC-0": 38,
+      "CC-BY": 10
+    },
+    "by_class": {
+      "benign": 24,
+      "malignant": 24
+    }
+  },
+  "study_set_licence_split": {
+    "CC-BY-NC_excluded": 7107,
+    "CC-0": 1466,
+    "CC-BY": 1427,
+    "total": 10000
+  },
+  "contributors": [
+    {
+      "attribution": "Anonymous",
+      "licence": "CC-0",
+      "images": 38
+    },
+    {
+      "attribution": "Anonymous",
+      "licence": "CC-BY",
+      "images": 6
+    },
+    {
+      "attribution": "Memorial Sloan Kettering Cancer Center",
+      "licence": "CC-BY",
+      "images": 4
+    }
+  ],
+  "images": [
+    {
+      "file": "ISIC_0000274.jpg",
+      "isic_id": "ISIC_0000274",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0000306.jpg",
+      "isic_id": "ISIC_0000306",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0000516.jpg",
+      "isic_id": "ISIC_0000516",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0000526.jpg",
+      "isic_id": "ISIC_0000526",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0000558.jpg",
+      "isic_id": "ISIC_0000558",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0001743.jpg",
+      "isic_id": "ISIC_0001743",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0001832.jpg",
+      "isic_id": "ISIC_0001832",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0002184.jpg",
+      "isic_id": "ISIC_0002184",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0002295.jpg",
+      "isic_id": "ISIC_0002295",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0003046.jpg",
+      "isic_id": "ISIC_0003046",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0003910.jpg",
+      "isic_id": "ISIC_0003910",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0004075.jpg",
+      "isic_id": "ISIC_0004075",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0005377.jpg",
+      "isic_id": "ISIC_0005377",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0007622.jpg",
+      "isic_id": "ISIC_0007622",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0009488.jpg",
+      "isic_id": "ISIC_0009488",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0009791.jpg",
+      "isic_id": "ISIC_0009791",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0009931.jpg",
+      "isic_id": "ISIC_0009931",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0009939.jpg",
+      "isic_id": "ISIC_0009939",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010251.jpg",
+      "isic_id": "ISIC_0010251",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010295.jpg",
+      "isic_id": "ISIC_0010295",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010364.jpg",
+      "isic_id": "ISIC_0010364",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010707.jpg",
+      "isic_id": "ISIC_0010707",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010724.jpg",
+      "isic_id": "ISIC_0010724",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010818.jpg",
+      "isic_id": "ISIC_0010818",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010874.jpg",
+      "isic_id": "ISIC_0010874",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0010958.jpg",
+      "isic_id": "ISIC_0010958",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0011127.jpg",
+      "isic_id": "ISIC_0011127",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0011697.jpg",
+      "isic_id": "ISIC_0011697",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0011703.jpg",
+      "isic_id": "ISIC_0011703",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0011930.jpg",
+      "isic_id": "ISIC_0011930",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0012260.jpg",
+      "isic_id": "ISIC_0012260",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0013672.jpg",
+      "isic_id": "ISIC_0013672",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0013778.jpg",
+      "isic_id": "ISIC_0013778",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0014013.jpg",
+      "isic_id": "ISIC_0014013",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0014766.jpg",
+      "isic_id": "ISIC_0014766",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0014922.jpg",
+      "isic_id": "ISIC_0014922",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0014925.jpg",
+      "isic_id": "ISIC_0014925",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0023811.jpg",
+      "isic_id": "ISIC_0023811",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-0",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0046331.jpg",
+      "isic_id": "ISIC_0046331",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0046458.jpg",
+      "isic_id": "ISIC_0046458",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0046597.jpg",
+      "isic_id": "ISIC_0046597",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0046647.jpg",
+      "isic_id": "ISIC_0046647",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0046693.jpg",
+      "isic_id": "ISIC_0046693",
+      "diagnosis": "nevus",
+      "malignant": false,
+      "licence": "CC-BY",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_0047008.jpg",
+      "isic_id": "ISIC_0047008",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Anonymous"
+    },
+    {
+      "file": "ISIC_1605945.jpg",
+      "isic_id": "ISIC_1605945",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Memorial Sloan Kettering Cancer Center"
+    },
+    {
+      "file": "ISIC_2108849.jpg",
+      "isic_id": "ISIC_2108849",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Memorial Sloan Kettering Cancer Center"
+    },
+    {
+      "file": "ISIC_2850215.jpg",
+      "isic_id": "ISIC_2850215",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Memorial Sloan Kettering Cancer Center"
+    },
+    {
+      "file": "ISIC_2916754.jpg",
+      "isic_id": "ISIC_2916754",
+      "diagnosis": "melanoma",
+      "malignant": true,
+      "licence": "CC-BY",
+      "attribution": "Memorial Sloan Kettering Cancer Center"
+    }
+  ]
+}
