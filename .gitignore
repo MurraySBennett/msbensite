@@ -24,3 +24,8 @@ dist/
 
 # AWS CLI cached credentials (never commit these)
 .aws/
+
+# Local venv for the Python build deps. This machine has no system pip,
+# so `uv venv .venv && uv pip install -r requirements-build.txt` is how
+# `scripts.build_site` becomes runnable locally. CI installs them directly.
+.venv/

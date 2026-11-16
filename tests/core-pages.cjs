@@ -5,6 +5,9 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const base = process.env.BASE_URL || 'http://127.0.0.1:8765';
+const toolsConfig = require('../data/tools.json');
+const readerTile = page => page.locator(
+  'article.tool-tile:has(a.tile-main[href="https://reader.murraysbennett.com"])');
 let browser;
 before(async () => {
   browser = await chromium.launch({ headless: true,
@@ -70,16 +73,36 @@ test('all published project routes fit desktop and mobile screens', async t => {
   }
   assert.deepEqual(errors, []);
 });
-test('KITH is linked from its project page and the tools page, like GRIN', async t => {
+test('every tool declared in data/tools.json reaches the tools page', async t => {
+  // Counted from the config rather than a literal, so adding a tool cannot
+  // leave this test asserting a stale number. The tile no longer carries the
+  // tool's name -- the headline addresses the reader instead -- so the headline
+  // is what identifies it.
   const page = await pageFor(t);
   await loadedProject(page, 'confidnet');
   assert.equal(await page.locator('#project-content').getByRole('link', { name: 'Open KITH' }).getAttribute('href'), 'https://kith.murraysbennett.com');
   assert.equal(await page.locator('#project-links-container').getByRole('link', { name: 'Open KITH' }).getAttribute('href'), 'https://kith.murraysbennett.com');
   await page.goto(`${base}/tools.html`);
-  const tile = page.locator('#tools-list a.research-tile[href="https://kith.murraysbennett.com"]');
-  assert.equal(await tile.count(), 1);
-  assert.match(await tile.innerText(), /KITH/);
-  assert.equal(await page.locator('#tools-list a.research-tile').count(), 2);
+  assert.equal(await page.locator('article.tool-tile').count(), toolsConfig.tools.length);
+  for (const tool of toolsConfig.tools) {
+    const tile = page.locator(`article.tool-tile a.tile-main[href="${tool.url}"]`);
+    assert.equal(await tile.count(), 1, tool.id);
+    assert.ok((await tile.innerText()).includes(tool.headline), tool.id);
+  }
+  assert.equal(await readerTile(page).locator('.tile-evidence').count(), 0,
+    'Reader sits in a section with no evidence requirement');
+});
+test('sector chips hide the tools that are not tagged that way', async t => {
+  // Progressive enhancement: every tile is visible before the script runs, and
+  // Reader is tagged research only, so a healthcare visitor should not see it.
+  const page = await pageFor(t);
+  await page.goto(`${base}/tools.html`);
+  const reader = readerTile(page);
+  assert.equal(await reader.isVisible(), true);
+  await page.locator('.sector-filter[data-sector="healthcare"]').click();
+  assert.equal(await reader.isVisible(), false);
+  await page.locator('.sector-filter[data-sector="research"]').click();
+  assert.equal(await reader.isVisible(), true);
 });
 test('legacy project link reaches the static page', async t => {
   const page = await pageFor(t);
