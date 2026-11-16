@@ -1,5 +1,5 @@
 {
-  "_note": "Tiles for tools.html, rendered by scripts/build_site.py. Adding a tool is an edit here, not HTML surgery. Every tile MUST carry an `evidence` link and at least one `sector`; the build raises otherwise. Headlines are in the second person or the imperative and say what the visitor gets -- never a methods sentence. No 'hire me' register, no CV cross-links, no 'my research' framing.",
+  "_note": "Tiles for tools.html, rendered by scripts/build_site.py. Adding a tool is an edit here, not HTML surgery. Every tile MUST carry at least one `sector`, and an `evidence` link unless its section sets `requires_evidence: false`; the build raises otherwise. A tile that has evidence renders it whichever section it sits in. Headlines are in the second person or the imperative and say what the visitor gets -- never a methods sentence. No 'hire me' register, no CV cross-links, no 'my research' framing.",
   "sections": [
     {
       "id": "about-you",

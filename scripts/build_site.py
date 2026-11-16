@@ -443,6 +443,8 @@ def build(source: Path, output: Path):
         'cv.html': ('CV — Murray S. Bennett', 'Curriculum vitae, research experience, publications, teaching, and professional service.'),
         'teaching.html': ('Teaching — Murray S. Bennett', 'Teaching experience and approach in psychology, research methods, and quantitative modelling.'),
         'tools.html': ('Tools — Murray S. Bennett', 'Free tools that run entirely in your browser: GRIN, for separating how distinguishable your items are from how respondents were deciding; KITH, for how familiar an AI model is with an input given its training; eight methods workshops rebuilt as things you build rather than read; and Reader, for working through a document one passage at a time.'),
+        'experiments.html': ('Experiment Demos — Murray S. Bennett', 'Playable versions of the tasks behind the research, each fitting the published model to your own responses.'),
+        'experiment-demo-viewer.html': ('Experiment Demo — Murray S. Bennett', 'A playable version of a published experimental task.'),
     }
     for name, (title, description) in page_info.items():
         page_path = output / name

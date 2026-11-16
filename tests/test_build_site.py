@@ -109,6 +109,18 @@ class BuildSiteTests(unittest.TestCase):
                 self.assertIn('<link rel="icon" href="/favicon.ico" sizes="any" />', text, page.name)
                 self.assertIn('<link rel="icon" href="/favicon.svg" type="image/svg+xml" />', text, page.name)
 
+    def test_no_published_page_keeps_an_unfilled_metadata_marker(self):
+        # insert_metadata() swaps the marker for the description, canonical and
+        # og tags. A page with no page_info entry keeps the raw comment and
+        # ships with no description at all -- silently, because only the pages
+        # core-pages.cjs happens to loop are ever looked at.
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp) / 'site'
+            build(ROOT, out)
+            bare = sorted(page.relative_to(out).as_posix() for page in out.rglob('*.html')
+                          if '<!-- site-metadata -->' in page.read_text(encoding='utf-8'))
+            self.assertEqual(bare, [], f'pages built with no metadata: {bare}')
+
     def test_missing_project_content_fails_build(self):
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp) / 'source'
@@ -237,9 +249,13 @@ class ToolsPageTests(unittest.TestCase):
     def test_the_reader_tile_sits_in_just_useful_without_an_evidence_link(self):
         # Reader has no paper behind it, which is the whole reason the
         # just-useful section exists.
-        grid = self.page.split('data-tools-section="just-useful"', 1)[1].split('</div>', 1)[0]
-        self.assertIn('href="https://reader.murraysbennett.com"', grid)
-        self.assertNotIn('class="tile-evidence"', grid)
+        section = self.page.split('data-tools-section="just-useful"', 1)[1].split('</section>', 1)[0]
+        self.assertIn('href="https://reader.murraysbennett.com"', section)
+        tile = section.split('<article', 1)[1].split('</article>', 1)[0]
+        # Without this the slice could stop before tile-meta and the assertion
+        # below would hold no matter what render_tool_tile emitted.
+        self.assertIn('tile-meta', tile)
+        self.assertNotIn('tile-evidence', tile)
 
     def test_the_thesis_appears_once_and_is_not_repeated_per_tile(self):
         # "Do not repeat it per tile; repetition reads as a slogan."
