@@ -417,7 +417,7 @@ def build(source: Path, output: Path):
         'research.html': ('Research — Murray S. Bennett', 'Published and current research in human-AI collaboration, cognitive modelling and decision science, and perception.'),
         'cv.html': ('CV — Murray S. Bennett', 'Curriculum vitae, research experience, publications, teaching, and professional service.'),
         'teaching.html': ('Teaching — Murray S. Bennett', 'Teaching experience and approach in psychology, research methods, and quantitative modelling.'),
-        'tools.html': ('Tools — Murray S. Bennett', 'Free research software built from my work with collaborators: GRIN, the General Recognition Inference Network, for rapid and uncertainty-aware diagnosis of how people perceive complex, interacting stimuli, and KITH, a method that indexes how familiar an AI model is with an input given its training, to help both you and the AI temper trust in its response.'),
+        'tools.html': ('Tools — Murray S. Bennett', 'Free tools that run entirely in your browser: GRIN, for separating how distinguishable your items are from how respondents were deciding; KITH, for how familiar an AI model is with an input given its training; eight methods workshops rebuilt as things you build rather than read; and Reader, for working through a document one passage at a time.'),
     }
     for name, (title, description) in page_info.items():
         page_path = output / name
