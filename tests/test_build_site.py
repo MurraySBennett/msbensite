@@ -123,8 +123,11 @@ class BuildSiteTests(unittest.TestCase):
             out = Path(temp) / 'site'
             build(ROOT, out)
             (out / 'assets/images/sprites/web-design-worker.gif').unlink()
+            # Pass the source, as build() does. Without it validate() has no
+            # demo slugs, so whether this raises about the missing asset or
+            # about /demos/workshops/ comes down to rglob's filesystem order.
             with self.assertRaisesRegex(FileNotFoundError, 'web-design-worker'):
-                validate(out)
+                validate(out, ROOT)
 
 
 class ToolsPageTests(unittest.TestCase):
