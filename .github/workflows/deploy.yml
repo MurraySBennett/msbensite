@@ -12,7 +12,12 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: that label moved to Ubuntu 26.04 and the
+    # pinned Playwright 1.56.1 refuses to install chromium there
+    # ("Playwright does not support chromium on ubuntu26.04-x64"), which fails
+    # the job before the build runs. Unpin once Playwright is upgraded —
+    # 1.65.1 is current, so that is a nine-minor jump and its own change.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
