@@ -1,6 +1,5 @@
 {
   "_note": "Tiles for tools.html, rendered by scripts/build_site.py. Adding a tool is an edit here, not HTML surgery. Every tile MUST carry an `evidence` link and at least one `sector`; the build raises otherwise. Headlines are in the second person or the imperative and say what the visitor gets -- never a methods sentence. No 'hire me' register, no CV cross-links, no 'my research' framing.",
-
   "sections": [
     {
       "id": "about-you",
@@ -16,11 +15,23 @@
       "id": "the-experiment",
       "title": "Play the experiment we actually ran",
       "blurb": "The task itself, as participants saw it."
+    },
+    {
+      "id": "just-useful",
+      "title": "Just use it",
+      "blurb": "No paper behind these. Small tools built for a job, kept here in case the job is yours too.",
+      "requires_evidence": false
     }
   ],
-
-  "sectors": ["healthcare", "defence", "HR", "marketing", "education", "product", "research"],
-
+  "sectors": [
+    "healthcare",
+    "defence",
+    "HR",
+    "marketing",
+    "education",
+    "product",
+    "research"
+  ],
   "tools": [
     {
       "id": "grin",
@@ -29,7 +40,11 @@
       "external": true,
       "headline": "When two of your products get confused, is it people's eyes or their standards?",
       "what_you_get": "Upload identification counts; get separate estimates of how distinguishable your items are and how your respondents were deciding, each with an uncertainty range.",
-      "sectors": ["marketing", "product", "research"],
+      "sectors": [
+        "marketing",
+        "product",
+        "research"
+      ],
       "evidence": {
         "label": "See the method and its recovery checks",
         "url": "/projects/grin.html"
@@ -47,7 +62,11 @@
       "external": true,
       "headline": "Has this AI ever seen anything like your photo before?",
       "what_you_get": "Pick or take a close-up photo and see the model's call beside two familiarity scores — how typical your image is of what it was trained on. Images stay on your computer.",
-      "sectors": ["healthcare", "product", "research"],
+      "sectors": [
+        "healthcare",
+        "product",
+        "research"
+      ],
       "evidence": {
         "label": "Read the preprint",
         "url": "https://doi.org/10.31234/osf.io/jp83f_v1"
@@ -66,13 +85,33 @@
       "external": false,
       "headline": "Eight methods papers, rebuilt as things you build instead of read.",
       "what_you_get": "Commit to a prediction before each step shows you the answer, then pull the sliders yourself: likelihood surfaces, overfitting, Bayes factors, bandits, response times, simulation-based inference.",
-      "sectors": ["education", "research"],
+      "sectors": [
+        "education",
+        "research"
+      ],
       "evidence": {
         "label": "Every workshop cites the paper it rebuilds",
         "url": "/demos/workshops/"
       },
       "status": "available",
       "load_note": "Runs entirely in your browser. Nothing you do is recorded, and nothing is saved between visits."
+    },
+    {
+      "id": "reader",
+      "section": "just-useful",
+      "url": "https://reader.murraysbennett.com",
+      "external": true,
+      "headline": "Read one paragraph at a time, with your notes beside it.",
+      "what_you_get": "Open a TXT, Markdown, TeX, DOCX or text-based PDF file and read it by paragraph, sentence or page-group, with notes anchored to the passage you were on. Play a selected passage one word at a time when the sentence will not sit still.",
+      "sectors": [
+        "research"
+      ],
+      "status": "available",
+      "load_note": "Runs entirely in your browser. Nothing you open is uploaded, and your notes stay on this device.",
+      "thumbnail": "/assets/images/project-icons/reader-home.webp",
+      "alt": "Reader's opening screen: a paste box and file controls beside the line “Read at your own pace.”",
+      "width": 1200,
+      "height": 400
     }
   ]
 }

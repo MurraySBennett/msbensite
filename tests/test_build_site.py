@@ -109,11 +109,15 @@ class ToolsPageTests(unittest.TestCase):
         self.assertEqual(self.page.count('class="research-tile tool-tile"'),
                          len(self.config['tools']))
 
-    def test_every_tile_carries_an_evidence_link(self):
+    def test_every_tile_in_a_citing_section_carries_an_evidence_link(self):
         # The rule that makes the hub read as a programme rather than a toy
-        # box. One tile without it and the page is a list of gadgets.
-        self.assertEqual(self.page.count('class="tile-evidence"'), len(self.config['tools']))
-        for tool in self.config['tools']:
+        # box. One tile without it and the page is a list of gadgets. Sections
+        # that set requires_evidence: false are exempt by design.
+        exempt = {section['id'] for section in self.config['sections']
+                  if section.get('requires_evidence') is False}
+        citing = [tool for tool in self.config['tools'] if tool['section'] not in exempt]
+        self.assertEqual(self.page.count('class="tile-evidence"'), len(citing))
+        for tool in citing:
             self.assertIn(esc(tool['evidence']['url']), self.page, tool['id'])
 
     def test_a_tool_without_evidence_fails_the_build(self):
@@ -174,11 +178,18 @@ class ToolsPageTests(unittest.TestCase):
             self.assertNotIn(phrase.lower(), self.main.lower(),
                              f"tools.html's own content contains {phrase!r}")
 
-    def test_all_three_taxonomy_sections_are_present_even_when_empty(self):
+    def test_every_taxonomy_section_is_present_even_when_empty(self):
         # The grouping is what carries the organising idea. An empty section
         # keeps its heading and says why it is empty.
         for section in self.config['sections']:
             self.assertIn(f'data-tools-section="{section["id"]}"', self.page)
+
+    def test_the_reader_tile_sits_in_just_useful_without_an_evidence_link(self):
+        # Reader has no paper behind it, which is the whole reason the
+        # just-useful section exists.
+        grid = self.page.split('data-tools-section="just-useful"', 1)[1].split('</div>', 1)[0]
+        self.assertIn('href="https://reader.murraysbennett.com"', grid)
+        self.assertNotIn('class="tile-evidence"', grid)
 
     def test_the_thesis_appears_once_and_is_not_repeated_per_tile(self):
         # "Do not repeat it per tile; repetition reads as a slogan."
@@ -219,6 +230,20 @@ class ToolThumbnailTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             source = self._source(temp, '/assets/images/project-icons/_absent.webp')
             with self.assertRaisesRegex(FileNotFoundError, 'missing publish input'):
+                build(source, Path(temp) / 'site')
+
+
+class ToolsSectionMarkupTests(unittest.TestCase):
+    """A section in the config needs a grid in the page, or its tools vanish."""
+
+    def test_a_section_with_no_grid_in_tools_html_fails_the_build(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / 'source'
+            shutil.copytree(ROOT, source, ignore=IGNORE_HEAVY)
+            config = json.loads((source / 'data/tools.json').read_text())
+            config['sections'].append({'id': 'no-grid-here', 'title': 'x', 'blurb': 'y'})
+            (source / 'data/tools.json').write_text(json.dumps(config))
+            with self.assertRaisesRegex(ValueError, 'missing tools grid: no-grid-here'):
                 build(source, Path(temp) / 'site')
 
 
