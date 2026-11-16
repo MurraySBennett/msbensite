@@ -405,6 +405,12 @@ def build(source: Path, output: Path):
     for meta, _ in projects:
         if meta.get('thumbnail'):
             copy_file(source, output, meta['thumbnail'].lstrip('/'))
+    # A tool tile's image need not belong to a project. The loop above covers
+    # GRIN and KITH only because those tools also have project pages; a tool
+    # with no page would reach validate() with a src nothing had copied.
+    for tool in json.loads((source / 'data/tools.json').read_text(encoding='utf-8'))['tools']:
+        if tool.get('thumbnail'):
+            copy_file(source, output, tool['thumbnail'].lstrip('/'))
 
     page_info = {
         'index.html': ('Murray S. Bennett — Computational Cognitive Scientist', 'Research in computational cognitive science, perception and human-AI collaboration.'),

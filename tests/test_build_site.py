@@ -9,6 +9,9 @@ from scripts.build_site import build, esc, render_tool_tile, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 IDS = [entry['id'] for entry in json.loads((ROOT / 'data/projects-index.json').read_text())]
+# Everything a build does not read, so a whole-tree copy in a test stays quick.
+IGNORE_HEAVY = shutil.ignore_patterns('node_modules', '.venv', '.git', 'dist',
+                                      'test-results', '.worktrees', '.superpowers')
 
 
 class BuildSiteTests(unittest.TestCase):
@@ -180,6 +183,43 @@ class ToolsPageTests(unittest.TestCase):
     def test_the_thesis_appears_once_and_is_not_repeated_per_tile(self):
         # "Do not repeat it per tile; repetition reads as a slogan."
         self.assertEqual(self.main.count('depends on the pairing'), 1)
+
+
+class ToolThumbnailTests(unittest.TestCase):
+    """A tool tile's image ships only if something copies it.
+
+    The publish loop copies `BASE_IMAGES`, the favicons, and each *project's*
+    thumbnail. GRIN's and KITH's tile images reach `dist/` only because those
+    tools also have project pages. A tool with no project page needs its
+    thumbnail published from `data/tools.json` itself, or `validate()` fails the
+    build on a `src` that was never copied.
+    """
+
+    def _source(self, temp, thumbnail):
+        """A copy of the tree whose first tool carries `thumbnail` and no project does."""
+        source = Path(temp) / 'source'
+        shutil.copytree(ROOT, source, ignore=IGNORE_HEAVY)
+        config = json.loads((source / 'data/tools.json').read_text())
+        config['tools'][0]['thumbnail'] = thumbnail
+        (source / 'data/tools.json').write_text(json.dumps(config))
+        return source
+
+    def test_a_tools_json_thumbnail_is_published_without_a_project_page(self):
+        name = '/assets/images/project-icons/_only-a-tool-uses-this.webp'
+        with tempfile.TemporaryDirectory() as temp:
+            source = self._source(temp, name)
+            shutil.copy2(source / 'assets/images/project-icons/grin-space-plot.webp',
+                         source / name.lstrip('/'))
+            out = Path(temp) / 'site'
+            build(source, out)
+            self.assertTrue((out / name.lstrip('/')).is_file(),
+                            'tools.json thumbnail was not published')
+
+    def test_a_missing_tool_thumbnail_fails_at_publish_rather_than_later(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source = self._source(temp, '/assets/images/project-icons/_absent.webp')
+            with self.assertRaisesRegex(FileNotFoundError, 'missing publish input'):
+                build(source, Path(temp) / 'site')
 
 
 class DemosPrefixReservationTests(unittest.TestCase):
