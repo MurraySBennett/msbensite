@@ -113,7 +113,7 @@ def render_tile(meta, size=None):
             f'<p>{esc(meta["summary"])}</p></div></a>')
 
 
-def render_tool_tile(tool, sectors):
+def render_tool_tile(tool, sectors, requires_evidence=True):
     """One tile on tools.html, from a `data/tools.json` entry.
 
     Three things are required and raise rather than degrade, because each is a
@@ -122,20 +122,28 @@ def render_tool_tile(tool, sectors):
 
     `evidence`  every tile carries a link to the thing that makes it real. It
                 is what separates a programme from a toy box, and it is the
-                first thing a sceptical visitor looks for.
+                first thing a sceptical visitor looks for. This one is
+                section-scoped, not optional: a section whose config sets
+                `requires_evidence: false` holds tools with no paper behind
+                them, and its tiles may omit it. Everywhere else it still
+                raises. A tile that does cite something keeps its citation
+                regardless of which section it sits in.
     `sectors`   the filter chips are how a non-academic self-selects. A tile
                 with no sector is invisible to every filter but "all".
     `headline`  second person or imperative, saying what the visitor gets. A
                 methods sentence here is the failure mode the page exists to
                 avoid.
     """
-    for field in ('id', 'section', 'url', 'headline', 'what_you_get', 'evidence', 'sectors'):
+    required = ['id', 'section', 'url', 'headline', 'what_you_get', 'sectors']
+    if requires_evidence:
+        required.append('evidence')
+    for field in required:
         if not tool.get(field):
             raise ValueError(f'tool {tool.get("id", "?")!r} is missing {field!r}')
     unknown = set(tool['sectors']) - set(sectors)
     if unknown:
         raise ValueError(f'tool {tool["id"]!r} has unknown sector(s): {sorted(unknown)}')
-    if not tool['evidence'].get('url') or not tool['evidence'].get('label'):
+    if tool.get('evidence') and (not tool['evidence'].get('url') or not tool['evidence'].get('label')):
         raise ValueError(f'tool {tool["id"]!r} needs an evidence label and url')
     status = tool.get('status', 'available')
     if status not in STATUS_LABELS:
@@ -153,6 +161,9 @@ def render_tool_tile(tool, sectors):
     caution = f'<p class="tile-caution">{esc(tool["caution"])}</p>' if tool.get('caution') else ''
     load = f'<p class="tile-load">{esc(tool["load_note"])}</p>' if tool.get('load_note') else ''
 
+    evidence = (f'<a class="tile-evidence" href="{esc(tool["evidence"]["url"])}">'
+                f'{esc(tool["evidence"]["label"])}</a>') if tool.get('evidence') else ''
+
     return (
         f'<article class="research-tile tool-tile" data-sectors="{esc(" ".join(tool["sectors"]))}">'
         f'<a class="tile-main" href="{esc(tool["url"])}"{external}>{image}'
@@ -161,8 +172,7 @@ def render_tool_tile(tool, sectors):
         f'<p>{esc(tool["what_you_get"])}</p>{caution}{load}'
         f'<span class="tile-link">Open it {new_tab}</span></div></a>'
         f'<p class="tile-meta"><span class="tile-sectors">{chips}</span>'
-        f'<a class="tile-evidence" href="{esc(tool["evidence"]["url"])}">'
-        f'{esc(tool["evidence"]["label"])}</a></p></article>'
+        f'{evidence}</p></article>'
     )
 
 
@@ -179,7 +189,7 @@ def render_tools_page(output, source):
             raise ValueError(f'tool {tool["id"]!r} names unknown section {tool["section"]!r}')
 
     for section in config['sections']:
-        tiles = ''.join(render_tool_tile(tool, sectors)
+        tiles = ''.join(render_tool_tile(tool, sectors, section.get('requires_evidence', True))
                         for tool in config['tools'] if tool['section'] == section['id'])
         pattern = re.compile(r'(<div class="research-grid" data-tools-section="'
                              + re.escape(section['id']) + r'">).*?(</div>)', re.S)

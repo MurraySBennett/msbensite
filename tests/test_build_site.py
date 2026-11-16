@@ -119,6 +119,23 @@ class ToolsPageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing 'evidence'"):
             render_tool_tile(tool, self.config['sectors'])
 
+    def test_a_tile_in_an_exempt_section_renders_without_evidence(self):
+        # A section may hold tools with no paper behind them. The bar is
+        # section-scoped, not optional: see render_tool_tile's docstring.
+        tool = dict(self.config['tools'][0])
+        tool.pop('evidence')
+        html = render_tool_tile(tool, self.config['sectors'], requires_evidence=False)
+        self.assertNotIn('class="tile-evidence"', html)
+        self.assertIn('class="sector-chip"', html)
+
+    def test_a_tile_in_an_exempt_section_still_renders_evidence_when_present(self):
+        # A tool that does cite something keeps its citation, whichever
+        # section holds it. The exemption only lifts the requirement.
+        tool = dict(self.config['tools'][0])
+        html = render_tool_tile(tool, self.config['sectors'], requires_evidence=False)
+        self.assertIn('class="tile-evidence"', html)
+        self.assertIn(esc(tool['evidence']['url']), html)
+
     def test_a_tool_with_an_invented_sector_fails_the_build(self):
         tool = dict(self.config['tools'][0], sectors=['astrology'])
         with self.assertRaisesRegex(ValueError, 'unknown sector'):
